@@ -30,7 +30,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
 
   const handleSave = () => {
     if (validateEmail(email)) {
-      navigation.getParam('setEmail')(email);
+      route.params.setEmail(email); // Ensure the email is set correctly
       navigation.goBack();
     } else {
       Alert.alert('Invalid Email', 'Please enter a valid email address.');
@@ -63,6 +63,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
         style={styles.picker}
         onValueChange={(itemValue) => handleThemeChange(itemValue)}
       >
+        <Picker.Item label="Default" value="default" />
         <Picker.Item label="Light" value="light" />
         <Picker.Item label="Dark" value="dark" />
         <Picker.Item label="High Contrast" value="highContrast" />

@@ -9,11 +9,11 @@ import {
   Image,
   Modal,
   Alert,
+  Linking,
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { launchCamera } from 'react-native-image-picker';
-import email from 'react-native-email';
 import { useColorScheme } from 'react-native';
 import SettingsScreen from './SettingsScreen';
 import { ThemeProvider, useTheme } from './ThemeContext'; // Import ThemeProvider and useTheme
@@ -24,7 +24,6 @@ const Stack = createStackNavigator();
 const HomeScreen = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); // Use theme colors
   const styles = useStyles(); // Use styles
-  const isDarkMode = useColorScheme() === 'dark';
   const scrollViewRef = useRef<ScrollView>(null);
 
   const backgroundStyle = {
@@ -80,111 +79,25 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     }
   };
 
-  const getButtonBorderColor = (index: number) => {
-    if (buttonNames[index] === 'Front Sensor(s)' || buttonNames[index] === 'Rear Sensor(s)') {
-      if (images[index].length >= 2) {
-        return 'green';
-      } else if (images[index].length === 1) {
-        return 'orange';
-      } else {
-        return 'red';
-      }
-    } else if (images[index].length > 0) {
-      return 'green';
-    } else if (buttonNames[index] === 'Reg Plate' || buttonNames[index] === 'T Piece Locations' || buttonNames[index] === 'Other') {
-      return 'orange';
-    } else {
-      return 'red';
-    }
-  };
+  const openMailApp = () => {
+    const email = 'example@example.com'; // Replace with the desired email address
+    const subject = 'Subject'; // Replace with the desired subject
+    const body = 'Body'; // Replace with the desired body text
 
-  const buttons = buttonNames.map((name, index) => ({
-    name,
-    index,
-    borderColor: getButtonBorderColor(index),
-  }));
+    const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-  const greenButtons = buttons.filter(button => button.borderColor === 'green');
-  const otherButtons = buttons.filter(button => button.borderColor !== 'green');
-
-  useEffect(() => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ y: 0, animated: true });
-    }
-  }, [greenButtons.length, otherButtons.length]);
-
-  const handleSendPress = () => {
-    if (!emailAddress) {
-      Alert.alert(
-        'No Email Set',
-        'Please set your email address in the settings.',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('Settings', { email: emailAddress }),
-          },
-        ],
-        { cancelable: false }
-      );
-    } else {
-      const redButton = buttons.find(button => button.borderColor === 'red');
-      if (redButton) {
-        Alert.alert('Incomplete', `A picture needs to be taken of ${redButton.name}`);
-      } else {
-        Alert.alert(
-          'Ready to Send',
-          'Are you ready to send the email?',
-          [
-            {
-              text: 'No',
-              onPress: () => console.log('Email not sent'),
-              style: 'cancel',
-            },
-            {
-              text: 'Yes',
-              onPress: () => {
-                const attachments = images.flat().map(uri => ({ path: uri }));
-                email(emailAddress, {
-                  subject: 'Pictures',
-                  body: 'Please find the attached pictures.',
-                  attachments,
-                }).then(() => {
-                  Alert.alert(
-                    'Email Sent',
-                    'Have you sent the email?',
-                    [
-                      {
-                        text: 'No',
-                        onPress: () => console.log('Email not sent'),
-                        style: 'cancel',
-                      },
-                      {
-                        text: 'Yes',
-                        onPress: () => setImages(Array(buttonNames.length).fill([])),
-                      },
-                    ],
-                    { cancelable: false }
-                  );
-                }).catch((error) => {
-                  console.error(error);
-                  Alert.alert('Error', 'Failed to send email');
-                });
-              },
-            },
-          ],
-          { cancelable: false }
-        );
-      }
-    }
+    Linking.openURL(mailtoUrl).catch((err) => {
+      console.error('Failed to open mail app:', err);
+    });
   };
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={colors.statusBarStyle} />
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.settingsButton}
-          onPress={() => navigation.navigate('Settings', { email: emailAddress })}
+          onPress={() => navigation.navigate('Settings', { email: emailAddress, setEmail: setEmailAddress })}
         >
           <Text style={styles.settingsButtonText}>⚙️</Text>
         </TouchableOpacity>
@@ -193,23 +106,18 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
           <View style={styles.buttonContainer}>
-            {buttons.map(button => (
-              <View key={button.index} style={styles.buttonWrapper}>
+            {buttonNames.map((name, index) => (
+              <View key={index} style={styles.buttonWrapper}>
                 <TouchableOpacity
-                  style={[styles.button, { borderColor: button.borderColor }]}
-                  onPress={() => openCamera(button.index)}>
+                  style={[styles.button, { borderColor: colors.primary }]}
+                  onPress={() => openCamera(index)}>
                   <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText}>{button.name}</Text>
-                    {button.borderColor === 'red' ? (
-                      <Text style={styles.plusIcon}>+</Text>
-                    ) : (
-                      <View style={styles.plusIconPlaceholder} />
-                    )}
+                    <Text style={styles.buttonText}>{name}</Text>
                   </View>
                 </TouchableOpacity>
                 <View style={styles.thumbnailContainer}>
-                  {images[button.index].map((uri, imgIndex) => (
-                    <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index: button.index })}>
+                  {images[index].map((uri, imgIndex) => (
+                    <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index })}>
                       <Image
                         source={{ uri: uri }}
                         style={styles.thumbnail}
@@ -225,8 +133,8 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
         <View style={styles.bottomButtonContainer}>
           <TouchableOpacity
             style={styles.bottomButton}
-            onPress={handleSendPress}>
-            <Text style={styles.bottomButtonText}>Send</Text>
+            onPress={openMailApp}>
+            <Text style={styles.bottomButtonText}>Send Email</Text>
           </TouchableOpacity>
         </View>
       </View>
