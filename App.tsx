@@ -11,11 +11,16 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { launchCamera } from 'react-native-image-picker';
 import email from 'react-native-email';
 import { useColorScheme } from 'react-native';
+import SettingsScreen from './SettingsScreen';
 
-const App = (): React.JSX.Element => {
+const Stack = createStackNavigator();
+
+const HomeScreen = ({ navigation }: { navigation: any }) => {
   const isDarkMode = useColorScheme() === 'dark';
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -39,6 +44,7 @@ const App = (): React.JSX.Element => {
 
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
+  const [emailAddress, setEmailAddress] = useState('atluk87@gmail.com');
 
   const openCamera = (index: number) => {
     const options = {
@@ -110,8 +116,7 @@ const App = (): React.JSX.Element => {
       Alert.alert('Incomplete', `A picture needs to be taken of ${redButton.name}`);
     } else {
       const attachments = images.flat().map(uri => ({ path: uri }));
-      const to = 'atluk87@gmail.com';
-      email(to, {
+      email(emailAddress, {
         subject: 'Pictures',
         body: 'Please find the attached pictures.',
         attachments,
@@ -132,7 +137,7 @@ const App = (): React.JSX.Element => {
           ],
           { cancelable: false }
         );
-      }).catch((error: any) => {
+      }).catch((error) => {
         console.error(error);
         Alert.alert('Error', 'Failed to send email');
       });
@@ -143,7 +148,10 @@ const App = (): React.JSX.Element => {
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <View style={styles.container}>
-        <TouchableOpacity style={styles.settingsButton} onPress={() => console.log('Settings button pressed')}>
+        <TouchableOpacity
+          style={styles.settingsButton}
+          onPress={() => navigation.navigate('Settings', { email: emailAddress, setEmail: setEmailAddress })}
+        >
           <Text style={styles.settingsButtonText}>⚙️</Text>
         </TouchableOpacity>
         <ScrollView
@@ -151,37 +159,18 @@ const App = (): React.JSX.Element => {
           contentInsetAdjustmentBehavior="automatic"
           style={backgroundStyle}>
           <View style={styles.buttonContainer}>
-            {otherButtons.map(button => (
+            {buttons.map(button => (
               <View key={button.index} style={styles.buttonWrapper}>
                 <TouchableOpacity
                   style={[styles.button, { borderColor: button.borderColor }]}
                   onPress={() => openCamera(button.index)}>
                   <View style={styles.buttonContent}>
                     <Text style={styles.buttonText}>{button.name}</Text>
-                    <Text style={styles.plusIcon}>+</Text>
-                  </View>
-                </TouchableOpacity>
-                <View style={styles.thumbnailContainer}>
-                  {images[button.index].map((uri, imgIndex) => (
-                    <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index: button.index })}>
-                      <Image
-                        source={{ uri: uri }}
-                        style={styles.thumbnail}
-                        resizeMode="contain"
-                      />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            ))}
-            {greenButtons.map(button => (
-              <View key={button.index} style={styles.buttonWrapper}>
-                <TouchableOpacity
-                  style={[styles.button, { borderColor: button.borderColor }]}
-                  onPress={() => openCamera(button.index)}>
-                  <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText}>{button.name}</Text>
-                    <Text style={styles.plusIcon}>+</Text>
+                    {button.borderColor === 'red' ? (
+                      <Text style={styles.plusIcon}>+</Text>
+                    ) : (
+                      <View style={styles.plusIconPlaceholder} />
+                    )}
                   </View>
                 </TouchableOpacity>
                 <View style={styles.thumbnailContainer}>
@@ -203,7 +192,7 @@ const App = (): React.JSX.Element => {
           <TouchableOpacity
             style={styles.bottomButton}
             onPress={handleSendPress}>
-            <Text style={styles.buttonText}>Send</Text>
+            <Text style={styles.bottomButtonText}>Send</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -231,14 +220,24 @@ const App = (): React.JSX.Element => {
   );
 };
 
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }} // Hide the header for the Home screen
+        />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    padding: 16,
   },
   settingsButton: {
     position: 'absolute',
@@ -250,13 +249,14 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   settingsButtonText: {
-    fontSize: 24,
+    fontSize: 35,
     color: '#fff',
   },
   buttonContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+    paddingTop: 50, // Add 10 more padding to the top
   },
   buttonWrapper: {
     width: '100%',
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     backgroundColor: '#6200ee',
     borderRadius: 25,
-    borderWidth: 2,
+    borderWidth: 3, // Increase border width
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
@@ -295,6 +295,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginRight: 10,
   },
+  plusIconPlaceholder: {
+    width: 24, // Same width as the plus icon
+    height: 32, // Same height as the plus icon
+    marginRight: 10,
+  },
   thumbnailContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -317,16 +322,21 @@ const styles = StyleSheet.create({
   },
   bottomButton: {
     width: '90%',
-    padding: 15,
-    backgroundColor: '#6200ee',
-    borderRadius: 25,
+    padding: 20, // Increase padding
+    backgroundColor: '#ff5722', // Change background color to a more prominent color
+    borderRadius: 30, // Increase border radius
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 }, // Increase shadow offset
+    shadowOpacity: 0.9, // Increase shadow opacity
+    shadowRadius: 4, // Increase shadow radius
+    elevation: 10, // Increase elevation
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  bottomButtonText: {
+    color: '#fff',
+    fontSize: 18, // Increase font size
+    fontWeight: 'bold', // Make text bold
   },
   fullScreenContainer: {
     flex: 1,
