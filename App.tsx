@@ -9,7 +9,6 @@ import {
   Image,
   Modal,
   Alert,
-  StyleSheet,
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -17,15 +16,19 @@ import { launchCamera } from 'react-native-image-picker';
 import email from 'react-native-email';
 import { useColorScheme } from 'react-native';
 import SettingsScreen from './SettingsScreen';
+import { ThemeProvider, useTheme } from './ThemeContext'; // Import ThemeProvider and useTheme
+import useStyles from './styles'; // Import useStyles
 
 const Stack = createStackNavigator();
 
 const HomeScreen = ({ navigation }: { navigation: any }) => {
+  const { colors } = useTheme(); // Use theme colors
+  const styles = useStyles(); // Use styles
   const isDarkMode = useColorScheme() === 'dark';
   const scrollViewRef = useRef<ScrollView>(null);
 
   const backgroundStyle = {
-    backgroundColor: isDarkMode ? '#000' : '#fff',
+    backgroundColor: colors.background, // Ensure background color is consistent
     flex: 1,
   };
 
@@ -44,7 +47,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
 
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
-  const [emailAddress, setEmailAddress] = useState('atluk87@gmail.com');
+  const [emailAddress, setEmailAddress] = useState('');
 
   const openCamera = (index: number) => {
     const options = {
@@ -111,19 +114,26 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
   }, [greenButtons.length, otherButtons.length]);
 
   const handleSendPress = () => {
-    const redButton = buttons.find(button => button.borderColor === 'red');
-    if (redButton) {
-      Alert.alert('Incomplete', `A picture needs to be taken of ${redButton.name}`);
+    if (!emailAddress) {
+      Alert.alert(
+        'No Email Set',
+        'Please set your email address in the settings.',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('Settings', { email: emailAddress }),
+          },
+        ],
+        { cancelable: false }
+      );
     } else {
-      const attachments = images.flat().map(uri => ({ path: uri }));
-      email(emailAddress, {
-        subject: 'Pictures',
-        body: 'Please find the attached pictures.',
-        attachments,
-      }).then(() => {
+      const redButton = buttons.find(button => button.borderColor === 'red');
+      if (redButton) {
+        Alert.alert('Incomplete', `A picture needs to be taken of ${redButton.name}`);
+      } else {
         Alert.alert(
-          'Email Sent',
-          'Have you sent the email?',
+          'Ready to Send',
+          'Are you ready to send the email?',
           [
             {
               text: 'No',
@@ -132,15 +142,39 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
             },
             {
               text: 'Yes',
-              onPress: () => setImages(Array(buttonNames.length).fill([])),
+              onPress: () => {
+                const attachments = images.flat().map(uri => ({ path: uri }));
+                email(emailAddress, {
+                  subject: 'Pictures',
+                  body: 'Please find the attached pictures.',
+                  attachments,
+                }).then(() => {
+                  Alert.alert(
+                    'Email Sent',
+                    'Have you sent the email?',
+                    [
+                      {
+                        text: 'No',
+                        onPress: () => console.log('Email not sent'),
+                        style: 'cancel',
+                      },
+                      {
+                        text: 'Yes',
+                        onPress: () => setImages(Array(buttonNames.length).fill([])),
+                      },
+                    ],
+                    { cancelable: false }
+                  );
+                }).catch((error) => {
+                  console.error(error);
+                  Alert.alert('Error', 'Failed to send email');
+                });
+              },
             },
           ],
           { cancelable: false }
         );
-      }).catch((error) => {
-        console.error(error);
-        Alert.alert('Error', 'Failed to send email');
-      });
+      }
     }
   };
 
@@ -150,14 +184,14 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.settingsButton}
-          onPress={() => navigation.navigate('Settings', { email: emailAddress, setEmail: setEmailAddress })}
+          onPress={() => navigation.navigate('Settings', { email: emailAddress })}
         >
           <Text style={styles.settingsButtonText}>⚙️</Text>
         </TouchableOpacity>
         <ScrollView
           ref={scrollViewRef}
           contentInsetAdjustmentBehavior="automatic"
-          style={backgroundStyle}>
+          style={styles.scrollView}>
           <View style={styles.buttonContainer}>
             {buttons.map(button => (
               <View key={button.index} style={styles.buttonWrapper}>
@@ -222,156 +256,19 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ headerShown: false }} // Hide the header for the Home screen
-        />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ThemeProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{ headerShown: false }} // Hide the header for the Home screen
+          />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ThemeProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  settingsButton: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
-    padding: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.0)', // Translucent background
-    borderRadius: 5,
-    zIndex: 1,
-  },
-  settingsButtonText: {
-    fontSize: 35,
-    color: '#fff',
-  },
-  buttonContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-    paddingTop: 50, // Add 10 more padding to the top
-  },
-  buttonWrapper: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  button: {
-    width: '90%',
-    padding: 15,
-    marginVertical: 10,
-    backgroundColor: '#6200ee',
-    borderRadius: 25,
-    borderWidth: 3, // Increase border width
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
-    flex: 1,
-  },
-  plusIcon: {
-    color: '#fff',
-    fontSize: 24,
-    marginRight: 10,
-  },
-  plusIconPlaceholder: {
-    width: 24, // Same width as the plus icon
-    height: 32, // Same height as the plus icon
-    marginRight: 10,
-  },
-  thumbnailContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  thumbnail: {
-    width: 100,
-    height: 100,
-    margin: 5,
-    borderRadius: 20,
-  },
-  bottomButtonContainer: {
-    alignItems: 'center',
-    padding: 16,
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    backgroundColor: '#fff',
-  },
-  bottomButton: {
-    width: '90%',
-    padding: 20, // Increase padding
-    backgroundColor: '#ff5722', // Change background color to a more prominent color
-    borderRadius: 30, // Increase border radius
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 }, // Increase shadow offset
-    shadowOpacity: 0.9, // Increase shadow opacity
-    shadowRadius: 4, // Increase shadow radius
-    elevation: 10, // Increase elevation
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bottomButtonText: {
-    color: '#fff',
-    fontSize: 18, // Increase font size
-    fontWeight: 'bold', // Make text bold
-  },
-  fullScreenContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black',
-  },
-  fullScreenImage: {
-    width: '90%',
-    height: '80%',
-    borderRadius: 50,
-  },
-  deleteButton: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
-  },
-  deleteButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  closeButton: {
-    position: 'absolute',
-    bottom: 20,
-    backgroundColor: 'gray',
-    padding: 10,
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-});
 
 export default App;
