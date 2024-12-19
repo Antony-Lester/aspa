@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // Import Picker
-import useStyles from './styles'; // Import useStyles
-import { useTheme } from './ThemeContext'; // Import useTheme
+import useStyles from '../styles'; // Import useStyles
+import { useTheme } from '../ThemeContext'; // Import useTheme
 
 interface SettingsScreenProps {
   navigation: any;

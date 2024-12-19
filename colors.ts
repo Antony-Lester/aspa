@@ -1,5 +1,3 @@
-
-
 const lightColors = {
   primary: '#415F91',
   surfaceTint: '#415F91',
@@ -50,6 +48,7 @@ const lightColors = {
   surfaceContainer: '#EDEDF4',
   surfaceContainerHigh: '#E7E8EE',
   surfaceContainerHighest: '#E2E2E9',
+  amber: '#FFC107', // Add amber color
 };
 
 const darkColors = {
@@ -102,6 +101,7 @@ const darkColors = {
   surfaceContainer: '#1D2024',
   surfaceContainerHigh: '#282A2F',
   surfaceContainerHighest: '#33353A',
+  amber: '#FFC107', // Add amber color
 };
 
 const highContrastColors = {
@@ -154,6 +154,7 @@ const highContrastColors = {
   surfaceContainer: '#EDEDF4',
   surfaceContainerHigh: '#E7E8EE',
   surfaceContainerHighest: '#E2E2E9',
+  amber: '#FFC107', // Add amber color
 };
 
 export { lightColors, darkColors, highContrastColors };

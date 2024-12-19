@@ -10,18 +10,20 @@ import {
   Modal,
   Alert,
   Linking,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { launchCamera } from 'react-native-image-picker';
 import { useColorScheme } from 'react-native';
-import SettingsScreen from './SettingsScreen';
+import SettingsScreen from './pages/SettingsScreen'; // Updated import path
 import { ThemeProvider, useTheme } from './ThemeContext'; // Import ThemeProvider and useTheme
 import useStyles from './styles'; // Import useStyles
 
 const Stack = createStackNavigator();
 
-const HomeScreen = ({ navigation }: { navigation: any }) => {
+const ObliInstalls = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); // Use theme colors
   const styles = useStyles(); // Use styles
   const scrollViewRef = useRef<ScrollView>(null);
@@ -44,11 +46,72 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     'Other',
   ];
 
+  const getButtonBorderColor = (index: number) => {
+    const name = buttonNames[index];
+    const imageCount = images[index].length;
+
+    if (imageCount === 0) {
+      if (name === 'T Piece Locations' || name === 'Reg Plate' || name === 'Other') {
+        return colors.amber;
+      }
+      return 'red';
+    } else if (imageCount === 1) {
+      if (name === 'Front Sensor(s)' || name === 'Rear Sensor(s)') {
+        return colors.amber;
+      }
+      return 'green';
+    } else if (imageCount >= 2) {
+      if (name === 'Front Sensor(s)' || name === 'Rear Sensor(s)') {
+        return 'green';
+      }
+    }
+    return 'green';
+  };
+
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
   const [emailAddress, setEmailAddress] = useState('');
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
 
-  const openCamera = (index: number) => {
+  const requestCameraPermission = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Camera Permission',
+            message: 'This app needs access to your camera to take photos.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      }
+      return true;
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    const checkPermission = async () => {
+      const granted = await requestCameraPermission();
+      setHasCameraPermission(granted);
+      if (!granted) {
+        Alert.alert('Camera Permission Denied', 'Please grant camera permission to use this app.');
+      }
+    };
+    checkPermission();
+  }, []);
+
+  const openCamera = async (index: number) => {
+    if (!hasCameraPermission) {
+      Alert.alert('Camera Permission Denied', 'Please grant camera permission to use this feature.');
+      return;
+    }
+
     const options = {
       mediaType: 'photo' as const,
       cameraType: 'back' as const,
@@ -91,6 +154,37 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     });
   };
 
+  if (hasCameraPermission === null) {
+    return (
+      <SafeAreaView style={backgroundStyle}>
+        <StatusBar barStyle={colors.statusBarStyle} />
+        <View style={styles.container}>
+          <Text style={styles.buttonText}>Checking camera permission...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!hasCameraPermission) {
+    return (
+      <SafeAreaView style={backgroundStyle}>
+        <StatusBar barStyle={colors.statusBarStyle} />
+        <View style={styles.container}>
+          <Text style={styles.buttonText}>Camera permission is required to use this app.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const buttons = buttonNames.map((name, index) => ({
+    name,
+    index,
+    borderColor: getButtonBorderColor(index),
+  }));
+
+  const greenButtons = buttons.filter(button => button.borderColor === 'green');
+  const otherButtons = buttons.filter(button => button.borderColor !== 'green');
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={colors.statusBarStyle} />
@@ -106,18 +200,18 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
           <View style={styles.buttonContainer}>
-            {buttonNames.map((name, index) => (
-              <View key={index} style={styles.buttonWrapper}>
+            {[...otherButtons, ...greenButtons].map(button => (
+              <View key={button.index} style={styles.buttonWrapper}>
                 <TouchableOpacity
-                  style={[styles.button, { borderColor: colors.primary }]}
-                  onPress={() => openCamera(index)}>
+                  style={[styles.button, { borderColor: button.borderColor }]}
+                  onPress={() => openCamera(button.index)}>
                   <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText}>{name}</Text>
+                    <Text style={styles.buttonText}>{button.name}</Text>
                   </View>
                 </TouchableOpacity>
                 <View style={styles.thumbnailContainer}>
-                  {images[index].map((uri, imgIndex) => (
-                    <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index })}>
+                  {images[button.index].map((uri, imgIndex) => (
+                    <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index: button.index })}>
                       <Image
                         source={{ uri: uri }}
                         style={styles.thumbnail}
@@ -166,11 +260,11 @@ const App = () => {
   return (
     <ThemeProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator initialRouteName="ObliInstalls">
           <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{ headerShown: false }} // Hide the header for the Home screen
+            name="ObliInstalls"
+            component={ObliInstalls}
+            options={{ headerShown: false }} // Hide the header for the ObliInstalls screen
           />
           <Stack.Screen name="Settings" component={SettingsScreen} />
         </Stack.Navigator>
