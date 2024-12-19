@@ -71,16 +71,19 @@ Aspa is a React Native application designed to capture and manage images related
 ### Running the App
 
 1. **Start the Metro Server**:
+
    ```bash
    npx react-native start
    ```
 
 2. **Run on Android**:
+
    ```bash
    npx react-native run-android
    ```
 
 3. **Run on iOS**:
+
    ```bash
    npx react-native run-ios
    ```
