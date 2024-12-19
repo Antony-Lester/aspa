@@ -100,7 +100,6 @@ const useStyles = () => {
       backgroundColor: colors.surface, // Use theme surface color
     },
     bottomButton: {
-      width: '90%',
       padding: 10, // Increase padding
       backgroundColor: colors.secondary, // Use theme secondary color
       borderRadius: 35, // Increase border radius
@@ -115,11 +114,12 @@ const useStyles = () => {
       justifyContent: 'center', // Center the text within the button
       marginVertical: 10, // Add vertical margin
       alignSelf: 'center', // Center the button horizontally
+      width: '80%', // Set button width
     },
     bottomButtonText: {
       color: colors.onSecondary, // Use theme onSecondary color
       fontSize: 20, // Increase font size
-      fontWeight: 'bold', // Make text bold
+      fontWeight: 'bold',
     },
     fullScreenContainer: {
       flex: 1,
@@ -200,7 +200,26 @@ const useStyles = () => {
       marginBottom: 20,
       color: colors.onBackground, // Use theme onBackground color
     },
+    homeButtonContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center', // Center the logo and buttons horizontally
+      padding: 16,
+      backgroundColor: colors.background, // Use theme background color
+    },
+    logo: {
+      width: '90%', // Set the width of the logo to the same size as the buttons
+      height: undefined, // Allow the height to adjust automatically
+      aspectRatio: 1, // Maintain the aspect ratio
+      marginVertical: 10, // Add vertical margin
+    },
+    buttonRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginVertical: 10,
+    },
   });
 };
 
 export default useStyles;
+

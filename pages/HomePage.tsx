@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import useStyles from '../styles'; // Import useStyles
 
@@ -8,8 +8,8 @@ const HomePage = () => {
   const styles = useStyles(); // Use styles
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Home Page</Text>
+    <View style={styles.homeButtonContainer}>
+      <Image source={require('../assets/Logo.png')} style={styles.logo} resizeMode="contain" />
       <TouchableOpacity
         style={styles.bottomButton}
         onPress={() => navigation.navigate('ObliInstall')}
