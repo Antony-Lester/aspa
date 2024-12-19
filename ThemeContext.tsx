@@ -1,15 +1,15 @@
 // ThemeContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
-import { defaultColors, lightColors, darkColors, highContrastColors } from './colors';
+import { lightColors, darkColors, highContrastColors } from './colors';
 
 interface ThemeContextProps {
-  colors: typeof defaultColors;
+  colors: typeof lightColors;
   setTheme: (theme: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextProps>({
-  colors: defaultColors,
+  colors: lightColors,
   setTheme: () => {},
 });
 
@@ -31,7 +31,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         setColors(highContrastColors);
         break;
       default:
-        setColors(defaultColors);
+        setColors(colorScheme === 'dark' ? darkColors : lightColors);
         break;
     }
   };

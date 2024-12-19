@@ -13,7 +13,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
   const { setTheme } = useTheme(); // Use setTheme from ThemeContext
   const styles = useStyles(); // Use styles
   const [email, setEmail] = useState(route.params.email);
-  const [selectedTheme, setSelectedTheme] = useState('default');
+  const [selectedTheme, setSelectedTheme] = useState('light');
 
   useEffect(() => {
     navigation.setOptions({
@@ -63,7 +63,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
         style={styles.picker}
         onValueChange={(itemValue) => handleThemeChange(itemValue)}
       >
-        <Picker.Item label="Default" value="default" />
         <Picker.Item label="Light" value="light" />
         <Picker.Item label="Dark" value="dark" />
         <Picker.Item label="High Contrast" value="highContrast" />
