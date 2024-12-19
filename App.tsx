@@ -12,6 +12,7 @@ import {
   Linking,
   PermissionsAndroid,
   Platform,
+  StatusBarStyle,
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -20,6 +21,7 @@ import { useColorScheme } from 'react-native';
 import SettingsScreen from './pages/SettingsScreen'; // Updated import path
 import { ThemeProvider, useTheme } from './ThemeContext'; // Import ThemeProvider and useTheme
 import useStyles from './styles'; // Import useStyles
+import changeNavigationBarColor from 'react-native-navigation-bar-color'; // Import the library
 
 const Stack = createStackNavigator();
 
@@ -29,9 +31,18 @@ const ObliInstalls = ({ navigation }: { navigation: any }) => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const backgroundStyle = {
-    backgroundColor: colors.background, // Ensure background color is consistent
+    backgroundColor: colors.primary, // Ensure background color is consistent
     flex: 1,
   };
+
+  useEffect(() => {
+    // Set the status bar color
+    StatusBar.setBackgroundColor(colors.primary);
+    StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
+
+    // Set the navigation bar color
+    changeNavigationBarColor(colors.primary, false);
+  }, [colors]);
 
   const buttonNames = [
     'Front Sensor(s)',
@@ -157,7 +168,7 @@ const ObliInstalls = ({ navigation }: { navigation: any }) => {
   if (hasCameraPermission === null) {
     return (
       <SafeAreaView style={backgroundStyle}>
-        <StatusBar barStyle={colors.statusBarStyle} />
+        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
         <View style={styles.container}>
           <Text style={styles.buttonText}>Checking camera permission...</Text>
         </View>
@@ -168,7 +179,7 @@ const ObliInstalls = ({ navigation }: { navigation: any }) => {
   if (!hasCameraPermission) {
     return (
       <SafeAreaView style={backgroundStyle}>
-        <StatusBar barStyle={colors.statusBarStyle} />
+        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
         <View style={styles.container}>
           <Text style={styles.buttonText}>Camera permission is required to use this app.</Text>
         </View>
@@ -187,7 +198,7 @@ const ObliInstalls = ({ navigation }: { navigation: any }) => {
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={colors.statusBarStyle} />
+      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.settingsButton}

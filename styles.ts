@@ -45,7 +45,7 @@ const useStyles = () => {
       backgroundColor: colors.primary, // Use theme primary color
       borderRadius: 35,
       borderWidth: 5, // Increase border width
-      borderColor: colors.primaryVariant, // Use theme primaryVariant color
+      borderColor: colors.primaryContainer, // Use theme primaryContainer color
       shadowColor: '#000',
       shadowOffset: { width: 1, height: 3 },
       shadowOpacity: 0.6,
