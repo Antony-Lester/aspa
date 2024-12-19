@@ -113,6 +113,8 @@ const useStyles = () => {
       elevation: 10, // Increase elevation
       alignItems: 'center', // Center the text within the button
       justifyContent: 'center', // Center the text within the button
+      marginVertical: 10, // Add vertical margin
+      alignSelf: 'center', // Center the button horizontally
     },
     bottomButtonText: {
       color: colors.onSecondary, // Use theme onSecondary color
@@ -190,6 +192,13 @@ const useStyles = () => {
       width: '100%',
       color: colors.onBackground, // Use theme onBackground color
       backgroundColor: colors.surface, // Use theme surface color
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 20,
+      color: colors.onBackground, // Use theme onBackground color
     },
   });
 };
