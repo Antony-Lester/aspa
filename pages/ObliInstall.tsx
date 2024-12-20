@@ -43,6 +43,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const [emailAddress, setEmailAddress] = useState('');
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [thumbnailSizes, setThumbnailSizes] = useState<{ [key: string]: { width: number, height: number } }>({});
+  const [fullScreenImageSize, setFullScreenImageSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
 
   useEffect(() => {
     const checkCameraPermission = async () => {
@@ -67,6 +68,21 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     });
   }, [images]);
 
+  useEffect(() => {
+    if (fullScreenImage) {
+      Image.getSize(`file://${fullScreenImage.uri}`, (imgWidth, imgHeight) => {
+        const aspectRatio = imgWidth / imgHeight;
+        if (aspectRatio > 1) {
+          // Landscape
+          setFullScreenImageSize({ width: 300, height: 300 / aspectRatio });
+        } else {
+          // Portrait
+          setFullScreenImageSize({ width: 300 * aspectRatio, height: 300 });
+        }
+      });
+    }
+  }, [fullScreenImage]);
+
   const handleDeleteImage = () => {
     deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
   };
@@ -82,10 +98,10 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
 
   if (hasCameraPermission === null) {
     return (
-      <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
+      <SafeAreaView style={styles.permissionMessageContainer}>
         <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
-        <View style={styles.container}>
-          <Text style={styles.buttonText}>Checking camera permission...</Text>
+        <View style={styles.permissionMessageContainer}>
+          <Text style={styles.permissionMessageText}>Checking camera permission...</Text>
         </View>
       </SafeAreaView>
     );
@@ -93,10 +109,10 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
 
   if (!hasCameraPermission) {
     return (
-      <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
+      <SafeAreaView style={styles.permissionMessageContainer}>
         <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
-        <View style={styles.container}>
-          <Text style={styles.buttonText}>Camera permission is required to use this app.</Text>
+        <View style={styles.permissionMessageContainer}>
+          <Text style={styles.permissionMessageText}>Camera permission is required to use this app.</Text>
         </View>
       </SafeAreaView>
     );
@@ -139,15 +155,17 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                 <View style={styles.thumbnailContainer}>
                   {images[index].map((uri, imgIndex) => {
                     console.log(`Rendering image for index ${index}: ${uri}`);
-                    const thumbnailStyle = thumbnailSizes[uri] || { width: 150, height: 150 };
+                    const thumbnailStyle = thumbnailSizes[uri];
                     return (
-                      <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index })}>
-                        <Image
-                          source={{ uri: `file://${uri}` }}
-                          style={[styles.thumbnail, thumbnailStyle]}
-                          resizeMode="contain"
-                        />
-                      </TouchableOpacity>
+                      thumbnailStyle && (
+                        <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index })}>
+                          <Image
+                            source={{ uri: `file://${uri}` }}
+                            style={[styles.thumbnail, thumbnailStyle]}
+                            resizeMode="contain"
+                          />
+                        </TouchableOpacity>
+                      )
                     );
                   })}
                 </View>
@@ -167,16 +185,16 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
             visible={true}
             transparent={false}
             onRequestClose={() => setFullScreenImage(null)}>
-            <View style={styles.fullScreenContainer}>
+            <TouchableOpacity style={styles.fullScreenContainer} onPress={() => setFullScreenImage(null)}>
               <Image
                 source={{ uri: `file://${fullScreenImage.uri}` }}
-                style={styles.fullScreenImage}
+                style={[styles.fullScreenImage, { width: fullScreenImageSize.width, height: fullScreenImageSize.height, borderColor: colors.primary, borderWidth: 2 }]}
                 resizeMode="contain"
               />
               <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteImage}>
                 <Text style={styles.deleteButtonText}>Delete</Text>
               </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           </Modal>
         )}
       </View>

@@ -89,7 +89,6 @@ const useStyles = () => {
       borderRadius: 20,
       borderWidth: 2, // Add border width
       borderColor: colors.primary, // Use theme primary color for border
-      
     },
     bottomButtonContainer: {
       alignItems: 'center',
@@ -132,7 +131,7 @@ const useStyles = () => {
     fullScreenImage: {
       width: '90%',
       height: '80%',
-      borderRadius: 50,
+      borderRadius: 20,
     },
     deleteButton: {
       position: 'absolute',
@@ -219,6 +218,17 @@ const useStyles = () => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginVertical: 10,
+    },
+    permissionMessageContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.background, // Use theme background color
+    },
+    permissionMessageText: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.onBackground, // Use theme onBackground color
     },
   });
 };
