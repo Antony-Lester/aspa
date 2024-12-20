@@ -44,7 +44,7 @@ export const requestStoragePermissions = async (): Promise<boolean> => {
   }
 };
 
-export const openCamera = (index: number, images: string[][], setImages: (images: string[][]) => void) => {
+export const openCamera = (index: number, buttonName: string, images: string[][], setImages: (images: string[][]) => void) => {
   launchCamera({ mediaType: 'photo' }, async (response) => {
     if (response.didCancel) {
       console.log('User cancelled image picker');
@@ -54,9 +54,9 @@ export const openCamera = (index: number, images: string[][], setImages: (images
       const newImages = [...images];
       const asset = response.assets[0];
       if (asset.uri) {
-        const fileName = asset.fileName || `image_${Date.now()}.jpg`;
+        const pictureNumber = newImages[index].length + 1;
+        const fileName = `${buttonName.replace(/\s+/g, '_')}_${pictureNumber}.jpg`;
         const privateFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
-        const publicFilePath = `${RNFS.ExternalDirectoryPath}/${fileName}`;
         try {
           const hasStoragePermissions = await requestStoragePermissions();
           if (!hasStoragePermissions) {
@@ -64,10 +64,8 @@ export const openCamera = (index: number, images: string[][], setImages: (images
             return;
           }
           await RNFS.copyFile(asset.uri, privateFilePath);
-          await RNFS.copyFile(asset.uri, publicFilePath);
           const fileSize = await RNFS.stat(privateFilePath).then(stat => stat.size);
           console.log(`File saved to private directory: ${privateFilePath}, size: ${fileSize} bytes`);
-          console.log(`File saved to public directory: ${publicFilePath}`);
           newImages[index] = [...newImages[index], privateFilePath];
           console.log(`Updated images state for index ${index}:`, newImages[index]);
           setImages(newImages);

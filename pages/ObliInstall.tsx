@@ -59,7 +59,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     const email = emailAddress; // Use the set email address
     const subject = 'Installation Report'; // Replace with the desired subject
     const body = 'Attached are the installation images.'; // Replace with the desired body text
-    const attachments = images.flat().map((filePath) => filePath.replace(RNFS.DocumentDirectoryPath, RNFS.ExternalDirectoryPath)); // Use the public directory paths
+    const attachments = images.flat(); // Use the internal storage paths
 
     openMailApp(email, subject, body, attachments);
   };
@@ -130,7 +130,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
               <View key={index} style={styles.buttonWrapper}>
                 <TouchableOpacity
                   style={[styles.button, { borderColor: getButtonBorderColor(index) }]}
-                  onPress={() => openCamera(index, images, setImages)}>
+                  onPress={() => openCamera(index, name, images, setImages)}>
                   <View style={styles.buttonContent}>
                     <Text style={styles.buttonText}>{name}</Text>
                   </View>
