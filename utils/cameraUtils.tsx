@@ -1,6 +1,7 @@
 // utils/cameraUtils.ts
 import { PermissionsAndroid, Platform } from 'react-native';
 import { launchCamera } from 'react-native-image-picker';
+import RNFS from 'react-native-fs';
 
 export const requestCameraPermission = async (): Promise<boolean> => {
   try {
@@ -25,17 +26,30 @@ export const requestCameraPermission = async (): Promise<boolean> => {
 };
 
 export const openCamera = (index: number, images: string[][], setImages: (images: string[][]) => void) => {
-  launchCamera({ mediaType: 'photo' }, (response) => {
+  launchCamera({ mediaType: 'photo' }, async (response) => {
     if (response.didCancel) {
       console.log('User cancelled image picker');
     } else if (response.errorCode) {
       console.log('ImagePicker Error: ', response.errorMessage);
     } else if (response.assets && response.assets.length > 0) {
       const newImages = [...images];
-      if (response.assets[0].uri) {
-        newImages[index] = [...newImages[index], response.assets[0].uri];
+      const asset = response.assets[0];
+      if (asset.uri) {
+        const fileName = asset.fileName || `image_${Date.now()}.jpg`;
+        const privateFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+        const publicFilePath = `${RNFS.ExternalDirectoryPath}/${fileName}`;
+        try {
+          await RNFS.copyFile(asset.uri, privateFilePath);
+          await RNFS.copyFile(asset.uri, publicFilePath);
+          const fileSize = await RNFS.stat(privateFilePath).then(stat => stat.size);
+          console.log(`File saved to private directory: ${privateFilePath}, size: ${fileSize} bytes`);
+          console.log(`File saved to public directory: ${publicFilePath}`);
+          newImages[index] = [...newImages[index], privateFilePath];
+          setImages(newImages);
+        } catch (error) {
+          console.error('Failed to save image:', error);
+        }
       }
-      setImages(newImages);
     }
   });
 };

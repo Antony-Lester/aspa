@@ -14,7 +14,7 @@ import {
   StatusBarStyle,
 } from 'react-native';
 import { useTheme } from '../ThemeContext'; // Import useTheme
-import useStyles from '../styles'; // Import useStyles
+import useStyles from '../styles'; // Use styles
 import { openMailApp } from '../utils/emailUtils'; // Adjust the import path as necessary
 import { requestCameraPermission, openCamera } from '../utils/cameraUtils'; // Import camera utils
 import { deleteImage } from '../utils/imageUtils'; // Import image utils
@@ -45,8 +45,9 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
     const email = emailAddress; // Use the set email address
     const subject = 'Weighbridge Repair Report'; // Replace with the desired subject
     const body = 'Attached are the before and after weighbridge repair images.'; // Replace with the desired body text
+    const attachments = images.flat(); // Flatten the array of image arrays
 
-    openMailApp(email, subject, body);
+    openMailApp(email, subject, body, attachments);
   };
 
   if (hasCameraPermission === null) {
@@ -82,7 +83,12 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.settingsButton}
-          onPress={() => navigation.navigate('Settings', { weighbridgeRepairEmail: emailAddress, setWeighbridgeRepairEmail: setEmailAddress })}
+          onPress={() => {
+            navigation.navigate('Settings', { weighbridgeRepairEmail: emailAddress });
+            navigation.setOptions({
+              setWeighbridgeRepairEmail: setEmailAddress,
+            });
+          }}
         >
           <Text style={styles.settingsButtonText}>⚙️</Text>
         </TouchableOpacity>

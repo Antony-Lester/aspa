@@ -45,8 +45,9 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
     const email = emailAddress; // Use the set email address
     const subject = 'Repair Report'; // Replace with the desired subject
     const body = 'Attached are the before and after repair images.'; // Replace with the desired body text
+    const attachments = images.flat(); // Flatten the array of image arrays
 
-    openMailApp(email, subject, body);
+    openMailApp(email, subject, body, attachments);
   };
 
   if (hasCameraPermission === null) {
@@ -82,7 +83,12 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.settingsButton}
-          onPress={() => navigation.navigate('Settings', { obliRepairEmail: emailAddress, setObliRepairEmail: setEmailAddress })}
+          onPress={() => {
+            navigation.navigate('Settings', { obliRepairEmail: emailAddress });
+            navigation.setOptions({
+              setObliRepairEmail: setEmailAddress,
+            });
+          }}
         >
           <Text style={styles.settingsButtonText}>⚙️</Text>
         </TouchableOpacity>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, Button } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // Import Picker
 import useStyles from '../styles'; // Import useStyles
 import { useTheme } from '../ThemeContext'; // Import useTheme
+import { openMailApp } from '../utils/emailUtils'; // Import openMailApp
 
 interface SettingsScreenProps {
   navigation: any;
@@ -42,10 +43,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
 
   const handleSave = () => {
     if (validateEmail(obliInstallEmail) && validateEmail(obliRepairEmail) && validateEmail(weighbridgeRepairEmail) && validateEmail(weighbridgeInstallEmail)) {
-      route.params.setObliInstallEmail(obliInstallEmail); // Ensure the obli install email is set correctly
-      route.params.setObliRepairEmail(obliRepairEmail); // Ensure the obli repair email is set correctly
-      route.params.setWeighbridgeRepairEmail(weighbridgeRepairEmail); // Ensure the weighbridge repair email is set correctly
-      route.params.setWeighbridgeInstallEmail(weighbridgeInstallEmail); // Ensure the weighbridge install email is set correctly
+      navigation.setOptions({
+        setObliInstallEmail: obliInstallEmail,
+        setObliRepairEmail: obliRepairEmail,
+        setWeighbridgeRepairEmail: weighbridgeRepairEmail,
+        setWeighbridgeInstallEmail: weighbridgeInstallEmail,
+      });
       navigation.goBack();
     } else {
       Alert.alert('Invalid Email', 'Please enter valid email addresses.');
@@ -57,8 +60,17 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
     setTheme(theme); // Apply the selected theme colors to the app
   };
 
+  const handleTestEmail = () => {
+    const email = obliInstallEmail; // Use the set email address
+    const subject = 'Test Email'; // Test subject
+    const body = 'This is a test email with a sample image attachment.'; // Test body
+    const attachments = ['file:///storage/emulated/0/rn_image_picker_lib_temp_405e67d2-ea2f-4194-a470-f651b02a4c59.jpg']; // Sample attachment
+
+    openMailApp(email, subject, body, attachments);
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.label}>Obli Install Email Address:</Text>
       <TextInput
         style={styles.input}
@@ -112,7 +124,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
         <Picker.Item label="Dark" value="dark" />
         <Picker.Item label="High Contrast" value="highContrast" />
       </Picker>
-    </View>
+      <Button title="Test Email" onPress={handleTestEmail} />
+    </ScrollView>
   );
 };
 

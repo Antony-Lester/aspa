@@ -15,16 +15,15 @@ import {
 } from 'react-native';
 import { useTheme } from '../ThemeContext'; // Import useTheme
 import useStyles from '../styles'; // Use styles
-import changeNavigationBarColor from 'react-native-navigation-bar-color'; // Import the library
 import { openMailApp } from '../utils/emailUtils'; // Adjust the import path as necessary
 import { requestCameraPermission, openCamera } from '../utils/cameraUtils'; // Import camera utils
 import { deleteImage } from '../utils/imageUtils'; // Import image utils
+import RNFS from 'react-native-fs';
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); // Use theme colors
   const styles = useStyles(); // Use styles
   const scrollViewRef = useRef<ScrollView>(null);
-
 
   const buttonNames = [
     'Front Sensor(s)',
@@ -60,8 +59,9 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     const email = emailAddress; // Use the set email address
     const subject = 'Installation Report'; // Replace with the desired subject
     const body = 'Attached are the installation images.'; // Replace with the desired body text
+    const attachments = images.flat().map((filePath) => filePath.replace(RNFS.DocumentDirectoryPath, RNFS.ExternalDirectoryPath)); // Use the public directory paths
 
-    openMailApp(email, subject, body);
+    openMailApp(email, subject, body, attachments);
   };
 
   if (hasCameraPermission === null) {
@@ -87,35 +87,9 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   }
 
   const getButtonBorderColor = (index: number) => {
-    const name = buttonNames[index];
     const imageCount = images[index].length;
-
-    if (imageCount === 0) {
-      if (name === 'T Piece Locations' || name === 'Reg Plate' || name === 'Other') {
-        return colors.amber;
-      }
-      return 'red';
-    } else if (imageCount === 1) {
-      if (name === 'Front Sensor(s)' || name === 'Rear Sensor(s)') {
-        return colors.amber;
-      }
-      return 'green';
-    } else if (imageCount >= 2) {
-      if (name === 'Front Sensor(s)' || name === 'Rear Sensor(s)') {
-        return 'green';
-      }
-    }
-    return 'green';
+    return imageCount > 0 ? 'green' : 'red';
   };
-
-  const buttons = buttonNames.map((name, index) => ({
-    name,
-    index,
-    borderColor: getButtonBorderColor(index),
-  }));
-
-  const greenButtons = buttons.filter(button => button.borderColor === 'green');
-  const otherButtons = buttons.filter(button => button.borderColor !== 'green');
 
   return (
     <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
@@ -123,7 +97,12 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.settingsButton}
-          onPress={() => navigation.navigate('Settings', { obliInstallEmail: emailAddress, setObliInstallEmail: setEmailAddress })}
+          onPress={() => {
+            navigation.navigate('Settings', { obliInstallEmail: emailAddress });
+            navigation.setOptions({
+              setObliInstallEmail: setEmailAddress,
+            });
+          }}
         >
           <Text style={styles.settingsButtonText}>⚙️</Text>
         </TouchableOpacity>
@@ -132,18 +111,18 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
           <View style={styles.buttonContainer}>
-            {[...otherButtons, ...greenButtons].map(button => (
-              <View key={button.index} style={styles.buttonWrapper}>
+            {buttonNames.map((name, index) => (
+              <View key={index} style={styles.buttonWrapper}>
                 <TouchableOpacity
-                  style={[styles.button, { borderColor: button.borderColor }]}
-                  onPress={() => openCamera(button.index, images, setImages)}>
+                  style={[styles.button, { borderColor: getButtonBorderColor(index) }]}
+                  onPress={() => openCamera(index, images, setImages)}>
                   <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText}>{button.name}</Text>
+                    <Text style={styles.buttonText}>{name}</Text>
                   </View>
                 </TouchableOpacity>
                 <View style={styles.thumbnailContainer}>
-                  {images[button.index].map((uri, imgIndex) => (
-                    <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index: button.index })}>
+                  {images[index].map((uri, imgIndex) => (
+                    <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index })}>
                       <Image
                         source={{ uri: uri }}
                         style={styles.thumbnail}
@@ -176,9 +155,6 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
               />
               <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteImage}>
                 <Text style={styles.deleteButtonText}>Delete</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.closeButton} onPress={() => setFullScreenImage(null)}>
-                <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
           </Modal>

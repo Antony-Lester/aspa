@@ -45,8 +45,9 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
     const email = emailAddress; // Use the set email address
     const subject = 'Weighbridge Install Report'; // Replace with the desired subject
     const body = 'Attached are the weighbridge install images.'; // Replace with the desired body text
+    const attachments = images.flat(); // Flatten the array of image arrays
 
-    openMailApp(email, subject, body);
+    openMailApp(email, subject, body, attachments);
   };
 
   if (hasCameraPermission === null) {
@@ -96,9 +97,14 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.settingsButton}
-          onPress={() => navigation.navigate('Settings', { weighbridgeInstallEmail: emailAddress, setWeighbridgeInstallEmail: setEmailAddress })}
+          onPress={() => {
+            navigation.navigate('Settings', { weighbridgeInstallEmail: emailAddress });
+            navigation.setOptions({
+              setWeighbridgeInstallEmail: setEmailAddress,
+            });
+          }}
         >
-          <Text style={styles.settingsButtonText}>⚙️</Text>
+          <Text style={styles.settingsButtonText}>���️</Text>
         </TouchableOpacity>
         <ScrollView
           ref={scrollViewRef}
