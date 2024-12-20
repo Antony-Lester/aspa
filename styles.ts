@@ -30,8 +30,7 @@ const useStyles = () => {
     buttonContainer: {
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 16,
-      paddingTop: 50, // Add 10 more padding to the top
+      padding: 10,
     },
     buttonWrapper: {
       width: '100%',
@@ -41,7 +40,7 @@ const useStyles = () => {
     button: {
       width: '98%',
       padding: 15,
-      marginVertical: 10,
+      marginVertical: 15,
       backgroundColor: colors.primary, // Use theme primary color
       borderRadius: 35,
       borderWidth: 5, // Increase border width
@@ -63,7 +62,7 @@ const useStyles = () => {
     buttonText: {
       color: colors.onPrimary, // Use theme onPrimary color
       fontSize: 20,
-	  fontWeight: 'bold', // Make text bold
+      fontWeight: 'bold', // Make text bold
       textAlign: 'center',
       flex: 1,
     },
@@ -81,18 +80,20 @@ const useStyles = () => {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'center',
-      marginTop: 10,
+      marginTop: 5,
     },
     thumbnail: {
-      width: 100,
-      height: 100,
+      width: 150,
+      height: 150,
       margin: 5,
       borderRadius: 20,
+      borderWidth: 2, // Add border width
+      borderColor: colors.primary, // Use theme primary color for border
     },
     bottomButtonContainer: {
       alignItems: 'center',
       justifyContent: 'center', // Center the button horizontally
-      padding: 16,
+      padding: 10,
       position: 'absolute',
       bottom: 0,
       left: 0, // Ensure the container fills the screen width
@@ -103,8 +104,8 @@ const useStyles = () => {
       padding: 10, // Increase padding
       backgroundColor: colors.secondary, // Use theme secondary color
       borderRadius: 35, // Increase border radius
-	  borderWidth: 5, // Increase border width
-	  borderColor: colors.onSecondaryFixedVariant, // Use theme secondary color
+      borderWidth: 5, // Increase border width
+      borderColor: colors.onSecondaryFixedVariant, // Use theme secondary color
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 }, // Increase shadow offset
       shadowOpacity: 0.9, // Increase shadow opacity

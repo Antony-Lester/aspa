@@ -25,6 +25,25 @@ export const requestCameraPermission = async (): Promise<boolean> => {
   }
 };
 
+export const requestStoragePermissions = async (): Promise<boolean> => {
+  try {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      ]);
+      return (
+        granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
+        granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED
+      );
+    }
+    return true;
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+};
+
 export const openCamera = (index: number, images: string[][], setImages: (images: string[][]) => void) => {
   launchCamera({ mediaType: 'photo' }, async (response) => {
     if (response.didCancel) {
@@ -39,12 +58,18 @@ export const openCamera = (index: number, images: string[][], setImages: (images
         const privateFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
         const publicFilePath = `${RNFS.ExternalDirectoryPath}/${fileName}`;
         try {
+          const hasStoragePermissions = await requestStoragePermissions();
+          if (!hasStoragePermissions) {
+            console.error('Storage permissions denied');
+            return;
+          }
           await RNFS.copyFile(asset.uri, privateFilePath);
           await RNFS.copyFile(asset.uri, publicFilePath);
           const fileSize = await RNFS.stat(privateFilePath).then(stat => stat.size);
           console.log(`File saved to private directory: ${privateFilePath}, size: ${fileSize} bytes`);
           console.log(`File saved to public directory: ${publicFilePath}`);
           newImages[index] = [...newImages[index], privateFilePath];
+          console.log(`Updated images state for index ${index}:`, newImages[index]);
           setImages(newImages);
         } catch (error) {
           console.error('Failed to save image:', error);

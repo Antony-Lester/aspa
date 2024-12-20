@@ -64,6 +64,21 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     openMailApp(email, subject, body, attachments);
   };
 
+  const checkImageExistenceAndSize = async (uri: string) => {
+    try {
+      const exists = await RNFS.exists(uri);
+      console.log(`Image exists at ${uri}: ${exists}`);
+      if (exists) {
+        const stat = await RNFS.stat(uri);
+        console.log(`Image size at ${uri}: ${stat.size} bytes`);
+      }
+      return exists;
+    } catch (error) {
+      console.error(`Error checking image existence and size at ${uri}:`, error);
+      return false;
+    }
+  };
+
   if (hasCameraPermission === null) {
     return (
       <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
@@ -121,15 +136,19 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                   </View>
                 </TouchableOpacity>
                 <View style={styles.thumbnailContainer}>
-                  {images[index].map((uri, imgIndex) => (
-                    <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index })}>
-                      <Image
-                        source={{ uri: uri }}
-                        style={styles.thumbnail}
-                        resizeMode="contain"
-                      />
-                    </TouchableOpacity>
-                  ))}
+                  {images[index].map((uri, imgIndex) => {
+                    checkImageExistenceAndSize(uri);
+                    console.log(`Rendering image for index ${index}: ${uri}`);
+                    return (
+                      <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index })}>
+                        <Image
+                          source={{ uri: `file://${uri}` }}
+                          style={styles.thumbnail}
+                          resizeMode="contain"
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </View>
             ))}
@@ -149,7 +168,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
             onRequestClose={() => setFullScreenImage(null)}>
             <View style={styles.fullScreenContainer}>
               <Image
-                source={{ uri: fullScreenImage.uri }}
+                source={{ uri: `file://${fullScreenImage.uri}` }}
                 style={styles.fullScreenImage}
                 resizeMode="contain"
               />
