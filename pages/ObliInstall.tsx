@@ -42,6 +42,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
   const [emailAddress, setEmailAddress] = useState('');
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [thumbnailSizes, setThumbnailSizes] = useState<{ [key: string]: { width: number, height: number } }>({});
 
   useEffect(() => {
     const checkCameraPermission = async () => {
@@ -50,6 +51,21 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     };
     checkCameraPermission();
   }, []);
+
+  useEffect(() => {
+    images.flat().forEach(uri => {
+      Image.getSize(`file://${uri}`, (imgWidth, imgHeight) => {
+        const aspectRatio = imgWidth / imgHeight;
+        if (aspectRatio > 1) {
+          // Landscape
+          setThumbnailSizes(prev => ({ ...prev, [uri]: { width: 150, height: 150 / aspectRatio } }));
+        } else {
+          // Portrait
+          setThumbnailSizes(prev => ({ ...prev, [uri]: { width: 150 * aspectRatio, height: 150 } }));
+        }
+      });
+    });
+  }, [images]);
 
   const handleDeleteImage = () => {
     deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
@@ -123,11 +139,12 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                 <View style={styles.thumbnailContainer}>
                   {images[index].map((uri, imgIndex) => {
                     console.log(`Rendering image for index ${index}: ${uri}`);
+                    const thumbnailStyle = thumbnailSizes[uri] || { width: 150, height: 150 };
                     return (
                       <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index })}>
                         <Image
                           source={{ uri: `file://${uri}` }}
-                          style={styles.thumbnail}
+                          style={[styles.thumbnail, thumbnailStyle]}
                           resizeMode="contain"
                         />
                       </TouchableOpacity>

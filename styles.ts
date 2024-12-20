@@ -30,7 +30,7 @@ const useStyles = () => {
     buttonContainer: {
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 10,
+      padding: 16,
     },
     buttonWrapper: {
       width: '100%',
@@ -40,7 +40,7 @@ const useStyles = () => {
     button: {
       width: '98%',
       padding: 15,
-      marginVertical: 15,
+      marginVertical: 10,
       backgroundColor: colors.primary, // Use theme primary color
       borderRadius: 35,
       borderWidth: 5, // Increase border width
@@ -80,7 +80,7 @@ const useStyles = () => {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'center',
-      marginTop: 5,
+      marginTop: 10,
     },
     thumbnail: {
       width: 150,
@@ -89,11 +89,12 @@ const useStyles = () => {
       borderRadius: 20,
       borderWidth: 2, // Add border width
       borderColor: colors.primary, // Use theme primary color for border
+      
     },
     bottomButtonContainer: {
       alignItems: 'center',
       justifyContent: 'center', // Center the button horizontally
-      padding: 10,
+      padding: 16,
       position: 'absolute',
       bottom: 0,
       left: 0, // Ensure the container fills the screen width
