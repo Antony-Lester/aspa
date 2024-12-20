@@ -22,7 +22,6 @@ import { requestCameraPermission, openCamera } from '../utils/cameraUtils'; // I
 import { deleteImage } from '../utils/imageUtils'; // Import image utils
 import RNFS from 'react-native-fs';
 import Orientation from 'react-native-orientation-locker';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import Icon
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); // Use theme colors
@@ -30,8 +29,8 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const buttonNames = [
-    'Front Sensor (s)',
-    'Rear Sensor (s)',
+    'Front Sensor(s)',
+    'Rear Sensor(s)',
     'T Piece Locations',
     'Cab Wire Entry',
     'Power Pick Up',
@@ -85,13 +84,13 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
         const aspectRatio = imgWidth / imgHeight;
         if (aspectRatio > 1) {
           // Landscape
-          const maxWidth = screenWidth - borderSize * 2;
-          const maxHeight = maxWidth / aspectRatio;
+          const maxHeight = screenHeight - borderSize * 1.7;
+          const maxWidth = maxHeight * aspectRatio;
           setFullScreenImageSize({ width: maxWidth, height: maxHeight });
           Orientation.lockToLandscape();
         } else {
           // Portrait
-          const maxHeight = screenHeight - borderSize * 2;
+          const maxHeight = screenHeight - borderSize * 12;
           const maxWidth = maxHeight * aspectRatio;
           setFullScreenImageSize({ width: maxWidth, height: maxHeight });
           Orientation.lockToPortrait();
@@ -237,7 +236,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                 />
               )}
               <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteImage}>
-                <Icon name="delete" size={30} color={colors.onError} />
+                <Text style={styles.deleteButtonText}>Delete</Text>
               </TouchableOpacity>
             </TouchableOpacity>
           </Modal>

@@ -130,15 +130,14 @@ const useStyles = () => {
       backgroundColor: 'black',
     },
     fullScreenImage: {
-      width: '90%',
-      height: '80%',
       borderRadius: 20,
+      alignSelf: 'center', // Center the image horizontally
     },
     deleteButton: {
       position: 'absolute',
       top: 40,
       right: 20,
-      backgroundColor: 'transparent', // Make background transparent
+      backgroundColor: colors.error, // Use theme error color
       padding: 10,
       borderRadius: 5,
     },
@@ -167,58 +166,6 @@ const useStyles = () => {
       height: 50, // Increase height
       fontSize: 18, // Increase font size
       borderColor: 'gray',
-      borderWidth: 1,
-      marginBottom: 16,
-      paddingHorizontal: 8,
-      color: colors.onBackground, // Use theme onBackground color
-    },
-    saveButton: {
-      backgroundColor: colors.secondary, // Use theme secondary color
-      padding: 15,
-      borderRadius: 30,
-      alignItems: 'center',
-      justifyContent: 'center',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.9,
-      shadowRadius: 4,
-      elevation: 10,
-    },
-    saveButtonText: {
-      color: colors.onSecondary, // Use theme onSecondary color
-      fontSize: 18,
-      fontWeight: 'bold',
-    },
-    picker: {
-      height: 50,
-      width: '100%',
-      color: colors.onBackground, // Use theme onBackground color
-      backgroundColor: colors.surface, // Use theme surface color
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      marginBottom: 20,
-      color: colors.onBackground, // Use theme onBackground color
-    },
-    homeButtonContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center', // Center the logo and buttons horizontally
-      padding: 16,
-      backgroundColor: colors.background, // Use theme background color
-    },
-    logo: {
-      width: '90%', // Set the width of the logo to the same size as the buttons
-      height: undefined, // Allow the height to adjust automatically
-      aspectRatio: 1, // Maintain the aspect ratio
-      marginVertical: 10, // Add vertical margin
-    },
-    buttonRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginVertical: 10,
     },
     permissionMessageContainer: {
       flex: 1,
