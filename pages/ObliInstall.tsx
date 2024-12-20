@@ -12,6 +12,8 @@ import {
   Linking,
   Platform,
   StatusBarStyle,
+  Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '../ThemeContext'; // Import useTheme
 import useStyles from '../styles'; // Use styles
@@ -19,6 +21,7 @@ import { openMailApp } from '../utils/emailUtils'; // Adjust the import path as 
 import { requestCameraPermission, openCamera } from '../utils/cameraUtils'; // Import camera utils
 import { deleteImage } from '../utils/imageUtils'; // Import image utils
 import RNFS from 'react-native-fs';
+import Orientation from 'react-native-orientation-locker';
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); // Use theme colors
@@ -39,11 +42,13 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   ];
 
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
+  const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({});
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
   const [emailAddress, setEmailAddress] = useState('');
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [thumbnailSizes, setThumbnailSizes] = useState<{ [key: string]: { width: number, height: number } }>({});
   const [fullScreenImageSize, setFullScreenImageSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
+  const [fullScreenImageLoading, setFullScreenImageLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const checkCameraPermission = async () => {
@@ -55,6 +60,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
 
   useEffect(() => {
     images.flat().forEach(uri => {
+      setImageLoading(prev => ({ ...prev, [uri]: true }));
       Image.getSize(`file://${uri}`, (imgWidth, imgHeight) => {
         const aspectRatio = imgWidth / imgHeight;
         if (aspectRatio > 1) {
@@ -64,22 +70,35 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
           // Portrait
           setThumbnailSizes(prev => ({ ...prev, [uri]: { width: 150 * aspectRatio, height: 150 } }));
         }
+        setImageLoading(prev => ({ ...prev, [uri]: false }));
       });
     });
   }, [images]);
 
   useEffect(() => {
     if (fullScreenImage) {
+      setFullScreenImageLoading(true);
+      const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+      const borderSize = 20; // Define the border size
       Image.getSize(`file://${fullScreenImage.uri}`, (imgWidth, imgHeight) => {
         const aspectRatio = imgWidth / imgHeight;
         if (aspectRatio > 1) {
           // Landscape
-          setFullScreenImageSize({ width: 300, height: 300 / aspectRatio });
+          const maxWidth = screenWidth - borderSize * 12;
+          const maxHeight = maxWidth / aspectRatio;
+          setFullScreenImageSize({ width: maxWidth, height: maxHeight });
+          Orientation.lockToLandscape();
         } else {
           // Portrait
-          setFullScreenImageSize({ width: 300 * aspectRatio, height: 300 });
+          const maxHeight = screenHeight - borderSize * 12;
+          const maxWidth = maxHeight * aspectRatio;
+          setFullScreenImageSize({ width: maxWidth, height: maxHeight });
+          Orientation.lockToPortrait();
         }
+        setFullScreenImageLoading(false);
       });
+    } else {
+      Orientation.unlockAllOrientations();
     }
   }, [fullScreenImage]);
 
@@ -157,7 +176,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                     console.log(`Rendering image for index ${index}: ${uri}`);
                     const thumbnailStyle = thumbnailSizes[uri];
                     return (
-                      thumbnailStyle && (
+                      thumbnailStyle && !imageLoading[uri] ? (
                         <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index })}>
                           <Image
                             source={{ uri: `file://${uri}` }}
@@ -165,6 +184,8 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                             resizeMode="contain"
                           />
                         </TouchableOpacity>
+                      ) : (
+                        <ActivityIndicator key={imgIndex} size="small" color={colors.primary} />
                       )
                     );
                   })}
@@ -186,11 +207,15 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
             transparent={false}
             onRequestClose={() => setFullScreenImage(null)}>
             <TouchableOpacity style={styles.fullScreenContainer} onPress={() => setFullScreenImage(null)}>
-              <Image
-                source={{ uri: `file://${fullScreenImage.uri}` }}
-                style={[styles.fullScreenImage, { width: fullScreenImageSize.width, height: fullScreenImageSize.height, borderColor: colors.primary, borderWidth: 2 }]}
-                resizeMode="contain"
-              />
+              {fullScreenImageLoading ? (
+                <ActivityIndicator size="large" color={colors.primary} />
+              ) : (
+                <Image
+                  source={{ uri: `file://${fullScreenImage.uri}` }}
+                  style={[styles.fullScreenImage, { width: fullScreenImageSize.width, height: fullScreenImageSize.height, borderColor: colors.primary, borderWidth: 2 }]}
+                  resizeMode="contain"
+                />
+              )}
               <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteImage}>
                 <Text style={styles.deleteButtonText}>Delete</Text>
               </TouchableOpacity>
