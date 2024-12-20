@@ -12,13 +12,25 @@ interface SettingsScreenProps {
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) => {
   const { setTheme } = useTheme(); // Use setTheme from ThemeContext
   const styles = useStyles(); // Use styles
-  const [email, setEmail] = useState(route.params.email);
+  const [obliInstallEmail, setObliInstallEmail] = useState(route.params.obliInstallEmail);
+  const [obliRepairEmail, setObliRepairEmail] = useState(route.params.obliRepairEmail);
+  const [weighbridgeRepairEmail, setWeighbridgeRepairEmail] = useState(route.params.weighbridgeRepairEmail);
+  const [weighbridgeInstallEmail, setWeighbridgeInstallEmail] = useState(route.params.weighbridgeInstallEmail);
   const [selectedTheme, setSelectedTheme] = useState('light');
 
   useEffect(() => {
     navigation.setOptions({
-      setEmail: (email: string) => {
-        setEmail(email);
+      setObliInstallEmail: (email: string) => {
+        setObliInstallEmail(email);
+      },
+      setObliRepairEmail: (email: string) => {
+        setObliRepairEmail(email);
+      },
+      setWeighbridgeRepairEmail: (email: string) => {
+        setWeighbridgeRepairEmail(email);
+      },
+      setWeighbridgeInstallEmail: (email: string) => {
+        setWeighbridgeInstallEmail(email);
       },
     });
   }, [navigation]);
@@ -29,11 +41,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
   };
 
   const handleSave = () => {
-    if (validateEmail(email)) {
-      route.params.setEmail(email); // Ensure the email is set correctly
+    if (validateEmail(obliInstallEmail) && validateEmail(obliRepairEmail) && validateEmail(weighbridgeRepairEmail) && validateEmail(weighbridgeInstallEmail)) {
+      route.params.setObliInstallEmail(obliInstallEmail); // Ensure the obli install email is set correctly
+      route.params.setObliRepairEmail(obliRepairEmail); // Ensure the obli repair email is set correctly
+      route.params.setWeighbridgeRepairEmail(weighbridgeRepairEmail); // Ensure the weighbridge repair email is set correctly
+      route.params.setWeighbridgeInstallEmail(weighbridgeInstallEmail); // Ensure the weighbridge install email is set correctly
       navigation.goBack();
     } else {
-      Alert.alert('Invalid Email', 'Please enter a valid email address.');
+      Alert.alert('Invalid Email', 'Please enter valid email addresses.');
     }
   };
 
@@ -44,14 +59,44 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Email Address:</Text>
+      <Text style={styles.label}>Obli Install Email Address:</Text>
       <TextInput
         style={styles.input}
-        value={email}
-        onChangeText={setEmail}
+        value={obliInstallEmail}
+        onChangeText={setObliInstallEmail}
         keyboardType="email-address"
         autoCapitalize="none"
-        placeholder="Enter The email Address"
+        placeholder="Enter Obli Install Email Address"
+        placeholderTextColor="gray"
+      />
+      <Text style={styles.label}>Obli Repair Email Address:</Text>
+      <TextInput
+        style={styles.input}
+        value={obliRepairEmail}
+        onChangeText={setObliRepairEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        placeholder="Enter Obli Repair Email Address"
+        placeholderTextColor="gray"
+      />
+      <Text style={styles.label}>Weighbridge Repair Email Address:</Text>
+      <TextInput
+        style={styles.input}
+        value={weighbridgeRepairEmail}
+        onChangeText={setWeighbridgeRepairEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        placeholder="Enter Weighbridge Repair Email Address"
+        placeholderTextColor="gray"
+      />
+      <Text style={styles.label}>Weighbridge Install Email Address:</Text>
+      <TextInput
+        style={styles.input}
+        value={weighbridgeInstallEmail}
+        onChangeText={setWeighbridgeInstallEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        placeholder="Enter Weighbridge Install Email Address"
         placeholderTextColor="gray"
       />
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
