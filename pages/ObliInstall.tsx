@@ -8,9 +8,6 @@ import {
   TouchableOpacity,
   Image,
   Modal,
-  Alert,
-  Linking,
-  Platform,
   StatusBarStyle,
   Dimensions,
   ActivityIndicator,
@@ -18,14 +15,14 @@ import {
 import { useTheme } from '../ThemeContext'; // Import useTheme
 import useStyles from '../styles'; // Use styles
 import { openMailApp } from '../utils/emailUtils'; // Adjust the import path as necessary
-import { requestCameraPermission, openCamera } from '../utils/cameraUtils'; // Import camera utils
-import { deleteImage } from '../utils/imageUtils'; // Import image utils
+import { openCamera } from '../utils/cameraUtils'; // Import camera utils
+import { requestCameraPermission } from '../utils/permissionsUtils'; // Import permissions utils
 import RNFS from 'react-native-fs';
 import Orientation from 'react-native-orientation-locker';
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
-  const { colors } = useTheme(); // Use theme colors
-  const styles = useStyles(); // Use styles
+  const { colors } = useTheme(); 
+  const styles = useStyles();
   const scrollViewRef = useRef<ScrollView>(null);
 
   const buttonNames = [
@@ -84,8 +81,8 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
         const aspectRatio = imgWidth / imgHeight;
         if (aspectRatio > 1) {
           // Landscape
-          const maxHeight = screenHeight - borderSize * 1.7;
-          const maxWidth = maxHeight * aspectRatio;
+          const maxWidth = screenWidth - borderSize * 1.90;
+          const maxHeight = maxWidth / aspectRatio;
           setFullScreenImageSize({ width: maxWidth, height: maxHeight });
           Orientation.lockToLandscape();
         } else {
@@ -126,10 +123,10 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   };
 
   const handleOpenMailApp = () => {
-    const email = emailAddress; // Use the set email address
-    const subject = 'Installation Report'; // Replace with the desired subject
-    const body = 'Attached are the installation images.'; // Replace with the desired body text
-    const attachments = images.flat(); // Use the internal storage paths
+    const email = emailAddress;
+    const subject = 'Installation Report';
+    const body = 'Attached are the installation images.'; 
+    const attachments = images.flat();
 
     openMailApp(email, subject, body, attachments);
   };
