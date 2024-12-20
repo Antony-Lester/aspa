@@ -22,6 +22,7 @@ import { requestCameraPermission, openCamera } from '../utils/cameraUtils'; // I
 import { deleteImage } from '../utils/imageUtils'; // Import image utils
 import RNFS from 'react-native-fs';
 import Orientation from 'react-native-orientation-locker';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Import Icon
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); // Use theme colors
@@ -29,8 +30,8 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const buttonNames = [
-    'Front Sensor(s)',
-    'Rear Sensor(s)',
+    'Front Sensor (s)',
+    'Rear Sensor (s)',
     'T Piece Locations',
     'Cab Wire Entry',
     'Power Pick Up',
@@ -84,13 +85,13 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
         const aspectRatio = imgWidth / imgHeight;
         if (aspectRatio > 1) {
           // Landscape
-          const maxWidth = screenWidth - borderSize * 12;
+          const maxWidth = screenWidth - borderSize * 2;
           const maxHeight = maxWidth / aspectRatio;
           setFullScreenImageSize({ width: maxWidth, height: maxHeight });
           Orientation.lockToLandscape();
         } else {
           // Portrait
-          const maxHeight = screenHeight - borderSize * 12;
+          const maxHeight = screenHeight - borderSize * 2;
           const maxWidth = maxHeight * aspectRatio;
           setFullScreenImageSize({ width: maxWidth, height: maxHeight });
           Orientation.lockToPortrait();
@@ -102,8 +103,27 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     }
   }, [fullScreenImage]);
 
-  const handleDeleteImage = () => {
-    deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
+  const handleDeleteImage = async () => {
+    if (fullScreenImage) {
+      const { uri, index } = fullScreenImage;
+      const fileName = uri.split('/').pop();
+      const privateFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+      const publicFilePath = `${RNFS.ExternalDirectoryPath}/${fileName}`;
+
+      try {
+        await RNFS.unlink(privateFilePath);
+        await RNFS.unlink(publicFilePath);
+        console.log(`Deleted image from private directory: ${privateFilePath}`);
+        console.log(`Deleted image from public directory: ${publicFilePath}`);
+      } catch (error) {
+        console.error('Failed to delete image:', error);
+      }
+
+      const newImages = [...images];
+      newImages[index] = newImages[index].filter(imageUri => imageUri !== uri);
+      setImages(newImages);
+      setFullScreenImage(null);
+    }
   };
 
   const handleOpenMailApp = () => {
@@ -217,7 +237,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                 />
               )}
               <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteImage}>
-                <Text style={styles.deleteButtonText}>Delete</Text>
+                <Icon name="delete" size={30} color={colors.onError} />
               </TouchableOpacity>
             </TouchableOpacity>
           </Modal>

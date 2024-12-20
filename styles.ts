@@ -80,6 +80,7 @@ const useStyles = () => {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'center',
+      alignItems: 'center', // Center align items vertically
       marginTop: 10,
     },
     thumbnail: {
@@ -137,7 +138,7 @@ const useStyles = () => {
       position: 'absolute',
       top: 40,
       right: 20,
-      backgroundColor: colors.error, // Use theme error color
+      backgroundColor: 'transparent', // Make background transparent
       padding: 10,
       borderRadius: 5,
     },
