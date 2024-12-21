@@ -18,12 +18,11 @@ const useStyles = () => {
       flexGrow: 1,
       justifyContent: 'center',
       padding: 16,
-      backgroundColor: colors.background
     },
     settingsButton: {
       position: 'absolute',
-      top: 0,
-      right: 0,
+      top: 5,
+      right: 5,
       padding: 5,
       backgroundColor: 'rgba(0, 0, 0, 0.0)', // Translucent background
       borderRadius: 5,
@@ -105,16 +104,15 @@ const useStyles = () => {
       bottom: 0,
       left: 0, // Ensure the container fills the screen width
       right: 0, // Ensure the container fills the screen width
-      backgroundColor: colors.surface, // Use theme surface color
+      backgroundColor: colors.primary, // Use theme primary color for background
     },
     bottomButton: {
       padding: 10, // Increase padding
-      backgroundColor: colors.secondary, // Use theme secondary color
       borderRadius: 35, // Increase border radius
       borderWidth: 5, // Increase border width
       borderColor: colors.onSecondaryFixedVariant, // Use theme secondary color
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 4 }, // Increase shadow offset
+      shadowOffset: { width: 2, height: 8 }, // Increase shadow offset
       shadowOpacity: 0.9, // Increase shadow opacity
       shadowRadius: 4, // Increase shadow radius
       elevation: 10, // Increase elevation
@@ -123,9 +121,10 @@ const useStyles = () => {
       marginVertical: 10, // Add vertical margin
       alignSelf: 'center', // Center the button horizontally
       width: '80%', // Set button width
+      backgroundColor: colors.primary, // Use theme onPrimary color for text
     },
     bottomButtonText: {
-      color: colors.onSecondary, // Use theme onSecondary color
+      color: colors.onPrimary, // Use theme onPrimary color for text
       fontSize: 20, // Increase font size
       fontWeight: 'bold',
     },
@@ -224,6 +223,19 @@ const useStyles = () => {
       fontSize: 20,
       fontWeight: 'bold',
       color: colors.onBackground, // Use theme onBackground color
+    },
+    homeButtonContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 16,
+      backgroundColor: colors.secondary, // Use theme background color
+    },
+    logo: {
+      width: '80%', // Set width to 50% of the screen width
+      height: undefined, // Maintain aspect ratio
+      aspectRatio: 1, // Ensure the logo is square
+      marginBottom: 20, // Add margin to the logo
     },
   });
 };

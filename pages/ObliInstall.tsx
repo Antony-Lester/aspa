@@ -9,7 +9,6 @@ import {
   Image,
   Modal,
   StatusBarStyle,
-  Dimensions,
   ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '../ThemeContext'; // Import useTheme
@@ -17,8 +16,7 @@ import useStyles from '../styles'; // Use styles
 import { openMailApp } from '../utils/emailUtils'; // Adjust the import path as necessary
 import { openCamera } from '../utils/cameraUtils'; // Import camera utils
 import { requestCameraPermission } from '../utils/permissionsUtils'; // Import permissions utils
-import RNFS from 'react-native-fs';
-import Orientation from 'react-native-orientation-locker';
+import { deleteImage } from '../utils/imageUtils'; // Import image utils
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); 
@@ -55,71 +53,13 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     checkCameraPermission();
   }, []);
 
-  useEffect(() => {
-    images.flat().forEach(uri => {
-      setImageLoading(prev => ({ ...prev, [uri]: true }));
-      Image.getSize(`file://${uri}`, (imgWidth, imgHeight) => {
-        const aspectRatio = imgWidth / imgHeight;
-        if (aspectRatio > 1) {
-          // Landscape
-          setThumbnailSizes(prev => ({ ...prev, [uri]: { width: 150, height: 150 / aspectRatio } }));
-        } else {
-          // Portrait
-          setThumbnailSizes(prev => ({ ...prev, [uri]: { width: 150 * aspectRatio, height: 150 } }));
-        }
-        setImageLoading(prev => ({ ...prev, [uri]: false }));
-      });
-    });
-  }, [images]);
+  const getButtonBorderColor = (index: number) => {
+    const imageCount = images[index].length;
+    return imageCount > 0 ? 'green' : (buttonNames[index] === 'T Piece Locations' || buttonNames[index] === 'Reg Plate' || buttonNames[index] === 'Other') ? 'orange' : 'red';
+  };
 
-  useEffect(() => {
-    if (fullScreenImage) {
-      setFullScreenImageLoading(true);
-      const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-      const borderSize = 20; // Define the border size
-      Image.getSize(`file://${fullScreenImage.uri}`, (imgWidth, imgHeight) => {
-        const aspectRatio = imgWidth / imgHeight;
-        if (aspectRatio > 1) {
-          // Landscape
-          const maxWidth = screenWidth - borderSize * 1.90;
-          const maxHeight = maxWidth / aspectRatio;
-          setFullScreenImageSize({ width: maxWidth, height: maxHeight });
-          Orientation.lockToLandscape();
-        } else {
-          // Portrait
-          const maxHeight = screenHeight - borderSize * 12;
-          const maxWidth = maxHeight * aspectRatio;
-          setFullScreenImageSize({ width: maxWidth, height: maxHeight });
-          Orientation.lockToPortrait();
-        }
-        setFullScreenImageLoading(false);
-      });
-    } else {
-      Orientation.unlockAllOrientations();
-    }
-  }, [fullScreenImage]);
-
-  const handleDeleteImage = async () => {
-    if (fullScreenImage) {
-      const { uri, index } = fullScreenImage;
-      const fileName = uri.split('/').pop();
-      const privateFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
-      const publicFilePath = `${RNFS.ExternalDirectoryPath}/${fileName}`;
-
-      try {
-        await RNFS.unlink(privateFilePath);
-        await RNFS.unlink(publicFilePath);
-        console.log(`Deleted image from private directory: ${privateFilePath}`);
-        console.log(`Deleted image from public directory: ${publicFilePath}`);
-      } catch (error) {
-        console.error('Failed to delete image:', error);
-      }
-
-      const newImages = [...images];
-      newImages[index] = newImages[index].filter(imageUri => imageUri !== uri);
-      setImages(newImages);
-      setFullScreenImage(null);
-    }
+  const handleDeleteImage = () => {
+    deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
   };
 
   const handleOpenMailApp = () => {
@@ -131,32 +71,8 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     openMailApp(email, subject, body, attachments);
   };
 
-  if (hasCameraPermission === null) {
-    return (
-      <SafeAreaView style={styles.permissionMessageContainer}>
-        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
-        <View style={styles.permissionMessageContainer}>
-          <Text style={styles.permissionMessageText}>Checking camera permission...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (!hasCameraPermission) {
-    return (
-      <SafeAreaView style={styles.permissionMessageContainer}>
-        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
-        <View style={styles.permissionMessageContainer}>
-          <Text style={styles.permissionMessageText}>Camera permission is required to use this app.</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  const getButtonBorderColor = (index: number) => {
-    const imageCount = images[index].length;
-    return imageCount > 0 ? 'green' : 'red';
-  };
+  const allButtonsGreen = images.every(imageArray => imageArray.length > 0);
+  const sendEmailButtonColor = allButtonsGreen ? 'green' : 'red';
 
   return (
     <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
@@ -212,8 +128,10 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
         </ScrollView>
         <View style={styles.bottomButtonContainer}>
           <TouchableOpacity
-            style={styles.bottomButton}
-            onPress={handleOpenMailApp}>
+            style={[styles.bottomButton, { backgroundColor: sendEmailButtonColor }]}
+            onPress={handleOpenMailApp}
+            disabled={!allButtonsGreen}
+          >
             <Text style={styles.bottomButtonText}>Send Email</Text>
           </TouchableOpacity>
         </View>

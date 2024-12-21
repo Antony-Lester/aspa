@@ -1,19 +1,30 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useTheme } from '../ThemeContext'; // Import useTheme
 import useStyles from '../styles'; // Import useStyles
+import changeNavigationBarColor from 'react-native-navigation-bar-color'; // Import navigation bar color changer
 
 type RootStackParamList = {
-  // const navigation = useNavigation();
   'Obli Repair': undefined;
   'Obli Install': undefined;
   'Weighbridge Install': undefined;
   'Weighbridge Repair': undefined;
 };
 
-  const HomePage: React.FC = () => {
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-    const styles = useStyles(); // Use styles
+const HomePage: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { colors } = useTheme(); // Use theme colors
+  const styles = useStyles(); // Use styles
+
+  useEffect(() => {
+    // Set the status bar color
+    StatusBar.setBackgroundColor(colors.secondary);
+    StatusBar.setBarStyle('light-content');
+
+    // Set the navigation bar color
+    changeNavigationBarColor(colors.secondary, true);
+  }, [colors]);
 
   return (
     <View style={styles.homeButtonContainer}>
