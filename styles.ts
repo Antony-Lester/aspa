@@ -14,10 +14,16 @@ const useStyles = () => {
     scrollView: {
       backgroundColor: colors.background, // Use theme background color
     },
+    contentContainer: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      padding: 16,
+      backgroundColor: colors.background
+    },
     settingsButton: {
       position: 'absolute',
-      top: 5,
-      right: 5,
+      top: 0,
+      right: 0,
       padding: 5,
       backgroundColor: 'rgba(0, 0, 0, 0.0)', // Translucent background
       borderRadius: 5,
@@ -30,7 +36,7 @@ const useStyles = () => {
     buttonContainer: {
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 16,
+      padding: 35,
     },
     buttonWrapper: {
       width: '100%',
@@ -146,8 +152,6 @@ const useStyles = () => {
       fontSize: 16,
     },
     closeButton: {
-      position: 'absolute',
-      bottom: 20,
       backgroundColor: 'gray',
       padding: 10,
       borderRadius: 5,
@@ -165,7 +169,50 @@ const useStyles = () => {
     input: {
       height: 50, // Increase height
       fontSize: 18, // Increase font size
-      borderColor: 'gray',
+      borderColor: colors.onSecondaryFixedVariant, // Use theme primary color for border
+      borderWidth: 2, // Increase border width
+      borderRadius: 10, // Add border radius
+      paddingHorizontal: 10, // Add horizontal padding
+      backgroundColor: colors.secondaryContainer, // Use theme surface color
+      color: colors.onBackground, // Use a lighter color for the input text
+      marginBottom: 16, // Add margin bottom
+      shadowColor: '#000', // Add shadow for better contrast
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.8,
+      shadowRadius: 2,
+      elevation: 5,
+    },
+    picker: {
+      height: 50,
+      width: '100%',
+      color: colors.onBackground, // Use theme onBackground color
+      backgroundColor: colors.secondaryContainer, // Use theme secondaryContainer color
+      borderColor: colors.primary, // Use theme primary color for border
+      borderWidth: 2, // Increase border width
+      borderRadius: 10, // Add border radius
+      marginBottom: 16, // Add margin bottom
+      shadowColor: '#000', // Add shadow for better contrast
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.8,
+      shadowRadius: 2,
+      elevation: 5,
+    },
+    saveButton: {
+      backgroundColor: colors.secondary, // Use theme secondary color
+      padding: 15,
+      borderRadius: 30,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.9,
+      shadowRadius: 4,
+      elevation: 10,
+    },
+    saveButtonText: {
+      color: colors.onSecondary, // Use theme onSecondary color
+      fontSize: 18,
+      fontWeight: 'bold',
     },
     permissionMessageContainer: {
       flex: 1,

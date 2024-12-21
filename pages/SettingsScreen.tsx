@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, Button } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // Import Picker
-import useStyles from '../styles'; // Import useStyles
+import { View, Text, TextInput, Alert, ScrollView } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useTheme } from '../ThemeContext'; // Import useTheme
-import { openMailApp } from '../utils/emailUtils'; // Import openMailApp
+import useStyles from '../styles'; // Import useStyles
 
-interface SettingsScreenProps {
-  navigation: any;
-  route: any;
-}
-
-const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) => {
-  const { setTheme } = useTheme(); // Use setTheme from ThemeContext
+const SettingsScreen = ({ navigation }: { navigation: any }) => {
+  const { colors, setTheme } = useTheme(); // Use theme colors and setTheme function
   const styles = useStyles(); // Use styles
-  const [obliInstallEmail, setObliInstallEmail] = useState(route.params.obliInstallEmail);
-  const [obliRepairEmail, setObliRepairEmail] = useState(route.params.obliRepairEmail);
-  const [weighbridgeRepairEmail, setWeighbridgeRepairEmail] = useState(route.params.weighbridgeRepairEmail);
-  const [weighbridgeInstallEmail, setWeighbridgeInstallEmail] = useState(route.params.weighbridgeInstallEmail);
-  const [selectedTheme, setSelectedTheme] = useState('light');
+
+  const [obliInstallEmail, setObliInstallEmail] = useState('');
+  const [obliRepairEmail, setObliRepairEmail] = useState('');
+  const [weighbridgeRepairEmail, setWeighbridgeRepairEmail] = useState('');
+  const [weighbridgeInstallEmail, setWeighbridgeInstallEmail] = useState('');
+  const [selectedTheme, setSelectedTheme] = useState('');
+  const [imageQuality, setImageQuality] = useState('0.5'); // Default image quality
 
   useEffect(() => {
     navigation.setOptions({
@@ -41,17 +37,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
     return re.test(email);
   };
 
-  const handleSave = () => {
-    if (validateEmail(obliInstallEmail) && validateEmail(obliRepairEmail) && validateEmail(weighbridgeRepairEmail) && validateEmail(weighbridgeInstallEmail)) {
+  const handleEmailBlur = (email: string, setEmail: (email: string) => void) => {
+    if (!validateEmail(email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address.');
+    } else {
+      setEmail(email);
+      // Automatically save the email to navigation options
       navigation.setOptions({
         setObliInstallEmail: obliInstallEmail,
         setObliRepairEmail: obliRepairEmail,
         setWeighbridgeRepairEmail: weighbridgeRepairEmail,
         setWeighbridgeInstallEmail: weighbridgeInstallEmail,
       });
-      navigation.goBack();
-    } else {
-      Alert.alert('Invalid Email', 'Please enter valid email addresses.');
     }
   };
 
@@ -60,71 +57,82 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation, route }) =>
     setTheme(theme); // Apply the selected theme colors to the app
   };
 
-  const handleTestEmail = () => {
-    const email = obliInstallEmail; // Use the set email address
-    const subject = 'Test Email'; // Test subject
-    const body = 'This is a test email with a sample image attachment.'; // Test body
-    const attachments = ['file:///storage/emulated/0/rn_image_picker_lib_temp_405e67d2-ea2f-4194-a470-f651b02a4c59.jpg']; // Sample attachment
-
-    openMailApp(email, subject, body, attachments);
-  };
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.label}>Obli Install Email Address:</Text>
-      <TextInput
-        style={styles.input}
-        value={obliInstallEmail}
-        onChangeText={setObliInstallEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        placeholder="Enter Obli Install Email Address"
-        placeholderTextColor="gray"
-      />
-      <Text style={styles.label}>Obli Repair Email Address:</Text>
-      <TextInput
-        style={styles.input}
-        value={obliRepairEmail}
-        onChangeText={setObliRepairEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        placeholder="Enter Obli Repair Email Address"
-        placeholderTextColor="gray"
-      />
-      <Text style={styles.label}>Weighbridge Repair Email Address:</Text>
-      <TextInput
-        style={styles.input}
-        value={weighbridgeRepairEmail}
-        onChangeText={setWeighbridgeRepairEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        placeholder="Enter Weighbridge Repair Email Address"
-        placeholderTextColor="gray"
-      />
-      <Text style={styles.label}>Weighbridge Install Email Address:</Text>
-      <TextInput
-        style={styles.input}
-        value={weighbridgeInstallEmail}
-        onChangeText={setWeighbridgeInstallEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        placeholder="Enter Weighbridge Install Email Address"
-        placeholderTextColor="gray"
-      />
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save</Text>
-      </TouchableOpacity>
-      <Text style={styles.label}>Select Theme:</Text>
-      <Picker
-        selectedValue={selectedTheme}
-        style={styles.picker}
-        onValueChange={(itemValue) => handleThemeChange(itemValue)}
-      >
-        <Picker.Item label="Light" value="light" />
-        <Picker.Item label="Dark" value="dark" />
-        <Picker.Item label="High Contrast" value="highContrast" />
-      </Picker>
-      <Button title="Test Email" onPress={handleTestEmail} />
+    <ScrollView contentContainerStyle={styles.contentContainer}>
+      <View style={styles.container}>
+        <Text style={styles.label}>Obli Install Email:</Text>
+        <TextInput
+          style={styles.input}
+          value={obliInstallEmail}
+          onChangeText={setObliInstallEmail}
+          onBlur={() => handleEmailBlur(obliInstallEmail, setObliInstallEmail)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholder="Enter Obli Install Email"
+          placeholderTextColor="gray"
+        />
+        <Text style={styles.label}>Obli Repair Email:</Text>
+        <TextInput
+          style={styles.input}
+          value={obliRepairEmail}
+          onChangeText={setObliRepairEmail}
+          onBlur={() => handleEmailBlur(obliRepairEmail, setObliRepairEmail)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholder="Enter Obli Repair Email"
+          placeholderTextColor="gray"
+        />
+        <Text style={styles.label}>Weighbridge Repair Email:</Text>
+        <TextInput
+          style={styles.input}
+          value={weighbridgeRepairEmail}
+          onChangeText={setWeighbridgeRepairEmail}
+          onBlur={() => handleEmailBlur(weighbridgeRepairEmail, setWeighbridgeRepairEmail)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholder="Enter Weighbridge Repair Email"
+          placeholderTextColor="gray"
+        />
+        <Text style={styles.label}>Weighbridge Install Email:</Text>
+        <TextInput
+          style={styles.input}
+          value={weighbridgeInstallEmail}
+          onChangeText={setWeighbridgeInstallEmail}
+          onBlur={() => handleEmailBlur(weighbridgeInstallEmail, setWeighbridgeInstallEmail)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholder="Enter Weighbridge Install Email"
+          placeholderTextColor="gray"
+        />
+        <Text style={styles.label}>Select Theme:</Text>
+        <Picker
+          selectedValue={selectedTheme}
+          style={styles.picker}
+          onValueChange={(itemValue) => handleThemeChange(itemValue)}
+        >
+          <Picker.Item label="Default" value="default" />
+          <Picker.Item label="Light" value="light" />
+          <Picker.Item label="Dark" value="dark" />
+          <Picker.Item label="High Contrast" value="highContrast" />
+        </Picker>
+        <Text style={styles.label}>Image Quality:</Text>
+        <Picker
+          selectedValue={imageQuality}
+          style={styles.picker}
+          onValueChange={(itemValue) => setImageQuality(itemValue)}
+        >
+          <Picker.Item label="0.1" value="0.1" />
+          <Picker.Item label="0.2" value="0.2" />
+          <Picker.Item label="0.3" value="0.3" />
+          <Picker.Item label="0.4" value="0.4" />
+          <Picker.Item label="0.5" value="0.5" />
+          <Picker.Item label="0.6" value="0.6" />
+          <Picker.Item label="0.7" value="0.7" />
+          <Picker.Item label="0.8" value="0.8" />
+          <Picker.Item label="0.9" value="0.9" />
+          <Picker.Item label="1.0" value="1.0" />
+        </Picker>
+      </View>
     </ScrollView>
   );
 };
