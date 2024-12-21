@@ -110,8 +110,8 @@ const useStyles = () => {
       padding: 10, // Increase padding
       borderRadius: 35, // Increase border radius
       borderWidth: 5, // Increase border width
-      borderColor: colors.onSecondaryFixedVariant, // Use theme secondary color
-      shadowColor: '#000',
+      borderColor: colors.onPrimaryFixedVariant, // Use theme secondary color
+      shadowColor: colors.shadow, // Use theme shadow color
       shadowOffset: { width: 2, height: 8 }, // Increase shadow offset
       shadowOpacity: 0.9, // Increase shadow opacity
       shadowRadius: 4, // Increase shadow radius
