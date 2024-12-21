@@ -1,6 +1,6 @@
 // utils/cameraUtils.ts
 import { launchCamera } from 'react-native-image-picker';
-import { savePicture } from './imageUtils'; 
+import { savePicture } from './imageUtils';
 
 export const openCamera = (index: number, buttonName: string, images: string[][], setImages: (images: string[][]) => void) => {
   launchCamera({ mediaType: 'photo', quality: 0.2 }, async (response) => {
