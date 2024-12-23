@@ -1,36 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Alert, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, Alert, ScrollView, BackHandler } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useTheme } from '../ThemeContext'; // Import useTheme
-import useStyles from '../styles'; // Import useStyles
+import useStyles from '../styles'; // Use styles
+import { useEmail } from '../EmailContext'; // Import useEmail
 
 const SettingsScreen = ({ navigation }: { navigation: any }) => {
   const { colors, setTheme } = useTheme(); // Use theme colors and setTheme function
   const styles = useStyles(); // Use styles
+  const {
+    obliInstallEmail,
+    setObliInstallEmail,
+    obliRepairEmail,
+    setObliRepairEmail,
+    weighbridgeRepairEmail,
+    setWeighbridgeRepairEmail,
+    weighbridgeInstallEmail,
+    setWeighbridgeInstallEmail,
+  } = useEmail(); // Use email context
 
-  const [obliInstallEmail, setObliInstallEmail] = useState('');
-  const [obliRepairEmail, setObliRepairEmail] = useState('');
-  const [weighbridgeRepairEmail, setWeighbridgeRepairEmail] = useState('');
-  const [weighbridgeInstallEmail, setWeighbridgeInstallEmail] = useState('');
-  const [selectedTheme, setSelectedTheme] = useState('');
-  const [imageQuality, setImageQuality] = useState('0.5'); // Default image quality
+  const [selectedTheme, setSelectedTheme] = useState('default'); // Add state for selectedTheme
+  const [imageQuality, setImageQuality] = useState('0.5'); // Add state for imageQuality
 
   useEffect(() => {
-    navigation.setOptions({
-      setObliInstallEmail: (email: string) => {
-        setObliInstallEmail(email);
-      },
-      setObliRepairEmail: (email: string) => {
-        setObliRepairEmail(email);
-      },
-      setWeighbridgeRepairEmail: (email: string) => {
-        setWeighbridgeRepairEmail(email);
-      },
-      setWeighbridgeInstallEmail: (email: string) => {
-        setWeighbridgeInstallEmail(email);
-      },
+    console.log('SettingsScreen mounted');
+    console.log('Initial obliInstallEmail:', obliInstallEmail);
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (!validateEmail(obliInstallEmail)) {
+        Alert.alert('Invalid Email', 'Please enter a valid email address.');
+        return true; // Prevent default behavior (navigation)
+      }
+      return false; // Allow default behavior (navigation)
     });
-  }, [navigation]);
+
+    return () => {
+      console.log('SettingsScreen unmounted');
+      backHandler.remove();
+    };
+  }, [navigation, obliInstallEmail]);
 
   const validateEmail = (email: string) => {
     const re = /\S+@\S+\.\S+/;
@@ -42,19 +50,14 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
       Alert.alert('Invalid Email', 'Please enter a valid email address.');
     } else {
       setEmail(email);
-      // Automatically save the email to navigation options
-      navigation.setOptions({
-        setObliInstallEmail: obliInstallEmail,
-        setObliRepairEmail: obliRepairEmail,
-        setWeighbridgeRepairEmail: weighbridgeRepairEmail,
-        setWeighbridgeInstallEmail: weighbridgeInstallEmail,
-      });
+      console.log('Email validated and set:', email);
     }
   };
 
   const handleThemeChange = (theme: string) => {
     setSelectedTheme(theme);
     setTheme(theme); // Apply the selected theme colors to the app
+    console.log('Theme changed to:', theme);
   };
 
   return (
@@ -68,7 +71,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
           onBlur={() => handleEmailBlur(obliInstallEmail, setObliInstallEmail)}
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholder="Enter Obli Install Email"
+          placeholder={obliInstallEmail || "Enter Obli Install Email"}
           placeholderTextColor="gray"
         />
         <Text style={styles.label}>Obli Repair Email:</Text>
@@ -79,7 +82,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
           onBlur={() => handleEmailBlur(obliRepairEmail, setObliRepairEmail)}
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholder="Enter Obli Repair Email"
+          placeholder={obliRepairEmail || "Enter Obli Repair Email"}
           placeholderTextColor="gray"
         />
         <Text style={styles.label}>Weighbridge Repair Email:</Text>
@@ -90,7 +93,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
           onBlur={() => handleEmailBlur(weighbridgeRepairEmail, setWeighbridgeRepairEmail)}
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholder="Enter Weighbridge Repair Email"
+          placeholder={weighbridgeRepairEmail || "Enter Weighbridge Repair Email"}
           placeholderTextColor="gray"
         />
         <Text style={styles.label}>Weighbridge Install Email:</Text>
@@ -101,7 +104,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
           onBlur={() => handleEmailBlur(weighbridgeInstallEmail, setWeighbridgeInstallEmail)}
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholder="Enter Weighbridge Install Email"
+          placeholder={weighbridgeInstallEmail || "Enter Weighbridge Install Email"}
           placeholderTextColor="gray"
         />
         <Text style={styles.label}>Select Theme:</Text>

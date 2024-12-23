@@ -10,6 +10,7 @@ import {
   Modal,
   StatusBarStyle,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useTheme } from '../ThemeContext'; // Import useTheme
 import useStyles from '../styles'; // Use styles
@@ -17,11 +18,13 @@ import { openMailApp } from '../utils/emailUtils'; // Adjust the import path as 
 import { openCamera } from '../utils/cameraUtils'; // Import camera utils
 import { requestCameraPermission } from '../utils/permissionsUtils'; // Import permissions utils
 import { deleteImage } from '../utils/imageUtils'; // Import image utils
+import { useEmail } from '../EmailContext'; // Import useEmail
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); 
   const styles = useStyles();
   const scrollViewRef = useRef<ScrollView>(null);
+  const { obliInstallEmail, setObliInstallEmail } = useEmail(); // Use email context
 
   const buttonNames = [
     'Front Sensor(s)',
@@ -39,18 +42,24 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
   const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({});
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
-  const [emailAddress, setEmailAddress] = useState('');
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [thumbnailSizes, setThumbnailSizes] = useState<{ [key: string]: { width: number, height: number } }>({});
   const [fullScreenImageSize, setFullScreenImageSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
   const [fullScreenImageLoading, setFullScreenImageLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    console.log('ObliInstall mounted');
+    console.log('Initial emailAddress:', obliInstallEmail);
+
     const checkCameraPermission = async () => {
       const granted = await requestCameraPermission();
       setHasCameraPermission(granted);
     };
     checkCameraPermission();
+
+    return () => {
+      console.log('ObliInstall unmounted');
+    };
   }, []);
 
   const getButtonBorderColor = (index: number) => {
@@ -63,16 +72,30 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   };
 
   const handleOpenMailApp = () => {
-    const email = emailAddress;
+    if (!obliInstallEmail) {
+      Alert.alert('No Email Set', 'Please set an email address in the settings.', [
+        { text: 'OK', onPress: () => navigation.navigate('Settings') },
+      ]);
+      return;
+    }
+
+    const incompleteButtonIndex = buttonNames.findIndex((name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red');
+    if (incompleteButtonIndex !== -1) {
+      Alert.alert('Incomplete', `Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
+      return;
+    }
+
+    const email = obliInstallEmail;
     const subject = 'Installation Report';
     const body = 'Attached are the installation images.'; 
     const attachments = images.flat();
 
+    console.log('Sending email to:', email);
     openMailApp(email, subject, body, attachments);
   };
 
-  const allButtonsGreen = images.every(imageArray => imageArray.length > 0);
-  const sendEmailButtonColor = allButtonsGreen ? 'green' : 'red';
+  const allButtonsGreenOrOrange = images.every((imageArray, index) => imageArray.length > 0 || getButtonBorderColor(index) === 'orange');
+  const sendEmailButtonColor = allButtonsGreenOrOrange ? 'green' : 'red';
 
   return (
     <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
@@ -81,10 +104,8 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={() => {
-            navigation.navigate('Settings', { obliInstallEmail: emailAddress });
-            navigation.setOptions({
-              setObliInstallEmail: setEmailAddress,
-            });
+            navigation.navigate('Settings');
+            console.log('Navigating to Settings with email:', obliInstallEmail);
           }}
         >
           <Text style={styles.settingsButtonText}>⚙️</Text>
@@ -130,7 +151,6 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
           <TouchableOpacity
             style={[styles.bottomButton, { backgroundColor: sendEmailButtonColor }]}
             onPress={handleOpenMailApp}
-            disabled={!allButtonsGreen}
           >
             <Text style={styles.bottomButtonText}>Send Email</Text>
           </TouchableOpacity>
