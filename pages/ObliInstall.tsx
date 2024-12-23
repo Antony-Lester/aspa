@@ -160,6 +160,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                 </View>
               </View>
             ))}
+            <View style={{ height: 250 }} /> {/* Add space at the bottom */}
           </View>
         </ScrollView>
         <View style={styles.bottomButtonContainer}>
