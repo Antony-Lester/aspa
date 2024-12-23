@@ -100,10 +100,17 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const allButtonsGreenOrOrange = images.every((imageArray, index) => imageArray.length > 0 || getButtonBorderColor(index) === 'orange');
   const sendEmailButtonColor = allButtonsGreenOrOrange ? 'green' : 'red';
 
-  // Sort button names based on their border color
-  const sortedButtonNames = buttonNames
+  // Separate green buttons and non-green buttons
+  const nonGreenButtons = buttonNames
     .map((name, index) => ({ name, index, borderColor: getButtonBorderColor(index) }))
-    .sort((a, b) => (a.borderColor === 'green' ? 1 : -1));
+    .filter(button => button.borderColor !== 'green');
+
+  const greenButtons = buttonNames
+    .map((name, index) => ({ name, index, borderColor: getButtonBorderColor(index) }))
+    .filter(button => button.borderColor === 'green');
+
+  // Concatenate non-green buttons with green buttons at the end
+  const sortedButtonNames = [...nonGreenButtons, ...greenButtons];
 
   return (
     <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
