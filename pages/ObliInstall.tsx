@@ -144,17 +144,24 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                     console.log(`Rendering image for index ${index}: ${uri}`);
                     const thumbnailStyle = thumbnailSizes[uri];
                     return (
-                      thumbnailStyle && !imageLoading[uri] ? (
-                        <TouchableOpacity key={imgIndex} onPress={() => setFullScreenImage({ uri, index })}>
+                      <View key={imgIndex} style={styles.thumbnailWrapper}>
+                        {imageLoading[uri] && <ActivityIndicator size="small" color={colors.primary} />}
+                        <TouchableOpacity onPress={() => setFullScreenImage({ uri, index })}>
                           <Image
                             source={{ uri: `file://${uri}` }}
                             style={[styles.thumbnail, thumbnailStyle]}
                             resizeMode="contain"
+                            onLoad={() => {
+                              console.log(`Image loaded: ${uri}`);
+                              setImageLoading(prev => ({ ...prev, [uri]: false }));
+                            }}
+                            onError={(error) => {
+                              console.error(`Failed to load image: ${uri}`, error);
+                              setImageLoading(prev => ({ ...prev, [uri]: false }));
+                            }}
                           />
                         </TouchableOpacity>
-                      ) : (
-                        <ActivityIndicator key={imgIndex} size="small" color={colors.primary} />
-                      )
+                      </View>
                     );
                   })}
                 </View>
