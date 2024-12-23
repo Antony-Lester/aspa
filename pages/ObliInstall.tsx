@@ -64,6 +64,9 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
 
   const getButtonBorderColor = (index: number) => {
     const imageCount = images[index].length;
+    if (buttonNames[index] === 'Front Sensor(s)' || buttonNames[index] === 'Rear Sensor(s)') {
+      return imageCount >= 2 ? 'green' : imageCount === 1 ? 'orange' : 'red';
+    }
     return imageCount > 0 ? 'green' : (buttonNames[index] === 'T Piece Locations' || buttonNames[index] === 'Reg Plate' || buttonNames[index] === 'Other') ? 'orange' : 'red';
   };
 
@@ -97,6 +100,11 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const allButtonsGreenOrOrange = images.every((imageArray, index) => imageArray.length > 0 || getButtonBorderColor(index) === 'orange');
   const sendEmailButtonColor = allButtonsGreenOrOrange ? 'green' : 'red';
 
+  // Sort button names based on their border color
+  const sortedButtonNames = buttonNames
+    .map((name, index) => ({ name, index, borderColor: getButtonBorderColor(index) }))
+    .sort((a, b) => (a.borderColor === 'green' ? 1 : -1));
+
   return (
     <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
       <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
@@ -115,10 +123,10 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
           <View style={styles.buttonContainer}>
-            {buttonNames.map((name, index) => (
+            {sortedButtonNames.map(({ name, index, borderColor }) => (
               <View key={index} style={styles.buttonWrapper}>
                 <TouchableOpacity
-                  style={[styles.button, { borderColor: getButtonBorderColor(index) }]}
+                  style={[styles.button, { borderColor }]}
                   onPress={() => openCamera(index, name, images, setImages)}>
                   <View style={styles.buttonContent}>
                     <Text style={styles.buttonText}>{name}</Text>
