@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
-  ScrollView,
   View,
   Text,
   TextInput,
@@ -29,14 +28,19 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
   const [reg, setReg] = useState('');
   const [emailOpened, setEmailOpened] = useState(false);
   const [chassisPlateUri, setChassisPlateUri] = useState('');
+  const [sendEmailButtonColor, setSendEmailButtonColor] = useState('red');
+  const [imageAspectRatio, setImageAspectRatio] = useState<number | null>(null);
 
   useEffect(() => {
+    // Lock orientation to portrait
+    //Orientation.lockToPortrait();
+
     // Suggest VIN and REG based on images
     const suggestVinAndReg = async () => {
       // Identify the Chassis plate image based on the tag
       for (const imageArray of images) {
         for (const imageUri of imageArray) {
-          if (imageUri.includes('Chassis_Plate_1.jpg')) {
+          if (imageUri.includes('Chassis_Plate.jpg')) {
             setChassisPlateUri(imageUri);
             break;
           }
@@ -46,6 +50,12 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
 
     suggestVinAndReg();
   }, [images]);
+
+  useEffect(() => {
+    // Validate VIN and set button color
+    const isValidVin = vin.replace(/\s/g, '').length >= 6 && vin.replace(/\s/g, '').length <= 17;
+    setSendEmailButtonColor(isValidVin ? 'green' : 'red');
+  }, [vin]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -89,49 +99,36 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
           { cancelable: false }
         );
       }
-    }, [emailOpened, images, vin, reg, emailAddress, navigation])
+    }, [emailOpened, images, navigation])
   );
 
-  const validateVin = (vin: string) => {
-    const isValid = vin.length >= 6 && vin.length <= 17;
-    console.log('Validating VIN:', vin, 'isValid:', isValid);
-    return isValid;
-  };
-
-  const validateReg = (reg: string) => {
-    const isValid = reg.length <= 7;
-    console.log('Validating REG:', reg, 'isValid:', isValid);
-    return isValid;
-  };
-
   const handleSave = () => {
-    console.log('Handle Save clicked');
-    if (!validateVin(vin)) {
-      Alert.alert('Invalid VIN', 'VIN should be between 6 and 17 characters long.');
+    const formattedVin = vin.replace(/\s/g, ''); // Remove spaces from VIN
+    if (formattedVin.length < 6 || formattedVin.length > 17) {
+      Alert.alert('Invalid VIN', 'Please enter a valid VIN number.');
       return;
     }
-    if (!validateReg(reg)) {
-      Alert.alert('Invalid REG', 'REG should be a maximum of 7 characters long.');
-      return;
-    }
-    console.log('Sending email with VIN:', vin, 'and REG:', reg);
+    // Handle save logic with formattedVin
+    console.log('Formatted VIN:', formattedVin);
+  };
 
-    const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
-    const body = 'Attached are the installation images.';
-    const attachments = images.flat();
-
-    openMailApp(emailAddress, subject, body, attachments);
-    setEmailOpened(true);
+  const handleImageLayout = (event) => {
+    const { width, height } = event.nativeEvent.layout;
+    setImageAspectRatio(width / height);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.chassisPlateContainer}>
+      <View style={styles.contentContainer}>
         {chassisPlateUri ? (
           <Image
             source={{ uri: `file://${chassisPlateUri}` }}
-            style={styles.chassisPlateImage}
+            style={[
+              styles.chassisPlateImage,
+              imageAspectRatio ? { aspectRatio: imageAspectRatio } : {},
+            ]}
             resizeMode="contain"
+            onLayout={handleImageLayout}
           />
         ) : null}
         <Text style={styles.vinLabel}>Enter VIN:</Text>
@@ -152,13 +149,15 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
           placeholderTextColor="gray"
           maxLength={7}
         />
+      </View>
+      <View style={styles.bottomButtonContainer}>
         <TouchableOpacity
-          style={styles.bottomButton}
+          style={[styles.bottomButton, { borderColor: sendEmailButtonColor, borderWidth: 11 }]}
           onPress={handleSave}
         >
-          <Text style={styles.buttonText}>Submit</Text>
+          <Text style={styles.bottomButtonText}>Submit</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };

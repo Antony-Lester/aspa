@@ -18,6 +18,7 @@ const useStyles = () => {
     contentContainer: {
       flexGrow: 1,
       justifyContent: 'center',
+      alignItems: 'center', // Center align items horizontally
       padding: 16,
     },
     settingsButton: {
@@ -188,10 +189,12 @@ const useStyles = () => {
       fontSize: 20, // Increase font size
       fontWeight: 'bold', // Make text bold
       marginBottom: 8,
-      color: colors.onSecondary // Use theme onBackground color
+      color: colors.onSecondary, // Use theme onBackground color
+      alignSelf: 'flex-start', // Align text to the left
     },
     vinInput: {
-      height: 50, // Increase height
+      height: 50, // Increase height,
+      width: '80%', // Full width of the screen
       fontSize: 18, // Increase font size
       borderColor: colors.onSecondaryFixedVariant, // Use theme primary color for border
       borderWidth: 2, // Increase border width
@@ -254,14 +257,11 @@ const useStyles = () => {
     chassisPlateContainer: {
       width: '100%', // Full width of the screen
       flex: 1,
-
-
       backgroundColor: colors.secondary, // Use theme background color
     },
     chassisPlateImage: {
       width: screenWidth, // Full width of the screen
-      height: '40%', // Maintain aspect ratio
-
+      height: undefined, // Maintain aspect ratio
       marginBottom: 20, // Add margin below the image
     },
   });
