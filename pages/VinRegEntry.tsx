@@ -106,7 +106,7 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
                 const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
                 const body = 'Attached are the installation images.';
                 const attachments = images.flat();
-                handleOpenMailApp(vin, reg, getEmailAddress(), ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation);
+                handleOpenMailApp(vin, reg, getEmailAddress(), ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation, sourcePage);
               },
             },
           ],
@@ -124,7 +124,7 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
     }
     // Handle save logic with formattedVin
     console.log('Formatted VIN:', formattedVin);
-    handleOpenMailApp(formattedVin, reg, getEmailAddress(), ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation);
+    handleOpenMailApp(formattedVin, reg, getEmailAddress(), ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation, sourcePage);
   };
 
   const handleImageLayout = (event: { nativeEvent: { layout: { width: any; height: any; }; }; }) => {

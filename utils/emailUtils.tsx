@@ -62,7 +62,8 @@ export const handleOpenMailApp = (
   buttonNames: string[],
   images: string[][],
   getButtonBorderColor: (index: number) => string,
-  navigation: any
+  navigation: any,
+  sourcePage: string
 ) => {
   if (!vin || vin.length < 6 || vin.length > 17) {
     Alert.alert('Invalid VIN', 'VIN should be between 6 and 17 characters long.');
@@ -85,7 +86,26 @@ export const handleOpenMailApp = (
   }
 
   const subject = `${new Date().toISOString().split('T')[0].replace(/-/g, '/') } ${vin} ${reg || ''}`;
-  const body = `Attached are the images for ${navigation.state.routeName}. ${vin || ''} ${reg || ''}`;
+  
+   let job = '';
+   switch (sourcePage) {
+      case 'ObliInstall':
+        job = 'OBLI Install';
+        break;
+      case 'ObliRepair':
+        job = 'OBLI Repair';
+        break;
+      case 'WeighbridgeInstall':
+        job = 'Weighbridge Install';
+        break;
+      case 'WeighbridgeRepair':
+        job = 'Weighbridge Repair';
+        break;
+      default:
+        job = '';
+    }
+  
+  const body = `Attached are the images for ${job},\n\n\nfor ${vin || ''} ${reg || ''}.`;
   const attachments = images.flat();
 
   console.log('IN handle email...Sending email to:', email);
