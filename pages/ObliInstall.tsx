@@ -22,9 +22,11 @@ import { useEmail } from '../EmailContext'; // Import useEmail
 import { useRoute } from '@react-navigation/native'; // Import useRoute
 import { StatusBarContext } from '../App'; // Import StatusBarContext
 
+
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); 
   const styles = useStyles();
+  const { obliRepairEmail } = useEmail(); // Use email context
   const scrollViewRef = useRef<ScrollView>(null);
   const { obliInstallEmail, setObliInstallEmail } = useEmail(); // Use email context
   const route = useRoute();
@@ -84,7 +86,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
 
   const handleSend = () => {
     if (!vin || vin.length < 6 || vin.length > 17) {
-      navigation.navigate('VinRegEntry', { images });
+      navigation.navigate('VinRegEntry', { images, emailAddress: obliInstallEmail })
       return;
     }
 

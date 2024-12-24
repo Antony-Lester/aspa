@@ -14,19 +14,22 @@ import {
   StatusBarStyle,
 } from 'react-native';
 import { useTheme } from '../ThemeContext'; // Import useTheme
-import useStyles from '../styles'; // Import useStyles
+import useStyles from '../styles'; // Use styles
 import { openMailApp } from '../utils/emailUtils'; // Adjust the import path as necessary
-import { requestCameraPermission, openCamera } from '../utils/cameraUtils'; // Import camera utils
+import { openCamera } from '../utils/cameraUtils'; // Import camera utils
 import { deleteImage } from '../utils/imageUtils'; // Import image utils
+import { useEmail } from '../EmailContext'; // Import useEmail
+import { requestCameraPermission } from '../utils/permissionsUtils'; // Import permissions utils
 
 const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); // Use theme colors
   const styles = useStyles(); // Use styles
   const scrollViewRef = useRef<ScrollView>(null);
 
+  const { weighbridgeInstallEmail } = useEmail(); // Use email context
+
   const [images, setImages] = useState<string[][]>(Array(5).fill([]));
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
-  const [emailAddress, setEmailAddress] = useState('');
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -42,7 +45,7 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
   };
 
   const handleOpenMailApp = () => {
-    const email = emailAddress; // Use the set email address
+    const email = weighbridgeInstallEmail; // Use the set email address
     const subject = 'Weighbridge Install Report'; // Replace with the desired subject
     const body = 'Attached are the weighbridge install images.'; // Replace with the desired body text
     const attachments = images.flat(); // Flatten the array of image arrays
@@ -98,10 +101,7 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={() => {
-            navigation.navigate('Settings', { weighbridgeInstallEmail: emailAddress });
-            navigation.setOptions({
-              setWeighbridgeInstallEmail: setEmailAddress,
-            });
+            navigation.navigate('Settings', { weighbridgeInstallEmail });
           }}
         >
           <Text style={styles.settingsButtonText}>⚙️</Text>
@@ -115,7 +115,7 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
               <View key={button.index} style={styles.buttonWrapper}>
                 <TouchableOpacity
                   style={[styles.button, { borderColor: button.borderColor }]}
-                  onPress={() => openCamera(button.index, images, setImages)}>
+                  onPress={() => openCamera(button.index, button.name, images, setImages)}>
                   <View style={styles.buttonContent}>
                     <Text style={styles.buttonText}>{button.name}</Text>
                   </View>
@@ -140,6 +140,11 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
             style={styles.bottomButton}
             onPress={handleOpenMailApp}>
             <Text style={styles.bottomButtonText}>Send Email</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.bottomButton}
+            onPress={() => navigation.navigate('VinRegEntry', { images, emailAddress: weighbridgeInstallEmail })}>
+            <Text style={styles.bottomButtonText}>Next</Text>
           </TouchableOpacity>
         </View>
         {fullScreenImage && (

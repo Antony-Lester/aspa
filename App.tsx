@@ -1,7 +1,7 @@
 import React, { useEffect, createContext, useContext, useState } from 'react';
 import { NavigationContainer, useNavigationState } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import HomePage from './pages/HomePage'; // Import HomePage
+import HomeScreen from './pages/HomePage'; // Import HomeScreen
 import ObliInstall from './pages/ObliInstall'; // Import ObliInstall
 import ObliRepair from './pages/ObliRepair'; // Import ObliRepair
 import WeighbridgeInstall from './pages/WeighbridgeInstall'; // Import WeighbridgeInstall
@@ -67,7 +67,7 @@ const MainNavigator = ({ statusBarColor, navigationBarColor }: { statusBarColor:
 
   return (
     <Stack.Navigator
-      initialRouteName="HomePage"
+      initialRouteName="Home"
       screenOptions={{
         headerStyle: {
           backgroundColor: colors.primary, // Apply theme primary color to the header
@@ -80,8 +80,8 @@ const MainNavigator = ({ statusBarColor, navigationBarColor }: { statusBarColor:
       }}
     >
       <Stack.Screen
-        name="HomePage"
-        component={HomePage}
+        name="Home"
+        component={HomeScreen}
         options={{ headerShown: false }} // Hide the header for the HomePage screen
       />
       <Stack.Screen

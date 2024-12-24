@@ -15,18 +15,21 @@ import {
 } from 'react-native';
 import { useTheme } from '../ThemeContext'; // Import useTheme
 import useStyles from '../styles'; // Use styles
-import { openMailApp } from '../utils/emailUtils'; // Adjust the import path as necessary
-import { requestCameraPermission, openCamera } from '../utils/cameraUtils'; // Import camera utils
+import { openCamera } from '../utils/cameraUtils'; // Import camera utils
 import { deleteImage } from '../utils/imageUtils'; // Import image utils
+import { useEmail } from '../EmailContext'; // Import useEmail
+import { requestCameraPermission } from '../utils/permissionsUtils'; // Import permissions utils
+import { handleOpenMailApp } from '../utils/emailUtils';
 
 const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); // Use theme colors
   const styles = useStyles(); // Use styles
   const scrollViewRef = useRef<ScrollView>(null);
 
+  const { weighbridgeRepairEmail } = useEmail(); // Use email context
+
   const [images, setImages] = useState<string[][]>(Array(2).fill([]));
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
-  const [emailAddress, setEmailAddress] = useState('');
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -41,25 +44,7 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
     deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
   };
 
-  const handleOpenMailApp = () => {
-    const email = emailAddress; // Use the set email address
-    const subject = 'Weighbridge Repair Report'; // Replace with the desired subject
-    const body = 'Attached are the before and after weighbridge repair images.'; // Replace with the desired body text
-    const attachments = images.flat(); // Flatten the array of image arrays
-
-    openMailApp(email, subject, body, attachments);
-  };
-
-  if (hasCameraPermission === null) {
-    return (
-      <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
-        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
-        <View style={styles.container}>
-          <Text style={styles.buttonText}>Checking camera permission...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+ 
 
   if (!hasCameraPermission) {
     return (
@@ -84,10 +69,7 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={() => {
-            navigation.navigate('Settings', { weighbridgeRepairEmail: emailAddress });
-            navigation.setOptions({
-              setWeighbridgeRepairEmail: setEmailAddress,
-            });
+            navigation.navigate('Settings', { weighbridgeRepairEmail });
           }}
         >
           <Text style={styles.settingsButtonText}>⚙️</Text>
@@ -101,7 +83,7 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
               <View key={button.index} style={styles.buttonWrapper}>
                 <TouchableOpacity
                   style={[styles.button, { borderColor: button.borderColor }]}
-                  onPress={() => openCamera(button.index, images, setImages)}>
+                  onPress={() => openCamera(button.index, button.name, images, setImages)}>
                   <View style={styles.buttonContent}>
                     <Text style={styles.buttonText}>{button.name}</Text>
                   </View>
@@ -124,8 +106,13 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
         <View style={styles.bottomButtonContainer}>
           <TouchableOpacity
             style={styles.bottomButton}
-            onPress={handleOpenMailApp}>
+            onPress={() => handleOpenMailApp('', '', weighbridgeRepairEmail, ['Before Repair', 'After Repair'], images, () => 'blue', navigation)}>
             <Text style={styles.bottomButtonText}>Send Email</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.bottomButton}
+            onPress={() => navigation.navigate('VinRegEntry', { images, emailAddress: weighbridgeRepairEmail })}>
+            <Text style={styles.bottomButtonText}>Next</Text>
           </TouchableOpacity>
         </View>
         {fullScreenImage && (

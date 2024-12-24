@@ -12,7 +12,8 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import RNFS from 'react-native-fs';
 import useStyles from '../styles'; // Import useStyles
-import { openMailApp } from '../utils/emailUtils'; // Import openMailApp
+import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
+//import Orientation from 'react-native-orientation-locker'; // Import Orientation
 
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 
@@ -88,11 +89,8 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
             {
               text: 'No',
               onPress: () => {
-                // Re-open the email app
-                const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
-                const body = 'Attached are the installation images.';
-                const attachments = images.flat();
-                openMailApp(emailAddress, subject, body, attachments);
+                setEmailOpened(false);
+                handleOpenMailApp(vin, reg, emailAddress, ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation);
               },
             },
           ],
@@ -110,9 +108,10 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
     }
     // Handle save logic with formattedVin
     console.log('Formatted VIN:', formattedVin);
+    handleOpenMailApp(formattedVin, reg, emailAddress, ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation);
   };
 
-  const handleImageLayout = (event) => {
+  const handleImageLayout = (event: any) => {
     const { width, height } = event.nativeEvent.layout;
     setImageAspectRatio(width / height);
   };
@@ -155,7 +154,7 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
           style={[styles.bottomButton, { borderColor: sendEmailButtonColor, borderWidth: 11 }]}
           onPress={handleSave}
         >
-          <Text style={styles.bottomButtonText}>Submit</Text>
+          <Text style={styles.bottomButtonText}>Send</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

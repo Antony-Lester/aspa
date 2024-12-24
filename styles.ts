@@ -194,7 +194,7 @@ const useStyles = () => {
     },
     vinInput: {
       height: 50, // Increase height,
-      width: '80%', // Full width of the screen
+      width: '100%', // Full width of the screen
       fontSize: 18, // Increase font size
       borderColor: colors.onSecondaryFixedVariant, // Use theme primary color for border
       borderWidth: 2, // Increase border width
@@ -260,8 +260,8 @@ const useStyles = () => {
       backgroundColor: colors.secondary, // Use theme background color
     },
     chassisPlateImage: {
-      width: screenWidth, // Full width of the screen
-      height: undefined, // Maintain aspect ratio
+      width: screenWidth - 5, // Set the width to the screen width minus padding
+      minHeight: 200, // Set a minimum height for the image
       marginBottom: 20, // Add margin below the image
     },
   });
