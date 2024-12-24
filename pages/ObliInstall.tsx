@@ -12,30 +12,17 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useTheme } from '../ThemeContext'; // Import useTheme
-import useStyles from '../styles'; // Use styles
-import { openMailApp, handleOpenMailApp } from '../utils/emailUtils'; // Import emailUtils
-import { openCamera } from '../utils/cameraUtils'; // Import camera utils
-import { requestCameraPermission } from '../utils/permissionsUtils'; // Import permissions utils
-import { deleteImage } from '../utils/imageUtils'; // Import image utils
-import { useEmail } from '../EmailContext'; // Import useEmail
-import { useRoute } from '@react-navigation/native'; // Import useRoute
-import { StatusBarContext } from '../App'; // Import StatusBarContext
+import { useTheme } from '../ThemeContext';
+import useStyles from '../styles';
+import { openMailApp, handleOpenMailApp } from '../utils/emailUtils';
+import { openCamera } from '../utils/cameraUtils';
+import { requestCameraPermission } from '../utils/permissionsUtils';
+import { deleteImage } from '../utils/imageUtils';
+import { useEmail } from '../EmailContext';
+import { useRoute } from '@react-navigation/native';
+import { StatusBarContext } from '../App';
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
-  const { colors } = useTheme(); 
-  const styles = useStyles();
-  const scrollViewRef = useRef<ScrollView>(null);
-  const { obliInstallEmail, setObliInstallEmail } = useEmail(); // Use email context
-  const route = useRoute();
-  const { vin, reg } = route.params as { vin: string; reg?: string } || {};
-  const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
-
-  useEffect(() => {
-    setStatusBarColor(colors.tertiaryContainer);
-    setNavigationBarColor(colors.tertiaryContainer);
-  }, [colors, setStatusBarColor, setNavigationBarColor]);
-
   const buttonNames = [
     'Front Sensor(s)',
     'Rear Sensor(s)',
@@ -48,7 +35,13 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     'Reg Plate',
     'Other',
   ];
-
+  const { colors } = useTheme();
+  const styles = useStyles();
+  const scrollViewRef = useRef<ScrollView>(null);
+  const { obliInstallEmail, setObliInstallEmail } = useEmail(); // Use email context
+  const route = useRoute();
+  const { vin, reg } = route.params as { vin: string; reg?: string } || {};
+  const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
   const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({});
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
@@ -56,6 +49,11 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const [thumbnailSizes, setThumbnailSizes] = useState<{ [key: string]: { width: number, height: number } }>({});
   const [fullScreenImageSize, setFullScreenImageSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
   const [fullScreenImageLoading, setFullScreenImageLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setStatusBarColor(colors.tertiaryContainer);
+    setNavigationBarColor(colors.tertiaryContainer);
+  }, [colors, setStatusBarColor, setNavigationBarColor]);
 
   useEffect(() => {
     console.log('ObliInstall mounted');
@@ -102,7 +100,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const allButtonsGreenOrOrange = images.every((imageArray, index) => imageArray.length > 0 || getButtonBorderColor(index) === 'orange');
   const sendEmailButtonColor = allButtonsGreenOrOrange ? 'green' : 'red';
 
-  // Separate green buttons and non-green buttons
+
   const nonGreenButtons = buttonNames
     .map((name, index) => ({ name, index, borderColor: getButtonBorderColor(index) }))
     .filter(button => button.borderColor !== 'green');
@@ -111,13 +109,13 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     .map((name, index) => ({ name, index, borderColor: getButtonBorderColor(index) }))
     .filter(button => button.borderColor === 'green');
 
-  // Concatenate non-green buttons with green buttons at the end
+
   const sortedButtonNames = [...nonGreenButtons, ...greenButtons];
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle}/>
-      <View style={[styles.container ]}>
+      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
+      <View style={[styles.container]}>
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={() => {
