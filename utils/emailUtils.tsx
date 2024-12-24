@@ -84,8 +84,8 @@ export const handleOpenMailApp = (
     return;
   }
 
-  const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
-  const body = `To: ${email}\n\nAttached are the images.`;
+  const subject = `${new Date().toISOString().split('T')[0].replace(/-/g, '/') } ${vin} ${reg || ''}`;
+  const body = `Attached are the images for ${navigation.state.routeName}. ${vin || ''} ${reg || ''}`;
   const attachments = images.flat();
 
   console.log('IN handle email...Sending email to:', email);
