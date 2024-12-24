@@ -12,17 +12,30 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { useTheme } from '../ThemeContext';
-import useStyles from '../styles';
-import { openMailApp, handleOpenMailApp } from '../utils/emailUtils';
-import { openCamera } from '../utils/cameraUtils';
-import { requestCameraPermission } from '../utils/permissionsUtils';
-import { deleteImage } from '../utils/imageUtils';
-import { useEmail } from '../EmailContext';
-import { useRoute } from '@react-navigation/native';
-import { StatusBarContext } from '../App';
+import { useTheme } from '../ThemeContext'; // Import useTheme
+import useStyles from '../styles'; // Use styles
+import { openMailApp, handleOpenMailApp } from '../utils/emailUtils'; // Import emailUtils
+import { openCamera } from '../utils/cameraUtils'; // Import camera utils
+import { requestCameraPermission } from '../utils/permissionsUtils'; // Import permissions utils
+import { deleteImage } from '../utils/imageUtils'; // Import image utils
+import { useEmail } from '../EmailContext'; // Import useEmail
+import { useRoute } from '@react-navigation/native'; // Import useRoute
+import { StatusBarContext } from '../App'; // Import StatusBarContext
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
+  const { colors } = useTheme(); 
+  const styles = useStyles();
+  const scrollViewRef = useRef<ScrollView>(null);
+  const { obliInstallEmail, setObliInstallEmail } = useEmail(); // Use email context
+  const route = useRoute();
+  const { vin, reg } = route.params || {};
+  const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
+
+  useEffect(() => {
+    setStatusBarColor(colors.primary);
+    setNavigationBarColor(colors.primary);
+  }, [colors, setStatusBarColor, setNavigationBarColor]);
+
   const buttonNames = [
     'Front Sensor(s)',
     'Rear Sensor(s)',
@@ -35,13 +48,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     'Reg Plate',
     'Other',
   ];
-  const { colors } = useTheme();
-  const styles = useStyles();
-  const scrollViewRef = useRef<ScrollView>(null);
-  const { obliInstallEmail, setObliInstallEmail } = useEmail(); // Use email context
-  const route = useRoute();
-  const { vin, reg } = route.params as { vin: string; reg?: string } || {};
-  const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
+
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
   const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({});
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
@@ -51,23 +58,11 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const [fullScreenImageLoading, setFullScreenImageLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    setStatusBarColor(colors.tertiaryContainer);
-    setNavigationBarColor(colors.tertiaryContainer);
-  }, [colors, setStatusBarColor, setNavigationBarColor]);
-
-  useEffect(() => {
-    console.log('ObliInstall mounted');
-    console.log('Initial emailAddress:', obliInstallEmail);
-
     const checkCameraPermission = async () => {
       const granted = await requestCameraPermission();
       setHasCameraPermission(granted);
     };
     checkCameraPermission();
-
-    return () => {
-      console.log('ObliInstall unmounted');
-    };
   }, []);
 
   const getButtonBorderColor = (index: number) => {
@@ -93,14 +88,13 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     const body = 'Attached are the installation images.';
     const attachments = images.flat();
 
-    console.log('Sending email to:', email);
     openMailApp(email, subject, body, attachments);
   };
 
   const allButtonsGreenOrOrange = images.every((imageArray, index) => imageArray.length > 0 || getButtonBorderColor(index) === 'orange');
   const sendEmailButtonColor = allButtonsGreenOrOrange ? 'green' : 'red';
 
-
+  // Separate green buttons and non-green buttons
   const nonGreenButtons = buttonNames
     .map((name, index) => ({ name, index, borderColor: getButtonBorderColor(index) }))
     .filter(button => button.borderColor !== 'green');
@@ -109,22 +103,14 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     .map((name, index) => ({ name, index, borderColor: getButtonBorderColor(index) }))
     .filter(button => button.borderColor === 'green');
 
-
+  // Concatenate non-green buttons with green buttons at the end
   const sortedButtonNames = [...nonGreenButtons, ...greenButtons];
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
-      <View style={[styles.container]}>
-        <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={() => {
-            navigation.navigate('Settings');
-            console.log('Navigating to Settings with email:', obliInstallEmail);
-          }}
-        >
-          <Text style={styles.settingsButtonText}>⚙️</Text>
-        </TouchableOpacity>
+    <SafeAreaView style={{ backgroundColor: colors.secondary, flex: 1 }}>
+      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
+      <View style={[styles.container, { backgroundColor: colors.secondary }]}>
+        
         <ScrollView
           ref={scrollViewRef}
           contentInsetAdjustmentBehavior="automatic"
@@ -141,7 +127,6 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                 </TouchableOpacity>
                 <View style={styles.thumbnailContainer}>
                   {images[index].map((uri, imgIndex) => {
-                    console.log(`Rendering image for index ${index}: ${uri}`);
                     const thumbnailStyle = thumbnailSizes[uri];
                     return (
                       <View key={imgIndex} style={styles.thumbnailWrapper}>
@@ -152,11 +137,9 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                             style={[styles.thumbnail, thumbnailStyle]}
                             resizeMode="contain"
                             onLoad={() => {
-                              console.log(`Image loaded: ${uri}`);
                               setImageLoading(prev => ({ ...prev, [uri]: false }));
                             }}
                             onError={(error) => {
-                              console.error(`Failed to load image: ${uri}`, error);
                               setImageLoading(prev => ({ ...prev, [uri]: false }));
                             }}
                           />
@@ -167,7 +150,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                 </View>
               </View>
             ))}
-            <View style={{ height: 250 }} /> {/* Add space at the bottom */}
+            <View style={{ height: 250 }} /> 
           </View>
         </ScrollView>
         <View style={[styles.bottomButtonContainer, { backgroundColor: colors.primary }]}>

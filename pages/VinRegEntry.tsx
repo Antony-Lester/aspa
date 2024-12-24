@@ -1,56 +1,35 @@
 // VinRegEntry.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert } from 'react-native';
-import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
-import TextRecognition from 'react-native-text-recognition';
-import useStyles from '../styles'; // Use styles
-import { openMailApp } from '../utils/emailUtils'; // Import openMailApp
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import RNFS from 'react-native-fs';
+import useStyles from '../styles'; // Import useStyles
+import { openMailApp } from '../utils/emailUtils'; // Import openMailApp
 
-const VinRegEntry = () => {
-  const styles = useStyles();
-  const navigation = useNavigation();
-  const route = useRoute();
+const VinRegEntry = ({ navigation, route }) => {
   const { images, emailAddress } = route.params || {};
-
+  const styles = useStyles();
   const [vin, setVin] = useState('');
   const [reg, setReg] = useState('');
   const [emailOpened, setEmailOpened] = useState(false);
+  const [chassisPlateUri, setChassisPlateUri] = useState('');
 
   useEffect(() => {
-    console.log('VinRegEntry mounted');
-    console.log('Images:', images);
-
-    const extractTextFromImage = async (imageUri: string) => {
-      console.log('Extracting text from image:', imageUri);
-      try {
-        const result = await TextRecognition.recognize(imageUri);
-        console.log('Text recognition result:', result);
-        const recognizedText = result.join('\n');
-        console.log('Recognized text:', recognizedText);
-        return recognizedText;
-      } catch (error) {
-        console.error('Failed to recognize text from image:', error);
-        return '';
-      }
-    };
-
+    // Suggest VIN and REG based on images
     const suggestVinAndReg = async () => {
-      if (images[7].length > 0) { // Chassis Plate
-        const vinText = await extractTextFromImage(images[7][0]);
-        if (vinText) {
-          console.log('Suggested VIN:', vinText);
-          setVin(vinText);
-          Alert.alert('VIN Found', `Suggested VIN: ${vinText}`);
-        }
-      }
-      if (images[8].length > 0) { // Reg Plate
-        const regText = await extractTextFromImage(images[8][0]);
-        if (regText) {
-          console.log('Suggested REG:', regText);
-          setReg(regText);
-          Alert.alert('REG Found', `Suggested REG: ${regText}`);
-        }
+      // Logic to suggest VIN and REG
+      // Assuming the Chassis plate image is the first image in the first array
+      if (images.length > 0 && images[0].length > 0) {
+        setChassisPlateUri(images[0][0]);
       }
     };
 
@@ -135,25 +114,41 @@ const VinRegEntry = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Enter VIN:</Text>
-      <TextInput
-        style={styles.input}
-        value={vin}
-        onChangeText={setVin}
-        placeholder="Enter VIN"
-        maxLength={17}
-      />
-      <Text style={styles.label}>Enter REG (optional):</Text>
-      <TextInput
-        style={styles.input}
-        value={reg}
-        onChangeText={setReg}
-        placeholder="Enter REG"
-        maxLength={7}
-      />
-      <Button title="Save" onPress={handleSave} />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
+        {chassisPlateUri ? (
+          <Image
+            source={{ uri: `file://${chassisPlateUri}` }}
+            style={styles.chassisPlateImage}
+            resizeMode="contain"
+          />
+        ) : null}
+        <Text style={styles.label}>Enter VIN:</Text>
+        <TextInput
+          style={styles.input}
+          value={vin}
+          onChangeText={setVin}
+          placeholder="Enter VIN"
+          placeholderTextColor="gray"
+          maxLength={17}
+        />
+        <Text style={styles.label}>Enter REG (optional):</Text>
+        <TextInput
+          style={styles.input}
+          value={reg}
+          onChangeText={setReg}
+          placeholder="Enter REG"
+          placeholderTextColor="gray"
+          maxLength={7}
+        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSave}
+        >
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

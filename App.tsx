@@ -12,6 +12,7 @@ import { ThemeProvider, useTheme } from './ThemeContext'; // Import ThemeProvide
 import { EmailProvider } from './EmailContext'; // Import EmailProvider
 import { StatusBar } from 'react-native';
 import changeNavigationBarColor from 'react-native-navigation-bar-color'; // Import navigation bar color changer
+import SettingsButton from './elements/SettingsButton'; // Import SettingsButton
 import useStyles from './styles'; // Import useStyles
 
 const Stack = createStackNavigator();
@@ -75,6 +76,7 @@ const MainNavigator = ({ statusBarColor, navigationBarColor }: { statusBarColor:
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        headerRight: () => <SettingsButton />, // Add the custom button to the header
       }}
     >
       <Stack.Screen
