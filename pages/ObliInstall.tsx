@@ -28,7 +28,12 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const { obliInstallEmail, setObliInstallEmail } = useEmail(); // Use email context
   const route = useRoute();
-  const { vin, reg } = route.params || {};
+  type RouteParams = {
+    vin?: string;
+    reg?: string;
+  };
+  
+  const { vin, reg } = (route.params as RouteParams) || {};
   const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
 
   useEffect(() => {

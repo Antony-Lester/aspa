@@ -11,6 +11,7 @@ export const openCamera = (index: number, buttonName: string, images: string[][]
     } else if (response.assets && response.assets.length > 0) {
       const asset = response.assets[0];
       if (asset.uri) {
+        const isChassisPlate = buttonName === 'Chassis Plate'; // Tag the Chassis plate image
         await savePicture(asset.uri, buttonName, index, images, setImages);
       }
     }

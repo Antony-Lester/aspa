@@ -15,7 +15,14 @@ import RNFS from 'react-native-fs';
 import useStyles from '../styles'; // Import useStyles
 import { openMailApp } from '../utils/emailUtils'; // Import openMailApp
 
-const VinRegEntry = ({ navigation, route }) => {
+import { NavigationProp, RouteProp } from '@react-navigation/native';
+
+type VinRegEntryProps = {
+  navigation: NavigationProp<any>;
+  route: RouteProp<{ params: { images: string[][]; emailAddress: string } }, 'params'>;
+};
+
+const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
   const { images, emailAddress } = route.params || {};
   const styles = useStyles();
   const [vin, setVin] = useState('');
@@ -26,10 +33,14 @@ const VinRegEntry = ({ navigation, route }) => {
   useEffect(() => {
     // Suggest VIN and REG based on images
     const suggestVinAndReg = async () => {
-      // Logic to suggest VIN and REG
-      // Assuming the Chassis plate image is the first image in the first array
-      if (images.length > 0 && images[0].length > 0) {
-        setChassisPlateUri(images[0][0]);
+      // Identify the Chassis plate image based on the tag
+      for (const imageArray of images) {
+        for (const imageUri of imageArray) {
+          if (imageUri.includes('Chassis_Plate_1.jpg')) {
+            setChassisPlateUri(imageUri);
+            break;
+          }
+        }
       }
     };
 
