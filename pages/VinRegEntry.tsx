@@ -126,7 +126,7 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+      <ScrollView contentContainerStyle={styles.chassisPlateContainer}>
         {chassisPlateUri ? (
           <Image
             source={{ uri: `file://${chassisPlateUri}` }}
@@ -134,18 +134,18 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
             resizeMode="contain"
           />
         ) : null}
-        <Text style={styles.label}>Enter VIN:</Text>
+        <Text style={styles.vinLabel}>Enter VIN:</Text>
         <TextInput
-          style={styles.input}
+          style={styles.vinInput}
           value={vin}
           onChangeText={setVin}
           placeholder="Enter VIN"
           placeholderTextColor="gray"
           maxLength={17}
         />
-        <Text style={styles.label}>Enter REG (optional):</Text>
+        <Text style={styles.vinLabel}>Enter REG (optional):</Text>
         <TextInput
-          style={styles.input}
+          style={styles.vinInput}
           value={reg}
           onChangeText={setReg}
           placeholder="Enter REG"
@@ -153,7 +153,7 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
           maxLength={7}
         />
         <TouchableOpacity
-          style={styles.button}
+          style={styles.bottomButton}
           onPress={handleSave}
         >
           <Text style={styles.buttonText}>Submit</Text>

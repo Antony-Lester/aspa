@@ -1,8 +1,9 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import { useTheme } from './ThemeContext'; // Import useTheme
 
 const useStyles = () => {
   const { colors } = useTheme(); // Use theme colors
+  const screenWidth = Dimensions.get('window').width; // Get the screen width
 
   return StyleSheet.create({
     container: {
@@ -43,20 +44,16 @@ const useStyles = () => {
       marginBottom: 20,
     },
     button: {
-      width: '80%',
-      padding: 10,
-      marginVertical: 5,
-      backgroundColor: colors.onSecondary, // Use theme primary color
-      borderRadius: 35,
-      borderWidth: 6, // Increase border width
-      borderColor: colors.tertiaryContainer, // Use theme primaryContainer color
-      shadowColor: colors.shadow, // Use theme shadow color
-      shadowOffset: { width: 5, height: 5 },
-      shadowOpacity: 0.6,
-      shadowRadius: 4,
-      elevation: 15,
+      backgroundColor: colors.primary, // Use theme primary color
+      padding: 15,
+      borderRadius: 30,
       alignItems: 'center',
       justifyContent: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.9,
+      shadowRadius: 4,
+      elevation: 10,
     },
     buttonContent: {
       flexDirection: 'row',
@@ -187,6 +184,28 @@ const useStyles = () => {
       shadowRadius: 2,
       elevation: 5,
     },
+    vinLabel: {
+      fontSize: 20, // Increase font size
+      fontWeight: 'bold', // Make text bold
+      marginBottom: 8,
+      color: colors.onSecondary // Use theme onBackground color
+    },
+    vinInput: {
+      height: 50, // Increase height
+      fontSize: 18, // Increase font size
+      borderColor: colors.onSecondaryFixedVariant, // Use theme primary color for border
+      borderWidth: 2, // Increase border width
+      borderRadius: 10, // Add border radius
+      paddingHorizontal: 10, // Add horizontal padding
+      backgroundColor: colors.secondaryContainer, // Use theme surface color
+      color: colors.onSecondaryContainer, // Use a lighter color for the input text
+      marginBottom: 16, // Add margin bottom
+      shadowColor: '#000', // Add shadow for better contrast
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.8,
+      shadowRadius: 2,
+      elevation: 5,
+    },
     picker: {
       height: 50,
       width: '100%',
@@ -232,9 +251,17 @@ const useStyles = () => {
       aspectRatio: 1, // Ensure the logo is square
       marginBottom: 20, // Add margin to the logo
     },
-    chassisPlateImage: {
+    chassisPlateContainer: {
       width: '100%', // Full width of the screen
-      height: 200, // Adjust the height as needed
+      flex: 1,
+
+
+      backgroundColor: colors.secondary, // Use theme background color
+    },
+    chassisPlateImage: {
+      width: screenWidth, // Full width of the screen
+      height: '40%', // Maintain aspect ratio
+
       marginBottom: 20, // Add margin below the image
     },
   });
