@@ -19,7 +19,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
     setWeighbridgeInstallEmail,
   } = useEmail(); // Use email context
 
-  const [selectedTheme, setSelectedTheme] = useState('default'); // Add state for selectedTheme
+  const [selectedTheme, setSelectedTheme] = useState('light'); // Add state for selectedTheme
   const [imageQuality, setImageQuality] = useState('0.5'); // Add state for imageQuality
 
   useEffect(() => {
@@ -113,7 +113,6 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
           style={styles.picker}
           onValueChange={(itemValue) => handleThemeChange(itemValue)}
         >
-          <Picker.Item label="Default" value="default" />
           <Picker.Item label="Light" value="light" />
           <Picker.Item label="Dark" value="dark" />
           <Picker.Item label="High Contrast" value="highContrast" />

@@ -1,5 +1,5 @@
 // utils/emailUtils.ts
-import { PermissionsAndroid, Platform } from 'react-native';
+import { PermissionsAndroid, Platform, Alert } from 'react-native';
 import Mailer from 'react-native-mail';
 import RNFS from 'react-native-fs';
 
@@ -51,4 +51,43 @@ export const sendEmail = async (email: string, subject: string, body: string, at
 
 export const openMailApp = async (email: string, subject: string, body: string, attachments: string[]) => {
   sendEmail(email, subject, body, attachments);
+};
+
+export const handleOpenMailApp = (
+  vin: string,
+  reg: string,
+  obliInstallEmail: string,
+  buttonNames: string[],
+  images: string[][],
+  getButtonBorderColor: (index: number) => string,
+  openMailApp: (email: string, subject: string, body: string, attachments: string[]) => void,
+  navigation: any
+) => {
+  if (!vin || vin.length < 6 || vin.length > 17) {
+    Alert.alert('Invalid VIN', 'VIN should be between 6 and 17 characters long.');
+    return;
+  }
+
+  if (!obliInstallEmail) {
+    Alert.alert('No Email Set', 'Please set an email address in the settings.', [
+      { text: 'OK', onPress: () => navigation.navigate('Settings') },
+    ]);
+    return;
+  }
+
+  const incompleteButtonIndex = buttonNames.findIndex(
+    (name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red'
+  );
+  if (incompleteButtonIndex !== -1) {
+    Alert.alert('Incomplete', `Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
+    return;
+  }
+
+  const email = obliInstallEmail;
+  const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
+  const body = 'Attached are the installation images.';
+  const attachments = images.flat();
+
+  console.log('Sending email to:', email);
+  openMailApp(email, subject, body, attachments);
 };

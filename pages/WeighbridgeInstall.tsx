@@ -104,7 +104,7 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
             });
           }}
         >
-          <Text style={styles.settingsButtonText}>���️</Text>
+          <Text style={styles.settingsButtonText}>⚙️</Text>
         </TouchableOpacity>
         <ScrollView
           ref={scrollViewRef}

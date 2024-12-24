@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -14,17 +14,27 @@ import {
 } from 'react-native';
 import { useTheme } from '../ThemeContext'; // Import useTheme
 import useStyles from '../styles'; // Use styles
-import { openMailApp } from '../utils/emailUtils'; // Adjust the import path as necessary
+import { openMailApp, handleOpenMailApp } from '../utils/emailUtils'; // Import emailUtils
 import { openCamera } from '../utils/cameraUtils'; // Import camera utils
 import { requestCameraPermission } from '../utils/permissionsUtils'; // Import permissions utils
 import { deleteImage } from '../utils/imageUtils'; // Import image utils
 import { useEmail } from '../EmailContext'; // Import useEmail
+import { useRoute } from '@react-navigation/native'; // Import useRoute
+import { StatusBarContext } from '../App'; // Import StatusBarContext
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); 
   const styles = useStyles();
   const scrollViewRef = useRef<ScrollView>(null);
   const { obliInstallEmail, setObliInstallEmail } = useEmail(); // Use email context
+  const route = useRoute();
+  const { vin, reg } = route.params || {};
+  const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
+
+  useEffect(() => {
+    setStatusBarColor(colors.primary);
+    setNavigationBarColor(colors.primary);
+  }, [colors, setStatusBarColor, setNavigationBarColor]);
 
   const buttonNames = [
     'Front Sensor(s)',
@@ -74,23 +84,15 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
   };
 
-  const handleOpenMailApp = () => {
-    if (!obliInstallEmail) {
-      Alert.alert('No Email Set', 'Please set an email address in the settings.', [
-        { text: 'OK', onPress: () => navigation.navigate('Settings') },
-      ]);
-      return;
-    }
-
-    const incompleteButtonIndex = buttonNames.findIndex((name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red');
-    if (incompleteButtonIndex !== -1) {
-      Alert.alert('Incomplete', `Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
+  const handleSend = () => {
+    if (!vin || vin.length < 6 || vin.length > 17) {
+      navigation.navigate('VinRegEntry', { images });
       return;
     }
 
     const email = obliInstallEmail;
-    const subject = 'Installation Report';
-    const body = 'Attached are the installation images.'; 
+    const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
+    const body = 'Attached are the installation images.';
     const attachments = images.flat();
 
     console.log('Sending email to:', email);
@@ -113,9 +115,9 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const sortedButtonNames = [...nonGreenButtons, ...greenButtons];
 
   return (
-    <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
-      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
-      <View style={styles.container}>
+    <SafeAreaView style={{ backgroundColor: colors.background, flex: 1 }}>
+      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={() => {
@@ -170,12 +172,12 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
             <View style={{ height: 250 }} /> {/* Add space at the bottom */}
           </View>
         </ScrollView>
-        <View style={styles.bottomButtonContainer}>
+        <View style={[styles.bottomButtonContainer, { backgroundColor: colors.primary }]}>
           <TouchableOpacity
             style={[styles.bottomButton, { backgroundColor: sendEmailButtonColor }]}
-            onPress={handleOpenMailApp}
+            onPress={handleSend}
           >
-            <Text style={styles.bottomButtonText}>Send Email</Text>
+            <Text style={styles.bottomButtonText}>Send</Text>
           </TouchableOpacity>
         </View>
         {fullScreenImage && (

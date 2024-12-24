@@ -35,7 +35,7 @@ const useStyles = () => {
     buttonContainer: {
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 35,
+      padding: 0,
     },
     buttonWrapper: {
       width: '100%',
@@ -43,18 +43,18 @@ const useStyles = () => {
       marginBottom: 20,
     },
     button: {
-      width: '98%',
-      padding: 15,
-      marginVertical: 10,
-      backgroundColor: colors.primary, // Use theme primary color
+      width: '80%',
+      padding: 10,
+      marginVertical: 5,
+      backgroundColor: colors.onSurfaceVariant, // Use theme primary color
       borderRadius: 35,
-      borderWidth: 5, // Increase border width
-      borderColor: colors.primaryContainer, // Use theme primaryContainer color
-      shadowColor: '#000',
-      shadowOffset: { width: 1, height: 3 },
+      borderWidth: 6, // Increase border width
+      borderColor: colors.tertiaryContainer, // Use theme primaryContainer color
+      shadowColor: colors.shadow, // Use theme shadow color
+      shadowOffset: { width: 5, height: 5 },
       shadowOpacity: 0.6,
       shadowRadius: 4,
-      elevation: 10,
+      elevation: 15,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -65,7 +65,7 @@ const useStyles = () => {
       width: '100%',
     },
     buttonText: {
-      color: colors.onPrimary, // Use theme onPrimary color
+      color: colors.onTertiary, // Use theme onPrimary color
       fontSize: 20,
       fontWeight: 'bold', // Make text bold
       textAlign: 'center',
@@ -99,7 +99,7 @@ const useStyles = () => {
     bottomButtonContainer: {
       alignItems: 'center',
       justifyContent: 'center', // Center the button horizontally
-      padding: 16,
+      padding: 0,
       position: 'absolute',
       bottom: 0,
       left: 0, // Ensure the container fills the screen width
@@ -110,21 +110,17 @@ const useStyles = () => {
       padding: 10, // Increase padding
       borderRadius: 35, // Increase border radius
       borderWidth: 5, // Increase border width
-      borderColor: colors.onPrimaryFixedVariant, // Use theme secondary color
-      shadowColor: colors.shadow, // Use theme shadow color
-      shadowOffset: { width: 2, height: 8 }, // Increase shadow offset
-      shadowOpacity: 0.9, // Increase shadow opacity
-      shadowRadius: 4, // Increase shadow radius
-      elevation: 10, // Increase elevation
+      borderColor: colors.outline, // Use theme secondary color
+      elevation: 0, // Increase elevation
       alignItems: 'center', // Center the text within the button
       justifyContent: 'center', // Center the text within the button
-      marginVertical: 10, // Add vertical margin
+      marginVertical: 5, // Add vertical margin
       alignSelf: 'center', // Center the button horizontally
       width: '80%', // Set button width
       backgroundColor: colors.primary, // Use theme onPrimary color for text
     },
     bottomButtonText: {
-      color: colors.onPrimary, // Use theme onPrimary color for text
+      color: colors.surfaceBright, // Use theme onPrimary color for text
       fontSize: 20, // Increase font size
       fontWeight: 'bold',
     },
