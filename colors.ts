@@ -1,4 +1,4 @@
-const lightColors = {
+const darkColors = {
   primary: '#415F91',
   surfaceTint: '#415F91',
   onPrimary: '#FFFFFF',
@@ -52,7 +52,7 @@ const lightColors = {
   statusBarStyle: 'dark-content', // Add this line
 };
 
-const darkColors = {
+const lightColors = {
   primary: '#AAC7FF',
   surfaceTint: '#AAC7FF',
   onPrimary: '#0A305F',

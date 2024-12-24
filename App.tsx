@@ -40,7 +40,7 @@ const App = () => {
   );
 };
 
-const MainNavigator = ({ statusBarColor, navigationBarColor }) => {
+const MainNavigator = ({ statusBarColor, navigationBarColor }: { statusBarColor: string, navigationBarColor: string }) => {
   const { colors } = useTheme(); // Use theme colors
   const state = useNavigationState(state => state);
   const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
@@ -103,7 +103,7 @@ const MainNavigator = ({ statusBarColor, navigationBarColor }) => {
         options={{ title: 'Weighbridge Repair' }}
       />
       <Stack.Screen
-        name="SettingsScreen"
+        name="Settings"
         component={SettingsScreen}
         options={{ title: 'Settings' }}
       />

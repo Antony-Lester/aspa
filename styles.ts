@@ -9,10 +9,10 @@ const useStyles = () => {
       flex: 1,
       padding: 16,
       justifyContent: 'center',
-      backgroundColor: colors.background, // Use theme background color
+      backgroundColor: colors.secondary, // Use theme background color
     },
     scrollView: {
-      backgroundColor: colors.background, // Use theme background color
+      backgroundColor: colors.secondary, // Use theme background color
     },
     contentContainer: {
       flexGrow: 1,
@@ -46,7 +46,7 @@ const useStyles = () => {
       width: '80%',
       padding: 10,
       marginVertical: 5,
-      backgroundColor: colors.onSurfaceVariant, // Use theme primary color
+      backgroundColor: colors.onSecondary, // Use theme primary color
       borderRadius: 35,
       borderWidth: 6, // Increase border width
       borderColor: colors.tertiaryContainer, // Use theme primaryContainer color
@@ -96,10 +96,15 @@ const useStyles = () => {
       borderWidth: 2, // Add border width
       borderColor: colors.primary, // Use theme primary color for border
     },
+    thumbnailWrapper: {
+      margin: 5,
+      borderRadius: 10,
+      overflow: 'hidden',
+    },
     bottomButtonContainer: {
       alignItems: 'center',
       justifyContent: 'center', // Center the button horizontally
-      padding: 0,
+      paddingTop: 10,
       position: 'absolute',
       bottom: 0,
       left: 0, // Ensure the container fills the screen width
@@ -180,17 +185,6 @@ const useStyles = () => {
     picker: {
       height: 50,
       width: '100%',
-      color: colors.onBackground, // Use theme onBackground color
-      backgroundColor: colors.secondaryContainer, // Use theme secondaryContainer color
-      borderColor: colors.primary, // Use theme primary color for border
-      borderWidth: 2, // Increase border width
-      borderRadius: 10, // Add border radius
-      marginBottom: 16, // Add margin bottom
-      shadowColor: '#000', // Add shadow for better contrast
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.8,
-      shadowRadius: 2,
-      elevation: 5,
     },
     saveButton: {
       backgroundColor: colors.secondary, // Use theme secondary color

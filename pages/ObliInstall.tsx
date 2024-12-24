@@ -28,12 +28,12 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const { obliInstallEmail, setObliInstallEmail } = useEmail(); // Use email context
   const route = useRoute();
-  const { vin, reg } = route.params || {};
+  const { vin, reg } = route.params as { vin: string; reg?: string } || {};
   const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
 
   useEffect(() => {
-    setStatusBarColor(colors.primary);
-    setNavigationBarColor(colors.primary);
+    setStatusBarColor(colors.tertiaryContainer);
+    setNavigationBarColor(colors.tertiaryContainer);
   }, [colors, setStatusBarColor, setNavigationBarColor]);
 
   const buttonNames = [
@@ -115,9 +115,9 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const sortedButtonNames = [...nonGreenButtons, ...greenButtons];
 
   return (
-    <SafeAreaView style={{ backgroundColor: colors.background, flex: 1 }}>
-      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle}/>
+      <View style={[styles.container ]}>
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={() => {
@@ -135,7 +135,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
             {sortedButtonNames.map(({ name, index, borderColor }) => (
               <View key={index} style={styles.buttonWrapper}>
                 <TouchableOpacity
-                  style={[styles.button, { borderColor }]}
+                  style={[styles.bottomButton, { borderColor }]}
                   onPress={() => openCamera(index, name, images, setImages)}>
                   <View style={styles.buttonContent}>
                     <Text style={styles.buttonText}>{name}</Text>
@@ -174,7 +174,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
         </ScrollView>
         <View style={[styles.bottomButtonContainer, { backgroundColor: colors.primary }]}>
           <TouchableOpacity
-            style={[styles.bottomButton, { backgroundColor: sendEmailButtonColor }]}
+            style={[styles.bottomButton, { borderColor: sendEmailButtonColor, borderWidth: 11, backgroundColor: colors.primary }]}
             onPress={handleSend}
           >
             <Text style={styles.bottomButtonText}>Send</Text>
