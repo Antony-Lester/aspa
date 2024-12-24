@@ -129,7 +129,7 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.bottomButton}
-            onPress={() => navigation.navigate('VinRegEntry', { images, emailAddress: obliRepairEmail })}>
+            onPress={() => navigation.navigate('VinRegEntry', { images, sourcePage: 'ObliRepair' })}>
             <Text style={styles.bottomButtonText}>Next</Text>
           </TouchableOpacity>
         </View>

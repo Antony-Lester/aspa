@@ -86,7 +86,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
 
   const handleSend = () => {
     if (!vin || vin.length < 6 || vin.length > 17) {
-      navigation.navigate('VinRegEntry', { images, emailAddress: obliInstallEmail })
+      navigation.navigate('VinRegEntry', { images, sourcePage: 'ObliInstall' });
       return;
     }
 

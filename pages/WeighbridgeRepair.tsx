@@ -111,7 +111,7 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.bottomButton}
-            onPress={() => navigation.navigate('VinRegEntry', { images, emailAddress: weighbridgeRepairEmail })}>
+            onPress={() => navigation.navigate('VinRegEntry', { images, sourcePage: 'WeighbridgeRepair' })}>
             <Text style={styles.bottomButtonText}>Next</Text>
           </TouchableOpacity>
         </View>

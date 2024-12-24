@@ -13,18 +13,19 @@ import { useFocusEffect } from '@react-navigation/native';
 import RNFS from 'react-native-fs';
 import useStyles from '../styles'; // Import useStyles
 import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
-//import Orientation from 'react-native-orientation-locker'; // Import Orientation
+import { useEmail } from '../EmailContext'; // Import useEmail
 
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 
 type VinRegEntryProps = {
   navigation: NavigationProp<any>;
-  route: RouteProp<{ params: { images: string[][]; emailAddress: string } }, 'params'>;
+  route: RouteProp<{ params: { images: string[][]; sourcePage: string } }, 'params'>;
 };
 
 const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
-  const { images, emailAddress } = route.params || {};
+  const { images, sourcePage } = route.params || {};
   const styles = useStyles();
+  const { obliInstallEmail, obliRepairEmail, weighbridgeRepairEmail, weighbridgeInstallEmail } = useEmail(); // Use email context
   const [vin, setVin] = useState('');
   const [reg, setReg] = useState('');
   const [emailOpened, setEmailOpened] = useState(false);
@@ -33,9 +34,6 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
   const [imageAspectRatio, setImageAspectRatio] = useState<number | null>(null);
 
   useEffect(() => {
-    // Lock orientation to portrait
-    //Orientation.lockToPortrait();
-
     // Suggest VIN and REG based on images
     const suggestVinAndReg = async () => {
       // Identify the Chassis plate image based on the tag
@@ -57,6 +55,21 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
     const isValidVin = vin.replace(/\s/g, '').length >= 6 && vin.replace(/\s/g, '').length <= 17;
     setSendEmailButtonColor(isValidVin ? 'green' : 'red');
   }, [vin]);
+
+  const getEmailAddress = () => {
+    switch (sourcePage) {
+      case 'ObliInstall':
+        return obliInstallEmail;
+      case 'ObliRepair':
+        return obliRepairEmail;
+      case 'WeighbridgeInstall':
+        return weighbridgeInstallEmail;
+      case 'WeighbridgeRepair':
+        return weighbridgeRepairEmail;
+      default:
+        return '';
+    }
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -89,8 +102,11 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
             {
               text: 'No',
               onPress: () => {
-                setEmailOpened(false);
-                handleOpenMailApp(vin, reg, emailAddress, ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation);
+                // Re-open the email app
+                const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
+                const body = 'Attached are the installation images.';
+                const attachments = images.flat();
+                handleOpenMailApp(vin, reg, getEmailAddress(), ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation);
               },
             },
           ],
@@ -108,10 +124,10 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
     }
     // Handle save logic with formattedVin
     console.log('Formatted VIN:', formattedVin);
-    handleOpenMailApp(formattedVin, reg, emailAddress, ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation);
+    handleOpenMailApp(formattedVin, reg, getEmailAddress(), ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation);
   };
 
-  const handleImageLayout = (event: any) => {
+  const handleImageLayout = (event: { nativeEvent: { layout: { width: any; height: any; }; }; }) => {
     const { width, height } = event.nativeEvent.layout;
     setImageAspectRatio(width / height);
   };

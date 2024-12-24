@@ -143,7 +143,7 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.bottomButton}
-            onPress={() => navigation.navigate('VinRegEntry', { images, emailAddress: weighbridgeInstallEmail })}>
+            onPress={() => navigation.navigate('VinRegEntry', { images, sourcePage: 'WeighbridgeInstall' })}>
             <Text style={styles.bottomButtonText}>Next</Text>
           </TouchableOpacity>
         </View>

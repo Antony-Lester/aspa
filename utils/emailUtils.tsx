@@ -28,7 +28,9 @@ export const sendEmail = async (email: string, subject: string, body: string, at
     console.error('Storage permissions denied');
     return;
   }
-  console.log('Email:', email);
+  console.log('IN sendEmail:', email);
+  console.log('Subject:', subject);
+  console.log('Body:', body);
   console.log('Attachments:', attachments); // Log the attachments for debugging
 
   Mailer.mail({
@@ -56,7 +58,7 @@ export const openMailApp = async (email: string, subject: string, body: string, 
 export const handleOpenMailApp = (
   vin: string,
   reg: string,
-  obliInstallEmail: string,
+  email: string,
   buttonNames: string[],
   images: string[][],
   getButtonBorderColor: (index: number) => string,
@@ -67,7 +69,7 @@ export const handleOpenMailApp = (
     return;
   }
 
-  if (!obliInstallEmail) {
+  if (!email) {
     Alert.alert('No Email Set', 'Please set an email address in the settings.', [
       { text: 'OK', onPress: () => navigation.navigate('Settings') },
     ]);
@@ -82,11 +84,10 @@ export const handleOpenMailApp = (
     return;
   }
 
-  const email = obliInstallEmail;
   const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
   const body = `To: ${email}\n\nAttached are the images.`;
   const attachments = images.flat();
 
-  console.log('Sending email to:', email);
+  console.log('IN handle email...Sending email to:', email);
   openMailApp(email, subject, body, attachments);
 };
