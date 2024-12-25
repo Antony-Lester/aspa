@@ -82,7 +82,7 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
     }
     console.log('All images deleted.');
     // Navigate to Home screen
-    navigation.navigate('HomePage');
+    navigation.navigate('Home');
   };
 
   useFocusEffect(

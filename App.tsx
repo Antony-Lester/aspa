@@ -1,6 +1,7 @@
 import React, { useEffect, createContext, useContext, useState } from 'react';
 import { NavigationContainer, useNavigationState } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from './pages/HomePage'; // Import HomeScreen
 import ObliInstall from './pages/ObliInstall'; // Import ObliInstall
 import ObliRepair from './pages/ObliRepair'; // Import ObliRepair
@@ -29,14 +30,30 @@ const App = () => {
   const styles = useStyles(); // Use styles
   const [statusBarColor, setStatusBarColor] = useState(colors.secondary);
   const [navigationBarColor, setNavigationBarColor] = useState(colors.secondary);
+  const [initialRouteName, setInitialRouteName] = useState('HomePage');
+
+  useEffect(() => {
+    const loadInitialRoute = async () => {
+      const savedRoute = await AsyncStorage.getItem('currentRoute');
+      if (savedRoute) {
+        setInitialRouteName(savedRoute);
+      }
+    };
+    loadInitialRoute();
+  }, []);
+
+  const handleStateChange = async (state: any) => {
+    const currentRoute = state.routes[state.index].name;
+    await AsyncStorage.setItem('currentRoute', currentRoute);
+  };
 
   return (
     <ThemeProvider>
       <EmailProvider>
         <ImagesProvider>
           <StatusBarContext.Provider value={{ setStatusBarColor, setNavigationBarColor }}>
-            <NavigationContainer>
-              <MainNavigator statusBarColor={statusBarColor} navigationBarColor={navigationBarColor} />
+            <NavigationContainer onStateChange={handleStateChange}>
+              <MainNavigator statusBarColor={statusBarColor} navigationBarColor={navigationBarColor} initialRouteName={initialRouteName} />
             </NavigationContainer>
           </StatusBarContext.Provider>
         </ImagesProvider>
@@ -45,7 +62,7 @@ const App = () => {
   );
 };
 
-const MainNavigator = ({ statusBarColor, navigationBarColor }: { statusBarColor: string, navigationBarColor: string }) => {
+const MainNavigator = ({ statusBarColor, navigationBarColor, initialRouteName }: { statusBarColor: string, navigationBarColor: string, initialRouteName: string }) => {
   const { colors } = useTheme(); // Use theme colors
   const state = useNavigationState(state => state);
   const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
@@ -71,7 +88,7 @@ const MainNavigator = ({ statusBarColor, navigationBarColor }: { statusBarColor:
 
   return (
     <Stack.Navigator
-      initialRouteName="Home"
+      initialRouteName={initialRouteName}
       screenOptions={{
         headerStyle: {
           backgroundColor: colors.primary, // Apply theme primary color to the header
