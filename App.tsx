@@ -8,8 +8,10 @@ import WeighbridgeInstall from './pages/WeighbridgeInstall'; // Import Weighbrid
 import WeighbridgeRepair from './pages/WeighbridgeRepair'; // Import WeighbridgeRepair
 import SettingsScreen from './pages/SettingsScreen'; // Import SettingsScreen
 import VinRegEntry from './pages/VinRegEntry'; // Import VinRegEntry
+import ConfirmEmailPage from './pages/ConfirmEmailPage'; // Import ConfirmEmailPage
 import { ThemeProvider, useTheme } from './ThemeContext'; // Import ThemeProvider and useTheme
 import { EmailProvider } from './EmailContext'; // Import EmailProvider
+import { ImagesProvider } from './ImagesContext'; // Import ImagesProvider
 import { StatusBar } from 'react-native';
 import changeNavigationBarColor from 'react-native-navigation-bar-color'; // Import navigation bar color changer
 import SettingsButton from './elements/SettingsButton'; // Import SettingsButton
@@ -31,11 +33,13 @@ const App = () => {
   return (
     <ThemeProvider>
       <EmailProvider>
-        <StatusBarContext.Provider value={{ setStatusBarColor, setNavigationBarColor }}>
-          <NavigationContainer>
-            <MainNavigator statusBarColor={statusBarColor} navigationBarColor={navigationBarColor} />
-          </NavigationContainer>
-        </StatusBarContext.Provider>
+        <ImagesProvider>
+          <StatusBarContext.Provider value={{ setStatusBarColor, setNavigationBarColor }}>
+            <NavigationContainer>
+              <MainNavigator statusBarColor={statusBarColor} navigationBarColor={navigationBarColor} />
+            </NavigationContainer>
+          </StatusBarContext.Provider>
+        </ImagesProvider>
       </EmailProvider>
     </ThemeProvider>
   );
@@ -113,6 +117,11 @@ const MainNavigator = ({ statusBarColor, navigationBarColor }: { statusBarColor:
         name="VinRegEntry"
         component={VinRegEntry}
         options={{ title: 'Enter VIN and REG' }}
+      />
+      <Stack.Screen
+        name="ConfirmEmailPage"
+        component={ConfirmEmailPage}
+        options={{ title: 'Confirm Email' }}
       />
     </Stack.Navigator>
   );

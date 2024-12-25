@@ -9,10 +9,11 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
 import RNFS from 'react-native-fs';
 import useStyles from '../styles'; // Import useStyles
 import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
+import { deleteImage } from '../utils/imageUtils'; // Import deleteImage
 import { useEmail } from '../EmailContext'; // Import useEmail
 
 import { NavigationProp, RouteProp } from '@react-navigation/native';
@@ -29,6 +30,7 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
   const [vin, setVin] = useState('');
   const [reg, setReg] = useState('');
   const [emailOpened, setEmailOpened] = useState(false);
+  const [emailSent, setEmailSent] = useState(false); // Flag to check if the email has been sent
   const [chassisPlateUri, setChassisPlateUri] = useState('');
   const [sendEmailButtonColor, setSendEmailButtonColor] = useState('red');
   const [imageAspectRatio, setImageAspectRatio] = useState<number | null>(null);
@@ -71,60 +73,81 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
     }
   };
 
+  const handleDeleteAllImages = async () => {
+    console.log('Deleting all images...');
+    for (const imageArray of images) {
+      for (const imageUri of imageArray) {
+        await deleteImage({ uri: imageUri, index: images.indexOf(imageArray) }, images, setImages, setFullScreenImage);
+      }
+    }
+    console.log('All images deleted.');
+    // Navigate to Home screen
+    navigation.navigate('HomePage');
+  };
+
   useFocusEffect(
     React.useCallback(() => {
-      if (emailOpened) {
-        Alert.alert(
-          'Email Sent?',
-          'Have You Sent the Email?',
-          [
-            {
-              text: 'Yes',
-              onPress: async () => {
-                // Delete all images
-                for (const imageArray of images) {
-                  for (const imageUri of imageArray) {
-                    try {
-                      await RNFS.unlink(imageUri);
-                      console.log(`Deleted image: ${imageUri}`);
-                    } catch (error) {
-                      console.error(`Failed to delete image: ${imageUri}`, error);
-                    }
-                  }
-                }
-                // Reset VIN and REG values
-                setVin('');
-                setReg('');
-                // Navigate to Home screen
-                navigation.navigate('HomePage');
+      const showAlert = async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay
+        const emailAddress = getEmailAddress();
+        console.log('Checking if alert should be shown...');
+        console.log('emailOpened:', emailOpened);
+        console.log('emailSent:', emailSent);
+        console.log('emailAddress:', emailAddress);
+        if (emailOpened && !emailSent && emailAddress) {
+          console.log('Showing alert...');
+          Alert.alert(
+            'Email Sent?',
+            'Have You Sent the Email?',
+            [
+              {
+                text: 'Yes',
+                onPress: async () => {
+                  console.log('User confirmed email sent.');
+                  await handleDeleteAllImages();
+                },
               },
-            },
-            {
-              text: 'No',
-              onPress: () => {
-                // Re-open the email app
-                const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
-                const body = 'Attached are the installation images.';
-                const attachments = images.flat();
-                handleOpenMailApp(vin, reg, getEmailAddress(), ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation, sourcePage);
+              {
+                text: 'No',
+                onPress: async () => {
+                  console.log('User confirmed email not sent. Resending email...');
+                  await handleOpenMailApp(vin, reg, emailAddress, ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation, sourcePage);
+                  setEmailOpened(true); // Set emailOpened to true to show the alert again
+                },
               },
-            },
-          ],
-          { cancelable: false }
-        );
-      }
-    }, [emailOpened, images, navigation])
+            ],
+            { cancelable: false }
+          );
+        }
+      };
+
+      showAlert();
+    }, [emailOpened, emailSent, images, navigation])
   );
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const formattedVin = vin.replace(/\s/g, ''); // Remove spaces from VIN
     if (formattedVin.length < 6 || formattedVin.length > 17) {
       Alert.alert('Invalid VIN', 'Please enter a valid VIN number.');
       return;
     }
+
+    const emailAddress = getEmailAddress();
+    if (!emailAddress) {
+      Alert.alert('No Email Set', 'Please set an email address in the settings.', [
+        { text: 'OK', onPress: () => navigation.navigate('Settings') },
+      ]);
+      return;
+    }
+
     // Handle save logic with formattedVin
     console.log('Formatted VIN:', formattedVin);
-    handleOpenMailApp(formattedVin, reg, getEmailAddress(), ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation, sourcePage);
+    await handleOpenMailApp(formattedVin, reg, emailAddress, ['Chassis Plate', 'Reg Plate'], images, () => 'green', navigation, sourcePage);
+    setEmailSent(true); // Set emailSent to true after sending the email
+    setEmailOpened(true); // Set emailOpened to true to show the alert
+    console.log('Email sent and navigating to confirmation page.');
+    await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay before navigating
+    navigation.navigate('ConfirmEmailPage', { vin: formattedVin, reg, emailAddress, images, sourcePage });
   };
 
   const handleImageLayout = (event: { nativeEvent: { layout: { width: any; height: any; }; }; }) => {
