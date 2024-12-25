@@ -12,7 +12,7 @@ type RootStackParamList = {
   'Weighbridge Repair': undefined;
 };
 
-const HomePage: React.FC = () => {
+const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { colors } = useTheme(); // Use theme colors
   const styles = useStyles(); // Use styles
@@ -57,4 +57,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default HomeScreen;

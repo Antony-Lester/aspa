@@ -2,20 +2,17 @@ import React, { useEffect, createContext, useContext, useState } from 'react';
 import { NavigationContainer, useNavigationState } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import HomeScreen from './pages/HomePage'; // Import HomeScreen
-import ObliInstall from './pages/ObliInstall'; // Import ObliInstall
-import ObliRepair from './pages/ObliRepair'; // Import ObliRepair
-import WeighbridgeInstall from './pages/WeighbridgeInstall'; // Import WeighbridgeInstall
-import WeighbridgeRepair from './pages/WeighbridgeRepair'; // Import WeighbridgeRepair
-import SettingsScreen from './pages/SettingsScreen'; // Import SettingsScreen
-import VinRegEntry from './pages/VinRegEntry'; // Import VinRegEntry
-import ConfirmEmailPage from './pages/ConfirmEmailPage'; // Import ConfirmEmailPage
-import { ThemeProvider, useTheme } from './ThemeContext'; // Import ThemeProvider and useTheme
-import { EmailProvider } from './EmailContext'; // Import EmailProvider
-import { ImagesProvider } from './ImagesContext'; // Import ImagesProvider
-import { StatusBar } from 'react-native';
-import changeNavigationBarColor from 'react-native-navigation-bar-color'; // Import navigation bar color changer
-import SettingsButton from './elements/SettingsButton'; // Import SettingsButton
+import HomeScreen from './pages/Home'; // Correctly import HomeScreen
+import ObliInstall from './pages/ObliInstall';
+import ObliRepair from './pages/ObliRepair';
+import WeighbridgeInstall from './pages/WeighbridgeInstall';
+import WeighbridgeRepair from './pages/WeighbridgeRepair';
+import SettingsScreen from './pages/SettingsScreen';
+import VinRegEntry from './pages/VinRegEntry';
+import ConfirmEmailPage from './pages/ConfirmEmailPage';
+import { ThemeProvider, useTheme } from './ThemeContext';
+import { EmailProvider } from './EmailContext';
+import { ImagesProvider } from './ImagesContext';
 import useStyles from './styles'; // Import useStyles
 
 const Stack = createStackNavigator();
@@ -26,11 +23,11 @@ const StatusBarContext = createContext({
 });
 
 const App = () => {
-  const { colors } = useTheme(); // Use theme colors
-  const styles = useStyles(); // Use styles
+  const { colors } = useTheme();
+  const styles = useStyles();
   const [statusBarColor, setStatusBarColor] = useState(colors.secondary);
   const [navigationBarColor, setNavigationBarColor] = useState(colors.secondary);
-  const [initialRouteName, setInitialRouteName] = useState('HomePage');
+  const [initialRouteName, setInitialRouteName] = useState('Home');
 
   useEffect(() => {
     const loadInitialRoute = async () => {
@@ -53,94 +50,21 @@ const App = () => {
         <ImagesProvider>
           <StatusBarContext.Provider value={{ setStatusBarColor, setNavigationBarColor }}>
             <NavigationContainer onStateChange={handleStateChange}>
-              <MainNavigator statusBarColor={statusBarColor} navigationBarColor={navigationBarColor} initialRouteName={initialRouteName} />
+              <Stack.Navigator initialRouteName={initialRouteName}>
+                <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="Obli Install" component={ObliInstall} options={{ title: 'Obli Install' }} />
+                <Stack.Screen name="Obli Repair" component={ObliRepair} options={{ title: 'Obli Repair' }} />
+                <Stack.Screen name="Weighbridge Install" component={WeighbridgeInstall} options={{ title: 'Weighbridge Install' }} />
+                <Stack.Screen name="Weighbridge Repair" component={WeighbridgeRepair} options={{ title: 'Weighbridge Repair' }} />
+                <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
+                <Stack.Screen name="VinRegEntry" component={VinRegEntry} options={{ title: 'Enter VIN and REG' }} />
+                <Stack.Screen name="ConfirmEmailPage" component={ConfirmEmailPage} options={{ title: 'Confirm Email' }} />
+              </Stack.Navigator>
             </NavigationContainer>
           </StatusBarContext.Provider>
         </ImagesProvider>
       </EmailProvider>
     </ThemeProvider>
-  );
-};
-
-const MainNavigator = ({ statusBarColor, navigationBarColor, initialRouteName }: { statusBarColor: string, navigationBarColor: string, initialRouteName: string }) => {
-  const { colors } = useTheme(); // Use theme colors
-  const state = useNavigationState(state => state);
-  const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
-
-  useEffect(() => {
-    if (state && state.routes) {
-      const currentRoute = state.routes[state.index].name;
-      if (currentRoute === 'Home') {
-        setStatusBarColor(colors.secondary);
-        setNavigationBarColor(colors.secondary);
-      } else {
-        setStatusBarColor(colors.primary);
-        setNavigationBarColor(colors.primary);
-      }
-    }
-  }, [state, colors, setStatusBarColor, setNavigationBarColor]);
-
-  useEffect(() => {
-    StatusBar.setBackgroundColor(statusBarColor);
-    StatusBar.setBarStyle(statusBarColor === colors.secondary ? 'light-content' : 'dark-content');
-    changeNavigationBarColor(navigationBarColor, statusBarColor === colors.secondary);
-  }, [statusBarColor, navigationBarColor, colors]);
-
-  return (
-    <Stack.Navigator
-      initialRouteName={initialRouteName}
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: colors.primary, // Apply theme primary color to the header
-        },
-        headerTintColor: colors.onPrimary, // Apply theme onPrimary color to the header text
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-        headerRight: () => <SettingsButton />, // Add the custom button to the header
-      }}
-    >
-      <Stack.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{ headerShown: false }} // Hide the header for the HomePage screen
-      />
-      <Stack.Screen
-        name="Obli Install"
-        component={ObliInstall}
-        options={{ title: 'Obli Install' }} // Ensure the screen name matches exactly
-      />
-      <Stack.Screen
-        name="Obli Repair"
-        component={ObliRepair}
-        options={{ title: 'Obli Repair' }}
-      />
-      <Stack.Screen
-        name="Weighbridge Install"
-        component={WeighbridgeInstall}
-        options={{ title: 'Weighbridge Install' }}
-      />
-      <Stack.Screen
-        name="Weighbridge Repair"
-        component={WeighbridgeRepair}
-        options={{ title: 'Weighbridge Repair' }}
-      />
-      <Stack.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ title: 'Settings' }}
-      />
-      <Stack.Screen
-        name="VinRegEntry"
-        component={VinRegEntry}
-        options={{ title: 'Enter VIN and REG' }}
-      />
-      <Stack.Screen
-        name="ConfirmEmailPage"
-        component={ConfirmEmailPage}
-        options={{ title: 'Confirm Email' }}
-      />
-    </Stack.Navigator>
   );
 };
 

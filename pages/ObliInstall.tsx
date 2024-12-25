@@ -22,13 +22,11 @@ import { useEmail } from '../EmailContext'; // Import useEmail
 import { useRoute } from '@react-navigation/native'; // Import useRoute
 import { StatusBarContext } from '../App'; // Import StatusBarContext
 
-
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme(); 
   const styles = useStyles();
-  const { obliRepairEmail } = useEmail(); // Use email context
   const scrollViewRef = useRef<ScrollView>(null);
-  const { obliInstallEmail, setObliInstallEmail } = useEmail(); // Use email context
+  const { obliInstallEmail } = useEmail(); // Use email context
   const route = useRoute();
   type RouteParams = {
     vin?: string;
@@ -57,10 +55,8 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   ];
 
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
-  const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({});
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
-  const [thumbnailSizes, setThumbnailSizes] = useState<{ [key: string]: { width: number, height: number } }>({});
   const [fullScreenImageSize, setFullScreenImageSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
   const [fullScreenImageLoading, setFullScreenImageLoading] = useState<boolean>(false);
 
@@ -113,11 +109,32 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   // Concatenate non-green buttons with green buttons at the end
   const sortedButtonNames = [...nonGreenButtons, ...greenButtons];
 
+  if (hasCameraPermission === null) {
+    return (
+      <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
+        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
+        <View style={styles.container}>
+          <Text style={styles.buttonText}>Checking camera permission...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!hasCameraPermission) {
+    return (
+      <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
+        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
+        <View style={styles.container}>
+          <Text style={styles.buttonText}>Camera permission is required to use this app.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={{ backgroundColor: colors.secondary, flex: 1 }}>
       <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
       <View style={[styles.container, { backgroundColor: colors.secondary }]}>
-        
         <ScrollView
           ref={scrollViewRef}
           contentInsetAdjustmentBehavior="automatic"
