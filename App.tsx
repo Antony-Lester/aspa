@@ -70,7 +70,7 @@ const MainNavigator = ({ statusBarColor, navigationBarColor, initialRouteName }:
   useEffect(() => {
     if (state && state.routes) {
       const currentRoute = state.routes[state.index].name;
-      if (currentRoute === 'HomePage') {
+      if (currentRoute === 'Home') {
         setStatusBarColor(colors.secondary);
         setNavigationBarColor(colors.secondary);
       } else {
