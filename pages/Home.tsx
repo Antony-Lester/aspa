@@ -19,7 +19,7 @@ const HomeScreen: React.FC = () => {
 
   useEffect(() => {
     // Set the status bar color
-    StatusBar.setBackgroundColor(colors.secondary);
+    StatusBar.setBackgroundColor(colors.primary);
     StatusBar.setBarStyle('light-content');
 
     // Set the navigation bar color

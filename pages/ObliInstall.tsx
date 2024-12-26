@@ -26,8 +26,8 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
 
   useEffect(() => {
-    setStatusBarColor(colors.primary);
-    setNavigationBarColor(colors.primary);
+    setStatusBarColor(colors.tertiary);
+    setNavigationBarColor(colors.tertiary);
   }, [colors, setStatusBarColor, setNavigationBarColor]);
 
   const buttonNames = [
@@ -167,9 +167,9 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
             <View style={{ height: 250 }} />
           </View>
         </ScrollView>
-        <View style={[styles.bottomButtonContainer, { backgroundColor: colors.primary }]}>
+        <View style={styles.bottomButtonContainer}>
           <TouchableOpacity
-            style={[styles.bottomButton, { borderColor: sendEmailButtonColor, borderWidth: 11, backgroundColor: colors.primary }]}
+            style={styles.bottomButton}
             onPress={handleSend}
           >
             <Text style={styles.bottomButtonText}>Send</Text>

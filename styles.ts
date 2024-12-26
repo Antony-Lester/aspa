@@ -45,16 +45,17 @@ const useStyles = () => {
       marginBottom: 20,
     },
     button: {
-      backgroundColor: colors.primary, // Use theme primary color
-      padding: 15,
+      backgroundColor: colors.primary,
+      padding: 25,
       borderRadius: 30,
       alignItems: 'center',
       justifyContent: 'center',
-      shadowColor: '#000',
+      shadowColor: colors.shadow, 
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.9,
       shadowRadius: 4,
       elevation: 10,
+      borderWidth: 3, 
     },
     buttonContent: {
       flexDirection: 'row',
@@ -63,27 +64,27 @@ const useStyles = () => {
       width: '100%',
     },
     buttonText: {
-      color: colors.onPrimary, // Use theme onPrimary color
+      color: colors.onPrimary,
       fontSize: 18,
       fontWeight: 'bold',
       textAlign: 'center',
       flex: 1,
     },
     plusIcon: {
-      color: colors.onPrimary, // Use theme onPrimary color
+      color: colors.onPrimary,
       fontSize: 24,
       marginRight: 10,
     },
     plusIconPlaceholder: {
-      width: 24, // Same width as the plus icon
-      height: 32, // Same height as the plus icon
+      width: 24,
+      height: 32,
       marginRight: 10,
     },
     thumbnailContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'center',
-      alignItems: 'center', // Center align items vertically
+      alignItems: 'center', 
       marginTop: 10,
     },
     thumbnail: {
@@ -91,8 +92,8 @@ const useStyles = () => {
       height: 150,
       margin: 5,
       borderRadius: 20,
-      borderWidth: 2, // Add border width
-      borderColor: colors.primary, // Use theme primary color for border
+      borderWidth: 2,
+      borderColor: colors.primary,
     },
     thumbnailWrapper: {
       margin: 5,
@@ -107,8 +108,8 @@ const useStyles = () => {
       bottom: 0,
       left: 0, // Ensure the container fills the screen width
       right: 0, // Ensure the container fills the screen width
-      backgroundColor: colors.primary, // Use theme primary color for background
-      shadowColor: '#000', // Add shadow color
+      backgroundColor: colors.tertiary, // Use theme primary color for background
+      shadowColor: colors.shadow, // Add shadow color
       shadowOffset: { width: 0, height: -10 }, // Increase shadow offset
       shadowOpacity: 0.8, // Increase shadow opacity
       shadowRadius: 10, // Increase shadow radius
