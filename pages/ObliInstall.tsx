@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useContext, useState, useLayoutEffect } from 'react';
-import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, Modal, ActivityIndicator, StatusBarStyle } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, Modal, ActivityIndicator, StatusBarStyle, Dimensions } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { StatusBarContext } from '../App';
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
@@ -62,6 +62,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [fullScreenImageSize, setFullScreenImageSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
   const [fullScreenImageLoading, setFullScreenImageLoading] = useState<boolean>(false);
+  const [componentHeights, setComponentHeights] = useState<number[]>([]);
 
   useEffect(() => {
     const checkCameraPermission = async () => {
@@ -134,6 +135,25 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     );
   }
 
+  const handleLayout = (event: any, index: number) => {
+    const { height } = event.nativeEvent.layout;
+    setComponentHeights(prevHeights => {
+      const newHeights = [...prevHeights];
+      newHeights[index] = height;
+      return newHeights;
+    });
+  };
+
+  const getSnapToOffsets = () => {
+    let offsets = [];
+    let currentOffset = 0;
+    for (let height of componentHeights) {
+      offsets.push(currentOffset);
+      currentOffset += height;
+    }
+    return offsets;
+  };
+
   return (
     <SafeAreaView style={{ backgroundColor: colors.secondary, flex: 1 }}>
       <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.tertiary} />
@@ -141,10 +161,14 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
         <ScrollView
           ref={scrollViewRef}
           contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
+          style={styles.scrollView}
+          snapToOffsets={getSnapToOffsets()} // Ensure components are fully visible when scrolling stops
+          snapToAlignment="start"
+          decelerationRate="fast"
+        >
           <View style={styles.buttonContainer}>
             {sortedButtonNames.map(({ name, index, borderColor }) => (
-              <View key={index} style={styles.buttonWrapper}>
+              <View key={index} style={styles.buttonWrapper} onLayout={(event) => handleLayout(event, index)}>
                 <TouchableOpacity
                   style={[styles.button, { borderColor }]}
                   onPress={() => openCamera(index, name, images, setImages)}>
