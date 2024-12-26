@@ -119,17 +119,17 @@ const useStyles = () => {
       padding: 10, // Increase padding
       borderRadius: 35, // Increase border radius
       borderWidth: 3, // Increase border width
-      borderColor: colors.outline, // Use theme secondary color
+      borderColor: colors.onTertiary, // Use theme secondary color
       elevation: 0, // Increase elevation
       alignItems: 'center', // Center the text within the button
       justifyContent: 'center', // Center the text within the button
       marginVertical: 5, // Add vertical margin
       alignSelf: 'center', // Center the button horizontally
       width: '80%', // Set button width
-      backgroundColor: colors.primary, // Use theme onPrimary color for text
+      backgroundColor: colors.tertiaryContainer, // Use theme onPrimary color for text
     },
     bottomButtonText: {
-      color: colors.surfaceBright, // Use theme onPrimary color for text
+      color: colors.onTertiaryContainer, // Use theme onPrimary color for text
       fontSize: 20, // Increase font size
       fontWeight: 'bold',
     },
