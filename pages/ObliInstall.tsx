@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useContext, useState } from 'react';
+import React, { useEffect, useRef, useContext, useState, useLayoutEffect } from 'react';
 import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, Modal, ActivityIndicator, StatusBarStyle } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { StatusBarContext } from '../App';
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
 import { useTheme } from '../ThemeContext';
@@ -13,10 +13,11 @@ import SettingsButton from '../elements/SettingsButton';
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
-  const styles = useStyles();
+  const styles = useStyles(colors);
   const scrollViewRef = useRef<ScrollView>(null);
   const { obliInstallEmail } = useEmail();
   const route = useRoute();
+  const nav = useNavigation();
   type RouteParams = {
     vin?: string;
     reg?: string;
@@ -25,9 +26,21 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { vin, reg } = (route.params as RouteParams) || {};
   const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
 
+  useLayoutEffect(() => {
+    nav.setOptions({
+      headerStyle: {
+        backgroundColor: colors.tertiary, // Set the top navigation bar color
+      },
+      headerTintColor: colors.onTertiary, // Set the text color on the navigation bar
+    });
+  }, [nav, colors]);
+
   useEffect(() => {
     setStatusBarColor(colors.tertiary);
     setNavigationBarColor(colors.tertiary);
+    changeNavigationBarColor(colors.tertiary, true);
+    StatusBar.setBackgroundColor(colors.tertiary); // Set the notification bar color
+    StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle); // Set the status bar style
   }, [colors, setStatusBarColor, setNavigationBarColor]);
 
   const buttonNames = [
@@ -164,7 +177,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                 </View>
               </View>
             ))}
-            <View style={{ height: 250 }} />
+            <View style={{ height: 50 }} />
           </View>
         </ScrollView>
         <View style={styles.bottomButtonContainer}>
