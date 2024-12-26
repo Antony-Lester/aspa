@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StatusBar } from 'react-native';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { useNavigation, NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../ThemeContext'; // Import useTheme
 import useStyles from '../styles'; // Import useStyles
 import changeNavigationBarColor from 'react-native-navigation-bar-color'; // Import navigation bar color changer
@@ -17,17 +17,19 @@ const HomeScreen: React.FC = () => {
   const { colors } = useTheme(); // Use theme colors
   const styles = useStyles(colors); // Use styles
 
-  useEffect(() => {
-    // Set the status bar color
-    StatusBar.setBackgroundColor(colors.background);
-    StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
+  useFocusEffect(
+    React.useCallback(() => {
+      // Set the status bar color
+      StatusBar.setBackgroundColor(colors.background);
+      StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
 
-    // Set the navigation bar color
-    changeNavigationBarColor(colors.background, true);
-  }, [colors]);
+      // Set the navigation bar color
+      changeNavigationBarColor(colors.background, true);
+    }, [colors])
+  );
 
   return (
-    <View style={styles.homeButtonContainer}>
+    <View style={[styles.homeButtonContainer, { backgroundColor: colors.background }]}>
       <Image source={require('../assets/Logo.png')} style={styles.logo} resizeMode="contain" />
       <TouchableOpacity
         style={styles.homeButton}
