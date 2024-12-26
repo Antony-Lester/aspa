@@ -1,4 +1,5 @@
-const darkColors = {
+
+const lightColors = {
   primary: '#415F91',
   surfaceTint: '#415F91',
   onPrimary: '#FFFFFF',
@@ -49,10 +50,10 @@ const darkColors = {
   surfaceContainerHigh: '#E7E8EE',
   surfaceContainerHighest: '#E2E2E9',
   amber: '#FFC107',
-  statusBarStyle: 'dark-content', // Add this line
+  statusBarStyle: 'light-content', // Add this line
 };
 
-const lightColors = {
+const darkColors = {
   primary: '#AAC7FF',
   surfaceTint: '#AAC7FF',
   onPrimary: '#0A305F',
@@ -103,7 +104,7 @@ const lightColors = {
   surfaceContainerHigh: '#282A2F',
   surfaceContainerHighest: '#33353A',
   amber: '#FFC107',
-  statusBarStyle: 'light-content', // Add this line
+  statusBarStyle: 'dark-content', // Add this line
 };
 
 const highContrastColors = {
@@ -157,7 +158,7 @@ const highContrastColors = {
   surfaceContainerHigh: '#E7E8EE',
   surfaceContainerHighest: '#E2E2E9',
   amber: '#FFC107',
-  statusBarStyle: 'dark-content', // Add this line
+  statusBarStyle: 'dark-content',
 };
 
 export { lightColors, darkColors, highContrastColors };

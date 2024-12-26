@@ -15,43 +15,43 @@ type RootStackParamList = {
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { colors } = useTheme(); // Use theme colors
-  const styles = useStyles(); // Use styles
+  const styles = useStyles(colors); // Use styles
 
   useEffect(() => {
     // Set the status bar color
-    StatusBar.setBackgroundColor(colors.primary);
-    StatusBar.setBarStyle('light-content');
+    StatusBar.setBackgroundColor(colors.background);
+    StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
 
     // Set the navigation bar color
-    changeNavigationBarColor(colors.secondary, true);
+    changeNavigationBarColor(colors.background, true);
   }, [colors]);
 
   return (
     <View style={styles.homeButtonContainer}>
       <Image source={require('../assets/Logo.png')} style={styles.logo} resizeMode="contain" />
       <TouchableOpacity
-        style={styles.bottomButton}
+        style={styles.homeButton}
         onPress={() => navigation.navigate('ObliInstall')}
       >
-        <Text style={styles.bottomButtonText}>Obli Install</Text>
+        <Text style={styles.homeButtonText}>Obli Install</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.bottomButton}
+        style={styles.homeButton}
         onPress={() => navigation.navigate('ObliRepair')}
       >
-        <Text style={styles.bottomButtonText}>Obli Repair</Text>
+        <Text style={styles.homeButtonText}>Obli Repair</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.bottomButton}
+        style={styles.homeButton}
         onPress={() => navigation.navigate('WeighbridgeInstall')}
       >
-        <Text style={styles.bottomButtonText}>Weighbridge Install</Text>
+        <Text style={styles.homeButtonText}>Weighbridge Install</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.bottomButton}
+        style={styles.homeButton}
         onPress={() => navigation.navigate('WeighbridgeRepair')}
       >
-        <Text style={styles.bottomButtonText}>Weighbridge Repair</Text>
+        <Text style={styles.homeButtonText}>Weighbridge Repair</Text>
       </TouchableOpacity>
     </View>
   );

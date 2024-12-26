@@ -246,8 +246,25 @@ const useStyles = () => {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 16,
-      backgroundColor: colors.secondary, // Use theme background color
+      backgroundColor: colors.background, // Set background color
+    },
+    logo: {
+      width: 200,
+      height: 200,
+      marginBottom: 20,
+    },
+    homeButton: {
+      backgroundColor: colors.primary,
+      padding: 15,
+      borderRadius: 10,
+      marginVertical: 10,
+      width: '80%',
+      alignItems: 'center',
+    },
+    homeButtonText: {
+      color: colors.onPrimary,
+      fontSize: 18,
+      fontWeight: 'bold',
     },
     logo: {
       width: '80%', // Set width to 50% of the screen width
