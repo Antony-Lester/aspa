@@ -1,7 +1,6 @@
 // ThemeContext.tsx
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { lightColors, darkColors, highContrastColors } from './colors';
 
 interface ThemeContextProps {
@@ -20,7 +19,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   const [colors, setColors] = useState(initialColors);
 
-  const setTheme = async (theme: string) => {
+  const setTheme = (theme: string) => {
     switch (theme) {
       case 'light':
         setColors(lightColors);
@@ -35,18 +34,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         setColors(lightColors);
         break;
     }
-    await AsyncStorage.setItem('theme', theme);
   };
-
-  useEffect(() => {
-    const loadTheme = async () => {
-      const savedTheme = await AsyncStorage.getItem('theme');
-      if (savedTheme) {
-        setTheme(savedTheme);
-      }
-    };
-    loadTheme();
-  }, []);
 
   return (
     <ThemeContext.Provider value={{ colors, setTheme }}>

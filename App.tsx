@@ -1,8 +1,9 @@
 import React, { useEffect, createContext, useContext, useState } from 'react';
-import { NavigationContainer, useNavigationState } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import HomeScreen from './pages/Home'; // Correctly import HomeScreen
+import { StatusBar } from 'react-native';
+import changeNavigationBarColor from 'react-native-navigation-bar-color';
+import HomeScreen from './pages/Home';
 import ObliInstall from './pages/ObliInstall';
 import ObliRepair from './pages/ObliRepair';
 import WeighbridgeInstall from './pages/WeighbridgeInstall';
@@ -13,7 +14,7 @@ import ConfirmEmailPage from './pages/ConfirmEmailPage';
 import { ThemeProvider, useTheme } from './ThemeContext';
 import { EmailProvider } from './EmailContext';
 import { ImagesProvider } from './ImagesContext';
-import useStyles from './styles'; // Import useStyles
+import useStyles from './styles';
 
 const Stack = createStackNavigator();
 
@@ -30,32 +31,38 @@ const App = () => {
   const [initialRouteName, setInitialRouteName] = useState('Home');
 
   useEffect(() => {
-    const loadInitialRoute = async () => {
-      const savedRoute = await AsyncStorage.getItem('currentRoute');
-      if (savedRoute) {
-        setInitialRouteName(savedRoute);
-      }
-    };
-    loadInitialRoute();
-  }, []);
+    // Apply status bar color
+    StatusBar.setBackgroundColor(statusBarColor);
+    StatusBar.setBarStyle(statusBarColor === colors.primary ? 'light-content' : 'dark-content');
+  }, [statusBarColor, colors]);
 
-  const handleStateChange = async (state: any) => {
-    const currentRoute = state.routes[state.index].name;
-    await AsyncStorage.setItem('currentRoute', currentRoute);
-  };
+  useEffect(() => {
+    // Apply navigation bar color
+    changeNavigationBarColor(navigationBarColor, true);
+  }, [navigationBarColor]);
 
   return (
     <ThemeProvider>
       <EmailProvider>
         <ImagesProvider>
           <StatusBarContext.Provider value={{ setStatusBarColor, setNavigationBarColor }}>
-            <NavigationContainer onStateChange={handleStateChange}>
+            <NavigationContainer>
               <Stack.Navigator initialRouteName={initialRouteName}>
                 <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-                <Stack.Screen name="Obli Install" component={ObliInstall} options={{ title: 'Obli Install' }} />
-                <Stack.Screen name="Obli Repair" component={ObliRepair} options={{ title: 'Obli Repair' }} />
-                <Stack.Screen name="Weighbridge Install" component={WeighbridgeInstall} options={{ title: 'Weighbridge Install' }} />
-                <Stack.Screen name="Weighbridge Repair" component={WeighbridgeRepair} options={{ title: 'Weighbridge Repair' }} />
+                <Stack.Screen
+                  name="ObliInstall"
+                  component={ObliInstall}
+                  options={{
+                    title: 'OBLI Install',
+                    headerStyle: {
+                      backgroundColor: colors.primary,
+                    },
+                    headerTintColor: colors.onPrimary,
+                  }}
+                />
+                <Stack.Screen name="ObliRepair" component={ObliRepair} options={{ title: 'Obli Repair' }} />
+                <Stack.Screen name="WeighbridgeInstall" component={WeighbridgeInstall} options={{ title: 'Weighbridge Install' }} />
+                <Stack.Screen name="WeighbridgeRepair" component={WeighbridgeRepair} options={{ title: 'Weighbridge Repair' }} />
                 <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
                 <Stack.Screen name="VinRegEntry" component={VinRegEntry} options={{ title: 'Enter VIN and REG' }} />
                 <Stack.Screen name="ConfirmEmailPage" component={ConfirmEmailPage} options={{ title: 'Confirm Email' }} />

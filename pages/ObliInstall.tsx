@@ -1,38 +1,27 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  Modal,
-  StatusBarStyle,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
-import { useTheme } from '../ThemeContext'; // Import useTheme
-import useStyles from '../styles'; // Use styles
-import { openMailApp, handleOpenMailApp } from '../utils/emailUtils'; // Import emailUtils
-import { openCamera } from '../utils/cameraUtils'; // Import camera utils
-import { requestCameraPermission } from '../utils/permissionsUtils'; // Import permissions utils
-import { deleteImage } from '../utils/imageUtils'; // Import image utils
-import { useEmail } from '../EmailContext'; // Import useEmail
-import { useRoute } from '@react-navigation/native'; // Import useRoute
-import { StatusBarContext } from '../App'; // Import StatusBarContext
+import React, { useEffect, useRef, useContext, useState } from 'react';
+import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, Modal, ActivityIndicator, StatusBarStyle } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import { StatusBarContext } from '../App';
+import changeNavigationBarColor from 'react-native-navigation-bar-color';
+import { useTheme } from '../ThemeContext';
+import useStyles from '../styles';
+import { useEmail } from '../EmailContext';
+import { requestCameraPermission } from '../utils/permissionsUtils';
+import { openCamera } from '../utils/cameraUtils';
+import { deleteImage } from '../utils/imageUtils';
+import SettingsButton from '../elements/SettingsButton';
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
-  const { colors } = useTheme(); 
+  const { colors } = useTheme();
   const styles = useStyles();
   const scrollViewRef = useRef<ScrollView>(null);
-  const { obliInstallEmail } = useEmail(); // Use email context
+  const { obliInstallEmail } = useEmail();
   const route = useRoute();
   type RouteParams = {
     vin?: string;
     reg?: string;
   };
-  
+
   const { vin, reg } = (route.params as RouteParams) || {};
   const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
 
@@ -135,6 +124,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     <SafeAreaView style={{ backgroundColor: colors.secondary, flex: 1 }}>
       <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
       <View style={[styles.container, { backgroundColor: colors.secondary }]}>
+        <SettingsButton />
         <ScrollView
           ref={scrollViewRef}
           contentInsetAdjustmentBehavior="automatic"
@@ -143,7 +133,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
             {sortedButtonNames.map(({ name, index, borderColor }) => (
               <View key={index} style={styles.buttonWrapper}>
                 <TouchableOpacity
-                  style={[styles.bottomButton, { borderColor }]}
+                  style={[styles.button, { borderColor }]}
                   onPress={() => openCamera(index, name, images, setImages)}>
                   <View style={styles.buttonContent}>
                     <Text style={styles.buttonText}>{name}</Text>
@@ -174,7 +164,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                 </View>
               </View>
             ))}
-            <View style={{ height: 250 }} /> 
+            <View style={{ height: 250 }} />
           </View>
         </ScrollView>
         <View style={[styles.bottomButtonContainer, { backgroundColor: colors.primary }]}>
