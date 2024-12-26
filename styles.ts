@@ -10,10 +10,10 @@ const useStyles = () => {
       flex: 1,
       padding: 16,
       justifyContent: 'center',
-      backgroundColor: colors.secondary, // Use theme background color
+      backgroundColor: colors.background, // Use theme background color
     },
     scrollView: {
-      backgroundColor: colors.secondary, // Use theme background color
+      backgroundColor: colors.background, // Use theme background color
     },
     contentContainer: {
       flexGrow: 1,
@@ -32,7 +32,6 @@ const useStyles = () => {
     },
     settingsButtonText: {
       fontSize: 35,
-      color: colors.onPrimary, // Use theme onPrimary color
     },
     buttonContainer: {
       justifyContent: 'center',
@@ -45,8 +44,8 @@ const useStyles = () => {
       marginBottom: 20,
     },
     button: {
-      backgroundColor: colors.primary,
-      padding: 25,
+      backgroundColor: colors.secondaryContainer, // Use theme secondary color
+      padding: 15,
       borderRadius: 30,
       alignItems: 'center',
       justifyContent: 'center',
@@ -54,19 +53,18 @@ const useStyles = () => {
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.9,
       shadowRadius: 4,
-      elevation: 10,
+      elevation: 3,
       borderWidth: 3, 
     },
     buttonContent: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      width: '100%',
+      width: '90%',
     },
     buttonText: {
-      color: colors.onPrimary,
+      color: colors.onSecondaryContainer,
       fontSize: 18,
-      fontWeight: 'bold',
       textAlign: 'center',
       flex: 1,
     },
@@ -108,28 +106,23 @@ const useStyles = () => {
       bottom: 0,
       left: 0, // Ensure the container fills the screen width
       right: 0, // Ensure the container fills the screen width
-      backgroundColor: colors.tertiary, // Use theme primary color for background
-      shadowColor: colors.shadow, // Add shadow color
-      shadowOffset: { width: 0, height: -10 }, // Increase shadow offset
-      shadowOpacity: 0.8, // Increase shadow opacity
-      shadowRadius: 10, // Increase shadow radius
+      backgroundColor: colors.primary, // Use theme primary color for background
       elevation: 30, // Increase elevation for Android
     },
     bottomButton: {
-      padding: 10, // Increase padding
-      borderRadius: 35, // Increase border radius
+      padding: 12, // Increase padding
+      borderRadius: 30, // Increase border radius
       borderWidth: 3, // Increase border width
-      borderColor: colors.onTertiary, // Use theme secondary color
-      elevation: 0, // Increase elevation
+      elevation: 3, // Increase elevation
       alignItems: 'center', // Center the text within the button
       justifyContent: 'center', // Center the text within the button
-      marginVertical: 5, // Add vertical margin
       alignSelf: 'center', // Center the button horizontally
-      width: '80%', // Set button width
-      backgroundColor: colors.tertiaryContainer, // Use theme onPrimary color for text
+      width: '85%', // Set button width
+      backgroundColor: colors.primaryContainer ,// Use theme onPrimary color for text
+      marginBottom: 10, // Add margin below the button
     },
     bottomButtonText: {
-      color: colors.onTertiaryContainer, // Use theme onPrimary color for text
+      color: colors.onPrimaryContainer, // Use theme onPrimary color for text
       fontSize: 20, // Increase font size
       fontWeight: 'bold',
     },

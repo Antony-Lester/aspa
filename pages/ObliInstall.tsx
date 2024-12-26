@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useContext, useState, useLayoutEffect } from 'react';
 import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, Modal, ActivityIndicator, StatusBarStyle, Dimensions } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StatusBarContext } from '../App';
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
 import { useTheme } from '../ThemeContext';
@@ -29,19 +29,27 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   useLayoutEffect(() => {
     nav.setOptions({
       headerStyle: {
-        backgroundColor: colors.tertiary, // Set the top navigation bar color
+        backgroundColor: colors.primary, // Set the top navigation bar color
       },
-      headerTintColor: colors.onTertiary, // Set the text color on the navigation bar
+      headerTintColor: colors.onPrimary, // Set the text color on the navigation bar to a lighter color
       headerRight: () => <SettingsButton />, // Use SettingsButton here
     });
   }, [nav, colors]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      // Set the status bar color
+      StatusBar.setBackgroundColor(colors.primary);
+      StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
+
+      // Set the navigation bar color
+      changeNavigationBarColor(colors.primary, true);
+    }, [colors])
+  );
+
   useEffect(() => {
-    setStatusBarColor(colors.tertiary);
-    setNavigationBarColor(colors.tertiary);
-    changeNavigationBarColor(colors.tertiary, true);
-    StatusBar.setBackgroundColor(colors.tertiary); // Set the notification bar color
-    StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle); // Set the status bar style
+    setStatusBarColor(colors.primary);
+    setNavigationBarColor(colors.primary);
   }, [colors, setStatusBarColor, setNavigationBarColor]);
 
   const buttonNames = [
@@ -155,9 +163,9 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: colors.secondary, flex: 1 }}>
-      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.tertiary} />
-      <View style={[styles.container, { backgroundColor: colors.secondary }]}>
+    <SafeAreaView style={{  flex: 1 }}>
+      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
+      <View style={styles.container}>
         <ScrollView
           ref={scrollViewRef}
           contentInsetAdjustmentBehavior="automatic"
@@ -204,12 +212,12 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
             <View style={{ height: 50 }} />
           </View>
         </ScrollView>
-        <View style={styles.bottomButtonContainer}>
+        <View style={[styles.bottomButtonContainer, { backgroundColor: colors.primary }]}>
           <TouchableOpacity
-            style={styles.bottomButton}
+            style={[styles.bottomButton, { borderColor: sendEmailButtonColor, backgroundColor: colors.primary }]}
             onPress={handleSend}
           >
-            <Text style={styles.bottomButtonText}>Send</Text>
+            <Text style={[styles.bottomButtonText, { color: colors.onPrimary }]}>Send</Text>
           </TouchableOpacity>
         </View>
         {fullScreenImage && (

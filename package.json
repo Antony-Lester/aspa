@@ -25,7 +25,8 @@
     "react-native-navigation-bar-color": "^2.0.2",
     "react-native-orientation-locker": "^1.7.0",
     "react-native-safe-area-context": "^5.0.0",
-    "react-native-screens": "^4.3.0"
+    "react-native-screens": "^4.3.0",
+    "react-native-system-navigation-bar": "^2.6.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
