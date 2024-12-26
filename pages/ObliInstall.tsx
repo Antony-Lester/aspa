@@ -135,7 +135,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
 
   return (
     <SafeAreaView style={{ backgroundColor: colors.secondary, flex: 1 }}>
-      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
+      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.tertiary} />
       <View style={[styles.container, { backgroundColor: colors.secondary }]}>
         <SettingsButton />
         <ScrollView
