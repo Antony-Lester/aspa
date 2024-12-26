@@ -1,28 +1,32 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
-import { useNavigation, useNavigationState } from '@react-navigation/native';
-import useStyles from '../styles'; // Import useStyles
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../ThemeContext';
 
 const SettingsButton = () => {
-  const navigation = useNavigation<any>();
-  const styles = useStyles();
-  const currentRoute = useNavigationState(state => state.routes[state.index].name);
-
-  // Conditionally render the button based on the current route
-  if (currentRoute === 'Settings') {
-    return null; // Do not display the button on the Settings screen
-  }
+  const navigation = useNavigation();
+  const { colors } = useTheme();
 
   return (
     <TouchableOpacity
-      style={styles.settingsButton}
+      style={styles.button}
       onPress={() => {
         navigation.navigate('Settings');
       }}
     >
-      <Text style={styles.settingsButtonText}>⚙️</Text>
+      <Text style={[styles.buttonText, { color: colors.onTertiary }]}>⚙️</Text>
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  button: {
+    padding: 10,
+    marginRight: 10,
+  },
+  buttonText: {
+    fontSize: 24,
+  },
+});
 
 export default SettingsButton;

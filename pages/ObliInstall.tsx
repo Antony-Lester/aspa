@@ -32,6 +32,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
         backgroundColor: colors.tertiary, // Set the top navigation bar color
       },
       headerTintColor: colors.onTertiary, // Set the text color on the navigation bar
+      headerRight: () => <SettingsButton />, // Use SettingsButton here
     });
   }, [nav, colors]);
 
@@ -137,7 +138,6 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     <SafeAreaView style={{ backgroundColor: colors.secondary, flex: 1 }}>
       <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.tertiary} />
       <View style={[styles.container, { backgroundColor: colors.secondary }]}>
-        <SettingsButton />
         <ScrollView
           ref={scrollViewRef}
           contentInsetAdjustmentBehavior="automatic"
