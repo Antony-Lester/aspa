@@ -183,7 +183,7 @@ const useStyles = () => {
       fontSize: 20, // Increase font size
       fontWeight: 'bold', // Make text bold
       marginBottom: 8,
-      color: colors.onSecondary, // Use theme onBackground color
+      color: colors.primary, // Use theme onBackground color
       alignSelf: 'flex-start', // Align text to the left
     },
     vinInput: {
