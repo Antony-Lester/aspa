@@ -205,7 +205,14 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
         </ScrollView>
         <View style={[styles.bottomButtonContainer, { backgroundColor: colors.primary }]}>
           <TouchableOpacity
-            style={[styles.bottomButton, { borderColor: sendEmailButtonColor, backgroundColor: colors.primary }]}
+            style={[
+              styles.bottomButton,
+              {
+                borderColor: sendEmailButtonColor,
+                backgroundColor: colors.primary,
+                borderWidth: sendEmailButtonColor === 'green' ? 10 : 3, // Set border width conditionally
+              },
+            ]}
             onPress={handleSend}
           >
             <Text style={[styles.bottomButtonText, { color: colors.onPrimary }]}>Send</Text>
