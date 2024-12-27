@@ -37,21 +37,21 @@ const ConfirmEmailPage = ({ navigation, route }: ConfirmEmailPageProps) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
-        <Text style={styles.confirmationText}>Has the email been sent?</Text>
-        <View style={styles.buttonContainer}>
+    <SafeAreaView style={styles.emailContainer}>
+      <View style={styles.emailContent}>
+        <Text style={styles.emailTitle}>Have You sent the email?</Text>
+        <View style={styles.emailButtonContainer}>
           <TouchableOpacity
-            style={styles.bottomButton}
+            style={styles.emailYesButton}
             onPress={handleDeleteAllImages}
           >
-            <Text style={styles.bottomButtonText}>Yes</Text>
+            <Text style={styles.emailButtonText}>Yes</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.bottomButton}
+            style={styles.emailNoButton}
             onPress={handleNoPress}
           >
-            <Text style={styles.bottomButtonText}>No</Text>
+            <Text style={styles.emailButtonText}>No</Text>
           </TouchableOpacity>
         </View>
       </View>

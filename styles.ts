@@ -275,6 +275,80 @@ const useStyles = () => {
       minHeight: 200, // Set a minimum height for the image
       marginBottom: 20, // Add margin below the image
     },
+    content: {
+      width: '80%',
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.onBackground,
+      marginBottom: 20,
+      textAlign: 'center',
+    },
+    yesButton: {
+      backgroundColor: colors.primary,
+      padding: 20,
+      borderRadius: 10,
+      width: screenWidth * 0.4, // 40% of screen width
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    noButton: {
+      backgroundColor: colors.secondary,
+      padding: 20,
+      borderRadius: 10,
+      width: screenWidth * 0.4, // 40% of screen width
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    emailContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.background,
+    },
+    emailContent: {
+      width: '80%',
+      alignItems: 'center',
+    },
+    emailTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.onBackground,
+      marginBottom: 20,
+      textAlign: 'center',
+    },
+    emailButtonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+    },
+    emailYesButton: {
+      backgroundColor: colors.background,
+      padding: 20,
+      borderRadius: 10,
+      width: screenWidth * 0.4, // 40% of screen width
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderColor: 'green',
+      borderWidth: 2,
+    },
+    emailNoButton: {
+      backgroundColor: colors.error,
+      padding: 20,
+      borderRadius: 10,
+      width: screenWidth * 0.4, // 40% of screen width
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderColor: colors.onError,
+      borderWidth: 2,
+    },
+    emailButtonText: {
+      color: colors.onBackground,
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
   });
 };
 
