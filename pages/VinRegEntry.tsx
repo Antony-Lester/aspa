@@ -207,13 +207,13 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
           />
         ) : null}
         <Text style={styles.vinLabel}>
-          {sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 'Enter Service Call:' : 'Enter VIN:'}
+          {sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 'Enter Service Call Number SC:' : 'Enter VIN:'}
         </Text>
         <TextInput
           style={styles.vinInput}
           value={vin}
           onChangeText={setVin}
-          placeholder={sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 'Enter Service Call' : 'Enter VIN'}
+          placeholder={sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 'Enter Service Call Number SC' : 'Enter VIN'}
           placeholderTextColor="gray"
           maxLength={sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 6 : 17}
           keyboardType="numeric"
