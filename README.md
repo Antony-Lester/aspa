@@ -1,5 +1,11 @@
 
 # Aspa
+testing release
+https://github.com/Antony-Lester/aspa/releases/download/testing/app-release.apk
+
+-download
+-settings > Install unknown apps > Allow from this source
+-play protect > scan app if prompted
 
 ## Building a Release APK for Android
 
