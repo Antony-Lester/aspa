@@ -22,6 +22,9 @@ const useStyles = () => {
       padding: 16,
       backgroundColor: colors.background, // Use theme background color
     },
+    inputContainer: {
+      marginBottom: 16,
+    },
     settingsButton: {
       position: 'absolute',
       top: 0,

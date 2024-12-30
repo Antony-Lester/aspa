@@ -10,8 +10,9 @@ import {
   Alert,
   StatusBar,
   StatusBarStyle,
+  ScrollView,
 } from 'react-native';
-import { useFocusEffect, useRoute } from '@react-navigation/native';
+import { useFocusEffect, useRoute, useNavigation } from '@react-navigation/native';
 import RNFS from 'react-native-fs';
 import useStyles from '../styles'; // Import useStyles
 import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
@@ -21,6 +22,8 @@ import { StatusBarContext } from '../App'; // Import StatusBarContext
 import SystemNavigationBar from 'react-native-system-navigation-bar'; // Import SystemNavigationBar
 import SettingsButton from '../elements/SettingsButton'; // Import SettingsButton
 import { useTheme } from '../ThemeContext'; // Import useTheme
+import { useImages } from '../ImagesContext'; // Import useImages
+import { setItem, getItem } from '../storage';
 
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 
@@ -30,10 +33,11 @@ type VinRegEntryProps = {
 };
 
 const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
-  const { images, sourcePage } = route.params || {};
+  const { images: routeImages, sourcePage } = route.params || {};
   const { colors } = useTheme(); // Use theme colors
   const styles = useStyles(); // Use styles
   const { obliInstallEmail, obliRepairEmail, weighbridgeRepairEmail, weighbridgeInstallEmail } = useEmail(); // Use email context
+  const { images, setImages } = useImages(); // Use images from context
   const [vin, setVin] = useState('');
   const [reg, setReg] = useState('');
   const [emailOpened, setEmailOpened] = useState(false);
@@ -110,7 +114,7 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
     console.log('Deleting all images...');
     for (const imageArray of images) {
       for (const imageUri of imageArray) {
-        await deleteImage({ uri: imageUri, index: images.indexOf(imageArray) }, images, setImages, setFullScreenImage);
+        await deleteImage({ uri: imageUri, index: images.indexOf(imageArray) }, images, setImages);
       }
     }
     console.log('All images deleted.');
@@ -194,53 +198,45 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
     setImageAspectRatio(width / height);
   };
 
+  useEffect(() => {
+    const loadSettings = () => {
+      const storedVin = getItem('vin');
+      const storedReg = getItem('reg');
+      if (storedVin) setVin(storedVin);
+      if (storedReg) setReg(storedReg);
+    };
+
+    loadSettings();
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
-        {chassisPlateUri ? (
-          <Image
-            source={{ uri: `file://${chassisPlateUri}` }}
-            style={[
-              styles.chassisPlateImage,
-              imageAspectRatio ? { aspectRatio: imageAspectRatio } : {},
-            ]}
-            resizeMode="contain"
-            onLayout={handleImageLayout}
+      <ScrollView contentContainerStyle={styles.contentContainer}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>VIN:</Text>
+          <TextInput
+            style={styles.input}
+            value={vin}
+            onChangeText={setVin}
+            placeholder="Enter VIN"
+            placeholderTextColor="gray"
           />
-        ) : null}
-        <Text style={styles.vinLabel}>
-          {sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 'Enter Service Call Number SC:' : 'Enter VIN:'}
-        </Text>
-        <TextInput
-          style={styles.vinInput}
-          value={vin}
-          onChangeText={setVin}
-          placeholder={sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 'Enter Service Call Number SC' : 'Enter VIN'}
-          placeholderTextColor="gray"
-          maxLength={sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 6 : 17}
-          keyboardType="numeric"
-        />
-        <Text style={styles.vinLabel}>
-          {sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 'Enter Serial Number (optional):' : 'Enter REG (optional):'}
-        </Text>
-        <TextInput
-          style={styles.vinInput}
-          value={reg}
-          onChangeText={setReg}
-          placeholder={sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 'Enter Serial Number' : 'Enter REG'}
-          placeholderTextColor="gray"
-          maxLength={sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall' ? 4 : 7}
-          keyboardType="numeric"
-        />
-      </View>
-      <View style={styles.bottomButtonContainer}>
+          <Text style={styles.label}>Registration:</Text>
+          <TextInput
+            style={styles.input}
+            value={reg}
+            onChangeText={setReg}
+            placeholder="Enter Registration"
+            placeholderTextColor="gray"
+          />
+        </View>
         <TouchableOpacity
-          style={[styles.bottomButton, { borderColor: sendEmailButtonColor, borderWidth: sendEmailButtonColor === 'green' ? 10 : 3 }]} // Set border width conditionally
+          style={[styles.button, { backgroundColor: sendEmailButtonColor }]}
           onPress={handleSave}
         >
-          <Text style={styles.bottomButtonText}>Send</Text>
+          <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

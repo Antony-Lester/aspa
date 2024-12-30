@@ -15,7 +15,7 @@ type ConfirmEmailPageProps = {
 const ConfirmEmailPage = ({ navigation, route }: ConfirmEmailPageProps) => {
   const { vin, reg, emailAddress, images, sourcePage } = route.params;
   const { colors } = useTheme();
-  const styles = useStyles(colors);
+  const styles = useStyles();
   const nav = useNavigation();
 
   useLayoutEffect(() => {

@@ -1,21 +1,33 @@
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StatusBar } from 'react-native';
+import React, { useEffect, useLayoutEffect } from 'react';
+import { View, Text, TouchableOpacity, Image, StatusBar, StatusBarStyle } from 'react-native';
 import { useNavigation, NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../ThemeContext'; // Import useTheme
 import useStyles from '../styles'; // Import useStyles
 import changeNavigationBarColor from 'react-native-navigation-bar-color'; // Import navigation bar color changer
+import SettingsButton from '../elements/SettingsButton'; // Import SettingsButton
 
 type RootStackParamList = {
   'Obli Repair': undefined;
   'Obli Install': undefined;
   'Weighbridge Install': undefined;
   'Weighbridge Repair': undefined;
+  'Settings': undefined;
 };
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { colors } = useTheme(); // Use theme colors
-  const styles = useStyles(colors); // Use styles
+  const styles = useStyles(); // Use styles
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: colors.primary, // Set the top navigation bar color
+      },
+      headerTintColor: colors.onPrimary, // Set the text color on the navigation bar to a lighter color
+      headerRight: () => <SettingsButton />, // Use SettingsButton here
+    });
+  }, [navigation, colors]);
 
   useFocusEffect(
     React.useCallback(() => {
