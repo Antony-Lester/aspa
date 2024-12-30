@@ -46,7 +46,7 @@ const useStyles = () => {
     },
     button: {
       backgroundColor: colors.secondaryContainer, // Use theme secondary color
-      padding: 15,
+      padding: 18,
       borderRadius: 30,
       alignItems: 'center',
       justifyContent: 'center',

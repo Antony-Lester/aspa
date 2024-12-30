@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { SafeAreaView, View, Text, TextInput, ScrollView, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import useStyles from '../styles';
 import { useTheme } from '../ThemeContext';
 import { useEmail } from '../EmailContext';
@@ -10,9 +10,19 @@ import { setItem, getItem } from '../storage';
 const SettingsScreen = () => {
   const { colors, setTheme } = useTheme();
   const styles = useStyles();
+  const navigation = useNavigation();
   const { obliInstallEmail, setObliInstallEmail, obliRepairEmail, setObliRepairEmail, weighbridgeRepairEmail, setWeighbridgeRepairEmail, weighbridgeInstallEmail, setWeighbridgeInstallEmail } = useEmail();
   const [selectedTheme, setSelectedTheme] = useState('light');
   const [imageQuality, setImageQuality] = useState('0.5');
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: colors.primary,
+      },
+      headerTintColor: colors.onPrimary,
+    });
+  }, [navigation, colors]);
 
   useEffect(() => {
     const loadSettings = () => {
