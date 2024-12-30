@@ -20,6 +20,7 @@ const useStyles = () => {
       justifyContent: 'center',
       alignItems: 'center', // Center align items horizontally
       padding: 16,
+      backgroundColor: colors.background, // Use theme background color
     },
     settingsButton: {
       position: 'absolute',

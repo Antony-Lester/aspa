@@ -1,4 +1,3 @@
-
 const lightColors = {
   primary: '#415F91',
   surfaceTint: '#415F91',
@@ -54,9 +53,9 @@ const lightColors = {
 };
 
 const darkColors = {
-  primary: '#AAC7FF',
-  surfaceTint: '#AAC7FF',
-  onPrimary: '#0A305F',
+  primary: '#1E3A8A', // Darker primary color
+  surfaceTint: '#1E3A8A',
+  onPrimary: '#FFFFFF',
   primaryContainer: '#284777',
   onPrimaryContainer: '#D6E3FF',
   secondary: '#BEC6DC',
@@ -104,7 +103,7 @@ const darkColors = {
   surfaceContainerHigh: '#282A2F',
   surfaceContainerHighest: '#33353A',
   amber: '#FFC107',
-  statusBarStyle: 'dark-content', // Add this line
+  statusBarStyle: 'dark-content',
 };
 
 const highContrastColors = {
