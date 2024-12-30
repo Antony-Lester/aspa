@@ -105,9 +105,9 @@ const SettingsScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.container}>
-        <Text style={styles.label}>OBLI Install Email:</Text>
+        <Text style={styles.settingsLabel}>OBLI Install Email:</Text>
         <TextInput
-          style={styles.input}
+          style={styles.settingsInput}
           value={obliInstallEmail}
           onChangeText={(text) => handleEmailChange('obliInstallEmail', text)}
           keyboardType="email-address"
@@ -115,9 +115,9 @@ const SettingsScreen = () => {
           placeholder={obliInstallEmail || "Enter OBLI Install Email"}
           placeholderTextColor="gray"
         />
-        <Text style={styles.label}>OBLI Repair Email:</Text>
+        <Text style={styles.settingsLabel}>OBLI Repair Email:</Text>
         <TextInput
-          style={styles.input}
+          style={styles.settingsInput}
           value={obliRepairEmail}
           onChangeText={(text) => handleEmailChange('obliRepairEmail', text)}
           keyboardType="email-address"
@@ -125,9 +125,9 @@ const SettingsScreen = () => {
           placeholder={obliRepairEmail || "Enter OBLI Repair Email"}
           placeholderTextColor="gray"
         />
-        <Text style={styles.label}>Weighbridge Repair Email:</Text>
+        <Text style={styles.settingsLabel}>Weighbridge Repair Email:</Text>
         <TextInput
-          style={styles.input}
+          style={styles.settingsInput}
           value={weighbridgeRepairEmail}
           onChangeText={(text) => handleEmailChange('weighbridgeRepairEmail', text)}
           keyboardType="email-address"
@@ -135,9 +135,9 @@ const SettingsScreen = () => {
           placeholder={weighbridgeRepairEmail || "Enter Weighbridge Repair Email"}
           placeholderTextColor="gray"
         />
-        <Text style={styles.label}>Weighbridge Install Email:</Text>
+        <Text style={styles.settingsLabel}>Weighbridge Install Email:</Text>
         <TextInput
-          style={styles.input}
+          style={styles.settingsInput}
           value={weighbridgeInstallEmail}
           onChangeText={(text) => handleEmailChange('weighbridgeInstallEmail', text)}
           keyboardType="email-address"
@@ -145,31 +145,35 @@ const SettingsScreen = () => {
           placeholder={weighbridgeInstallEmail || "Enter Weighbridge Install Email"}
           placeholderTextColor="gray"
         />
-        <Text style={styles.label}>Select Theme:</Text>
-        <Picker
-          selectedValue={selectedTheme}
-          style={styles.picker}
-          onValueChange={(itemValue) => handleThemeChange(itemValue)}
-        >
-          <Picker.Item label="Light" value="light" />
-          <Picker.Item label="Dark" value="dark" />
-          <Picker.Item label="High Contrast" value="highContrast" />
-        </Picker>
-        <Text style={styles.label}>Image Quality:</Text>
-        <Picker
-          selectedValue={imageQuality}
-          style={styles.picker}
-          onValueChange={(itemValue) => handleImageQualityChange(itemValue)}
-        >
-          <Picker.Item label="0.1" value="0.1" />
-          <Picker.Item label="0.2" value="0.2" />
-          <Picker.Item label="0.3" value="0.3" />
-          <Picker.Item label="0.4" value="0.4" />
-          <Picker.Item label="0.5" value="0.5" />
-          <Picker.Item label="0.6" value="0.6" />
-          <Picker.Item label="0.7" value="0.7" />
-          <Picker.Item label="0.8" value="0.8" />
-        </Picker>
+        <Text style={styles.settingsLabel}>Select Theme:</Text>
+        <View style={styles.settingsInput}>
+          <Picker
+            selectedValue={selectedTheme}
+            onValueChange={(itemValue) => handleThemeChange(itemValue)}
+            style={{ color: colors.onSurface }}
+          >
+            <Picker.Item label="Light" value="light" />
+            <Picker.Item label="Dark" value="dark" />
+            <Picker.Item label="High Contrast" value="highContrast" />
+          </Picker>
+        </View>
+        <Text style={styles.settingsLabel}>Image Quality:</Text>
+        <View style={styles.settingsInput}>
+          <Picker
+            selectedValue={imageQuality}
+            onValueChange={(itemValue) => handleImageQualityChange(itemValue)}
+            style={{ color: colors.onSurface }}
+          >
+            <Picker.Item label="0.1" value="0.1" />
+            <Picker.Item label="0.2" value="0.2" />
+            <Picker.Item label="0.3" value="0.3" />
+            <Picker.Item label="0.4" value="0.4" />
+            <Picker.Item label="0.5" value="0.5" />
+            <Picker.Item label="0.6" value="0.6" />
+            <Picker.Item label="0.7" value="0.7" />
+            <Picker.Item label="0.8" value="0.8" />
+          </Picker>
+        </View>
       </View>
     </ScrollView>
   );

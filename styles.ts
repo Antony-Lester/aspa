@@ -206,7 +206,7 @@ const useStyles = () => {
     picker: {
       height: 50,
       width: '100%',
-    },
+padding: 16    },
     saveButton: {
       backgroundColor: colors.secondary, // Use theme secondary color
       padding: 15,
@@ -348,6 +348,35 @@ const useStyles = () => {
       color: colors.onBackground,
       fontSize: 18,
       fontWeight: 'bold',
+    },
+    settingsLabel: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: colors.onBackground,
+      marginBottom: 10,
+      alignSelf: 'flex-start',
+    },
+    settingsInput: {
+      width: screenWidth * 0.9,
+      height: 50,
+      fontSize: 16,
+      borderColor: colors.primary,
+      borderWidth: 1,
+      borderRadius: 10,
+      paddingHorizontal: 10,
+      backgroundColor: colors.surface,
+      color: colors.onSurface,
+      marginBottom: 20,
+    },
+    settingsPicker: {
+      width: screenWidth * 0.9,
+      height: 50,
+      marginBottom: 20,
+      backgroundColor: colors.surface,
+      color: colors.onSurface,
+    },
+    settingsPickerItem: {
+      color: colors.onSurface,
     },
   });
 };
