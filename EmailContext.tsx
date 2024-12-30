@@ -1,6 +1,6 @@
 // EmailContext.tsx
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setItem, getItem } from './storage';
 
 interface EmailContextProps {
   obliInstallEmail: string;
@@ -22,11 +22,11 @@ export const EmailProvider = ({ children }: { children: ReactNode }) => {
   const [weighbridgeInstallEmail, setWeighbridgeInstallEmail] = useState('');
 
   useEffect(() => {
-    const loadEmails = async () => {
-      const savedObliInstallEmail = await AsyncStorage.getItem('obliInstallEmail');
-      const savedObliRepairEmail = await AsyncStorage.getItem('obliRepairEmail');
-      const savedWeighbridgeRepairEmail = await AsyncStorage.getItem('weighbridgeRepairEmail');
-      const savedWeighbridgeInstallEmail = await AsyncStorage.getItem('weighbridgeInstallEmail');
+    const loadEmails = () => {
+      const savedObliInstallEmail = getItem('obliInstallEmail');
+      const savedObliRepairEmail = getItem('obliRepairEmail');
+      const savedWeighbridgeRepairEmail = getItem('weighbridgeRepairEmail');
+      const savedWeighbridgeInstallEmail = getItem('weighbridgeInstallEmail');
 
       if (savedObliInstallEmail) setObliInstallEmail(savedObliInstallEmail);
       if (savedObliRepairEmail) setObliRepairEmail(savedObliRepairEmail);
@@ -37,19 +37,19 @@ export const EmailProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    AsyncStorage.setItem('obliInstallEmail', obliInstallEmail);
+    setItem('obliInstallEmail', obliInstallEmail);
   }, [obliInstallEmail]);
 
   useEffect(() => {
-    AsyncStorage.setItem('obliRepairEmail', obliRepairEmail);
+    setItem('obliRepairEmail', obliRepairEmail);
   }, [obliRepairEmail]);
 
   useEffect(() => {
-    AsyncStorage.setItem('weighbridgeRepairEmail', weighbridgeRepairEmail);
+    setItem('weighbridgeRepairEmail', weighbridgeRepairEmail);
   }, [weighbridgeRepairEmail]);
 
   useEffect(() => {
-    AsyncStorage.setItem('weighbridgeInstallEmail', weighbridgeInstallEmail);
+    setItem('weighbridgeInstallEmail', weighbridgeInstallEmail);
   }, [weighbridgeInstallEmail]);
 
   return (

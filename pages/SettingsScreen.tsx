@@ -1,50 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, TextInput, ScrollView, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect } from '@react-navigation/native';
 import useStyles from '../styles';
 import { useTheme } from '../ThemeContext';
 import { useEmail } from '../EmailContext';
+import { setItem, getItem } from '../storage';
 
 const SettingsScreen = () => {
-  const { colors } = useTheme();
+  const { colors, setTheme } = useTheme();
   const styles = useStyles();
   const { obliInstallEmail, setObliInstallEmail, obliRepairEmail, setObliRepairEmail, weighbridgeRepairEmail, setWeighbridgeRepairEmail, weighbridgeInstallEmail, setWeighbridgeInstallEmail } = useEmail();
   const [selectedTheme, setSelectedTheme] = useState('light');
   const [imageQuality, setImageQuality] = useState('0.5');
 
   useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const storedObliInstallEmail = await AsyncStorage.getItem('obliInstallEmail');
-        const storedObliRepairEmail = await AsyncStorage.getItem('obliRepairEmail');
-        const storedWeighbridgeRepairEmail = await AsyncStorage.getItem('weighbridgeRepairEmail');
-        const storedWeighbridgeInstallEmail = await AsyncStorage.getItem('weighbridgeInstallEmail');
-        const storedTheme = await AsyncStorage.getItem('selectedTheme');
-        const storedImageQuality = await AsyncStorage.getItem('imageQuality');
+    const loadSettings = () => {
+      const storedObliInstallEmail = getItem('obliInstallEmail');
+      const storedObliRepairEmail = getItem('obliRepairEmail');
+      const storedWeighbridgeRepairEmail = getItem('weighbridgeRepairEmail');
+      const storedWeighbridgeInstallEmail = getItem('weighbridgeInstallEmail');
+      const storedTheme = getItem('selectedTheme');
+      const storedImageQuality = getItem('imageQuality');
 
-        if (storedObliInstallEmail) {
-          setObliInstallEmail(storedObliInstallEmail);
-          console.log('Loaded OBLI Install Email:', storedObliInstallEmail);
-        }
-        if (storedObliRepairEmail) {
-          setObliRepairEmail(storedObliRepairEmail);
-          console.log('Loaded OBLI Repair Email:', storedObliRepairEmail);
-        }
-        if (storedWeighbridgeRepairEmail) {
-          setWeighbridgeRepairEmail(storedWeighbridgeRepairEmail);
-          console.log('Loaded Weighbridge Repair Email:', storedWeighbridgeRepairEmail);
-        }
-        if (storedWeighbridgeInstallEmail) {
-          setWeighbridgeInstallEmail(storedWeighbridgeInstallEmail);
-          console.log('Loaded Weighbridge Install Email:', storedWeighbridgeInstallEmail);
-        }
-        if (storedTheme) setSelectedTheme(storedTheme);
-        if (storedImageQuality) setImageQuality(storedImageQuality);
-      } catch (error) {
-        console.error('Failed to load settings.', error);
+      if (storedObliInstallEmail) {
+        setObliInstallEmail(storedObliInstallEmail);
+        console.log('Loaded OBLI Install Email:', storedObliInstallEmail);
       }
+      if (storedObliRepairEmail) {
+        setObliRepairEmail(storedObliRepairEmail);
+        console.log('Loaded OBLI Repair Email:', storedObliRepairEmail);
+      }
+      if (storedWeighbridgeRepairEmail) {
+        setWeighbridgeRepairEmail(storedWeighbridgeRepairEmail);
+        console.log('Loaded Weighbridge Repair Email:', storedWeighbridgeRepairEmail);
+      }
+      if (storedWeighbridgeInstallEmail) {
+        setWeighbridgeInstallEmail(storedWeighbridgeInstallEmail);
+        console.log('Loaded Weighbridge Install Email:', storedWeighbridgeInstallEmail);
+      }
+      if (storedTheme) {
+        setSelectedTheme(storedTheme);
+        setTheme(storedTheme);
+      }
+      if (storedImageQuality) setImageQuality(storedImageQuality);
     };
 
     loadSettings();
@@ -53,16 +52,18 @@ const SettingsScreen = () => {
   useFocusEffect(
     React.useCallback(() => {
       return () => {
-        const saveSettings = async () => {
+        const saveSettings = () => {
           try {
-            await AsyncStorage.setItem('obliInstallEmail', obliInstallEmail);
+            setItem('obliInstallEmail', obliInstallEmail);
             console.log('Saved OBLI Install Email:', obliInstallEmail);
-            await AsyncStorage.setItem('obliRepairEmail', obliRepairEmail);
+            setItem('obliRepairEmail', obliRepairEmail);
             console.log('Saved OBLI Repair Email:', obliRepairEmail);
-            await AsyncStorage.setItem('weighbridgeRepairEmail', weighbridgeRepairEmail);
+            setItem('weighbridgeRepairEmail', weighbridgeRepairEmail);
             console.log('Saved Weighbridge Repair Email:', weighbridgeRepairEmail);
-            await AsyncStorage.setItem('weighbridgeInstallEmail', weighbridgeInstallEmail);
+            setItem('weighbridgeInstallEmail', weighbridgeInstallEmail);
             console.log('Saved Weighbridge Install Email:', weighbridgeInstallEmail);
+            setItem('selectedTheme', selectedTheme);
+            setItem('imageQuality', imageQuality);
           } catch (error) {
             console.error('Failed to save settings.', error);
           }
@@ -70,7 +71,7 @@ const SettingsScreen = () => {
 
         saveSettings();
       };
-    }, [obliInstallEmail, obliRepairEmail, weighbridgeRepairEmail, weighbridgeInstallEmail])
+    }, [obliInstallEmail, obliRepairEmail, weighbridgeRepairEmail, weighbridgeInstallEmail, selectedTheme, imageQuality])
   );
 
   const handleEmailChange = (key: string, value: string) => {
@@ -94,12 +95,13 @@ const SettingsScreen = () => {
 
   const handleThemeChange = (theme: string) => {
     setSelectedTheme(theme);
-    AsyncStorage.setItem('selectedTheme', theme);
+    setTheme(theme);
+    setItem('selectedTheme', theme);
   };
 
   const handleImageQualityChange = (quality: string) => {
     setImageQuality(quality);
-    AsyncStorage.setItem('imageQuality', quality);
+    setItem('imageQuality', quality);
   };
 
   return (

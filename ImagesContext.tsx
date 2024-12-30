@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setItem, getItem } from './storage';
 
 type ImagesContextType = {
   images: string[][];
@@ -8,12 +8,16 @@ type ImagesContextType = {
 
 const ImagesContext = createContext<ImagesContextType | undefined>(undefined);
 
-export const ImagesProvider: React.FC = ({ children }) => {
+interface ImagesProviderProps {
+  children: React.ReactNode;
+}
+
+export const ImagesProvider: React.FC<ImagesProviderProps> = ({ children }) => {
   const [images, setImages] = useState<string[][]>([]);
 
   useEffect(() => {
-    const loadImages = async () => {
-      const savedImages = await AsyncStorage.getItem('images');
+    const loadImages = () => {
+      const savedImages = getItem('images');
       if (savedImages) {
         setImages(JSON.parse(savedImages));
       }
@@ -22,7 +26,7 @@ export const ImagesProvider: React.FC = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    AsyncStorage.setItem('images', JSON.stringify(images));
+    setItem('images', JSON.stringify(images));
   }, [images]);
 
   return (
