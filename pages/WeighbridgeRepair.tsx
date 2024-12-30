@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useContext, useState, useLayoutEffect } from 'react';
-import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, ImageBackground, Modal, ActivityIndicator, StatusBarStyle, Dimensions } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, ImageBackground, Modal, ActivityIndicator, StatusBarStyle, Dimensions, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StatusBarContext } from '../App';
 import SystemNavigationBar from 'react-native-system-navigation-bar'; // Import SystemNavigationBar
@@ -56,6 +56,7 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
   const buttonNames = [
     'Before Repair',
     'After Repair',
+    'Other',
   ];
 
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
@@ -77,17 +78,30 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
 
   const getButtonBorderColor = (index: number) => {
     const imageCount = images[index].length;
+    if (buttonNames[index] === 'Other') {
+      return imageCount > 0 ? 'green' : 'orange';
+    }
     return imageCount > 0 ? 'green' : 'red';
   };
 
-  const allButtonsGreen = images.every((imageArray) => imageArray.length > 0);
-  const sendEmailButtonColor = allButtonsGreen ? 'green' : 'red';
+  const allButtonsGreenOrOrange = images.every((imageArray, index) => imageArray.length > 0 || buttonNames[index] === 'Other');
+  const sendEmailButtonColor = allButtonsGreenOrOrange ? 'green' : 'red';
 
   const handleDeleteImage = () => {
     deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
   };
 
   const handleSend = () => {
+    const missingImageIndex = buttonNames.findIndex((_, index) => images[index].length === 0 && buttonNames[index] !== 'Other');
+
+    if (missingImageIndex !== -1) {
+      Alert.alert(
+        'Incomplete Images',
+        `Please take a picture for the following button: ${buttonNames[missingImageIndex]}.`,
+      );
+      return;
+    }
+
     if (!vin || vin.length < 6 || vin.length > 17) {
       navigation.navigate('VinRegEntry', { images, sourcePage: 'WeighbridgeRepair' });
       return;
