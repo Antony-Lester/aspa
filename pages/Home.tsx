@@ -42,6 +42,7 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={[styles.homeButtonContainer, { backgroundColor: colors.background }]}>
+      <SettingsButton />
       <Image source={require('../assets/Logo.png')} style={styles.logo} resizeMode="contain" />
       <TouchableOpacity
         style={styles.homeButton}
