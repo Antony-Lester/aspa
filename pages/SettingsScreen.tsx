@@ -9,7 +9,7 @@ import { useEmail } from '../EmailContext';
 
 const SettingsScreen = () => {
   const { colors } = useTheme();
-  const styles = useStyles(colors);
+  const styles = useStyles();
   const { obliInstallEmail, setObliInstallEmail, obliRepairEmail, setObliRepairEmail, weighbridgeRepairEmail, setWeighbridgeRepairEmail, weighbridgeInstallEmail, setWeighbridgeInstallEmail } = useEmail();
   const [selectedTheme, setSelectedTheme] = useState('light');
   const [imageQuality, setImageQuality] = useState('0.5');
@@ -73,7 +73,7 @@ const SettingsScreen = () => {
     }, [obliInstallEmail, obliRepairEmail, weighbridgeRepairEmail, weighbridgeInstallEmail])
   );
 
-  const handleEmailChange = (key, value) => {
+  const handleEmailChange = (key: string, value: string) => {
     switch (key) {
       case 'obliInstallEmail':
         setObliInstallEmail(value);
@@ -92,12 +92,12 @@ const SettingsScreen = () => {
     }
   };
 
-  const handleThemeChange = (theme) => {
+  const handleThemeChange = (theme: string) => {
     setSelectedTheme(theme);
     AsyncStorage.setItem('selectedTheme', theme);
   };
 
-  const handleImageQualityChange = (quality) => {
+  const handleImageQualityChange = (quality: string) => {
     setImageQuality(quality);
     AsyncStorage.setItem('imageQuality', quality);
   };

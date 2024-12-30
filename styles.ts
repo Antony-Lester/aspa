@@ -241,11 +241,6 @@ padding: 16    },
       alignItems: 'center',
       backgroundColor: colors.background, // Set background color
     },
-    logo: {
-      width: 200,
-      height: 200,
-      marginBottom: 20,
-    },
     homeButton: {
       backgroundColor: colors.primary,
       padding: 15,
