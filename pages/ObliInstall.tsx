@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useContext, useState, useLayoutEffect } from 'react';
-import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, ImageBackground, Modal, ActivityIndicator, StatusBarStyle, Dimensions } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, ImageBackground, Modal, ActivityIndicator, StatusBarStyle, Dimensions, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StatusBarContext } from '../App';
 import SystemNavigationBar from 'react-native-system-navigation-bar'; // Import SystemNavigationBar
@@ -11,10 +11,12 @@ import { openCamera } from '../utils/cameraUtils';
 import { deleteImage } from '../utils/imageUtils';
 import { getThumbnailStyle } from '../utils/thumbnailUtils'; // Import getThumbnailStyle
 import SettingsButton from '../elements/SettingsButton';
+import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
+import { getItem, setItem } from '../storage';
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
-  const styles = useStyles(colors);
+  const styles = useStyles();
   const scrollViewRef = useRef<ScrollView>(null);
   const { obliInstallEmail } = useEmail();
   const route = useRoute();
@@ -44,7 +46,17 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
       StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
 
       // Set the navigation bar color and button color
-      SystemNavigationBar.setNavigationColor(colors.primary, true);
+      SystemNavigationBar.setNavigationColor(colors.primary, undefined);
+
+      const checkEmailAppOpened = async () => {
+        const emailAppOpened = await getItem('emailAppOpened');
+        if (emailAppOpened === 'true') {
+          await setItem('emailAppOpened', 'false');
+          navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress: obliInstallEmail, images, sourcePage: 'ObliInstall' });
+        }
+      };
+
+      checkEmailAppOpened();
     }, [colors])
   );
 
@@ -116,12 +128,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
       return;
     }
 
-    const email = obliInstallEmail;
-    const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
-    const body = 'Attached are the installation images.';
-    const attachments = images.flat();
-
-    openMailApp(email, subject, body, attachments);
+    handleOpenMailApp(vin, reg, obliInstallEmail, buttonNames, images, getButtonBorderColor, navigation, 'ObliInstall');
   };
 
   const handleLayout = (event: any, index: number) => {

@@ -2,6 +2,7 @@
 import { PermissionsAndroid, Platform, Alert } from 'react-native';
 import Mailer from 'react-native-mail';
 import RNFS from 'react-native-fs';
+import { setItem } from '../storage';
 
 const requestStoragePermissions = async () => {
   if (Platform.OS === 'android') {
@@ -51,13 +52,9 @@ export const sendEmail = async (email: string, subject: string, body: string, at
   });
 };
 
-export const openMailApp = async (email: string, subject: string, body: string, attachments: string[]) => {
-  sendEmail(email, subject, body, attachments);
-};
-
 export const handleOpenMailApp = (
   vin: string,
-  reg: string,
+  reg: string | undefined,
   email: string,
   buttonNames: string[],
   images: string[][],
@@ -65,18 +62,6 @@ export const handleOpenMailApp = (
   navigation: any,
   sourcePage: string
 ) => {
-  if (!vin || vin.length < 6 || vin.length > 17) {
-    Alert.alert('Invalid VIN', 'VIN should be between 6 and 17 characters long.');
-    return;
-  }
-
-  if (!email) {
-    Alert.alert('No Email Set', 'Please set an email address in the settings.', [
-      { text: 'OK', onPress: () => navigation.navigate('Settings') },
-    ]);
-    return;
-  }
-
   const incompleteButtonIndex = buttonNames.findIndex(
     (name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red'
   );
@@ -87,27 +72,44 @@ export const handleOpenMailApp = (
 
   const subject = `${new Date().toISOString().split('T')[0].replace(/-/g, '/') } ${vin} ${reg || ''}`;
   
-   let job = '';
-   switch (sourcePage) {
-      case 'ObliInstall':
-        job = 'OBLI Install';
-        break;
-      case 'ObliRepair':
-        job = 'OBLI Repair';
-        break;
-      case 'WeighbridgeInstall':
-        job = 'Weighbridge Install';
-        break;
-      case 'WeighbridgeRepair':
-        job = 'Weighbridge Repair';
-        break;
-      default:
-        job = '';
-    }
-  
+  let job = '';
+  switch (sourcePage) {
+    case 'ObliInstall':
+      job = 'OBLI Install';
+      break;
+    case 'ObliRepair':
+      job = 'OBLI Repair';
+      break;
+    case 'WeighbridgeInstall':
+      job = 'Weighbridge Install';
+      break;
+    case 'WeighbridgeRepair':
+      job = 'Weighbridge Repair';
+      break;
+    default:
+      job = '';
+  }
+
   const body = `Attached are the images for ${job},\n\n\nfor ${vin || ''} ${reg || ''}.`;
   const attachments = images.flat();
 
   console.log('IN handle email...Sending email to:', email);
-  openMailApp(email, subject, body, attachments);
+  Mailer.mail({
+    subject: subject,
+    recipients: [email],
+    body: body,
+    isHTML: true,
+    attachments: attachments.map((filePath) => ({
+      path: filePath,
+      type: 'image',
+      name: 'image',
+    })),
+  }, async (error, event) => {
+    if (error) {
+      console.error('Failed to send email:', error);
+    } else {
+      await setItem('emailAppOpened', 'true');
+      navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress: email, images, sourcePage });
+    }
+  });
 };

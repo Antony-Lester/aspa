@@ -9,6 +9,7 @@ import {
   Image,
   Alert,
   StatusBar,
+  StatusBarStyle,
 } from 'react-native';
 import { useFocusEffect, useRoute } from '@react-navigation/native';
 import RNFS from 'react-native-fs';
@@ -31,7 +32,7 @@ type VinRegEntryProps = {
 const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
   const { images, sourcePage } = route.params || {};
   const { colors } = useTheme(); // Use theme colors
-  const styles = useStyles(colors);
+  const styles = useStyles(); // Use styles
   const { obliInstallEmail, obliRepairEmail, weighbridgeRepairEmail, weighbridgeInstallEmail } = useEmail(); // Use email context
   const [vin, setVin] = useState('');
   const [reg, setReg] = useState('');
@@ -59,7 +60,7 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
       StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
 
       // Set the navigation bar color and button color
-      SystemNavigationBar.setNavigationColor(colors.primary, true);
+      SystemNavigationBar.setNavigationColor(colors.primary, undefined);
     }, [colors])
   );
 
@@ -185,6 +186,7 @@ const VinRegEntry = ({ navigation, route }: VinRegEntryProps) => {
     setEmailOpened(true); // Set emailOpened to true to show the alert
     console.log('Email sent and navigating to confirmation page.');
     await new Promise(resolve => setTimeout(resolve, 1000)); // 1-second delay before navigating
+    navigation.navigate('ConfirmEmailPage', { vin: formattedVinOrServiceCall, reg, emailAddress, images, sourcePage });
   };
 
   const handleImageLayout = (event: { nativeEvent: { layout: { width: any; height: any; }; }; }) => {

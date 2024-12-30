@@ -11,10 +11,12 @@ import { openCamera } from '../utils/cameraUtils';
 import { deleteImage } from '../utils/imageUtils';
 import { getThumbnailStyle } from '../utils/thumbnailUtils'; // Import getThumbnailStyle
 import SettingsButton from '../elements/SettingsButton';
+import { handleOpenMailApp } from '../utils/emailUtils';
+import { getItem, setItem } from '../storage'; // Import getItem and setItem
 
 const ObliRepair = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
-  const styles = useStyles(colors);
+  const styles = useStyles();
   const scrollViewRef = useRef<ScrollView>(null);
   const { obliRepairEmail } = useEmail();
   const route = useRoute();
@@ -44,7 +46,17 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
       StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
 
       // Set the navigation bar color and button color
-      SystemNavigationBar.setNavigationColor(colors.primary, true);
+      SystemNavigationBar.setNavigationColor(colors.primary, undefined);
+
+      const checkEmailAppOpened = async () => {
+        const emailAppOpened = await getItem('emailAppOpened');
+        if (emailAppOpened === 'true') {
+          await setItem('emailAppOpened', 'false');
+          navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress: obliRepairEmail, images, sourcePage: 'ObliRepair' });
+        }
+      };
+
+      checkEmailAppOpened();
     }, [colors])
   );
 
@@ -93,12 +105,7 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
       return;
     }
 
-    const email = obliRepairEmail;
-    const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
-    const body = 'Attached are the repair images.';
-    const attachments = images.flat();
-
-    openMailApp(email, subject, body, attachments);
+    handleOpenMailApp(vin, reg, obliRepairEmail, buttonNames, images, getButtonBorderColor, navigation, 'ObliRepair');
   };
 
   const handleLayout = (event: any, index: number) => {

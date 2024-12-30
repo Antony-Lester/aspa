@@ -10,11 +10,13 @@ import { requestCameraPermission } from '../utils/permissionsUtils';
 import { openCamera } from '../utils/cameraUtils';
 import { deleteImage } from '../utils/imageUtils';
 import { getThumbnailStyle } from '../utils/thumbnailUtils'; // Import getThumbnailStyle
+import { handleOpenMailApp } from '../utils/emailUtils';
+import { getItem, setItem } from '../storage';
 import SettingsButton from '../elements/SettingsButton';
 
 const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
-  const styles = useStyles(colors);
+  const styles = useStyles();
   const scrollViewRef = useRef<ScrollView>(null);
   const { weighbridgeRepairEmail } = useEmail();
   const route = useRoute();
@@ -44,7 +46,17 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
       StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
 
       // Set the navigation bar color and button color
-      SystemNavigationBar.setNavigationColor(colors.primary, true);
+      SystemNavigationBar.setNavigationColor(colors.primary, undefined);
+
+      const checkEmailAppOpened = async () => {
+        const emailAppOpened = await getItem('emailAppOpened');
+        if (emailAppOpened === 'true') {
+          await setItem('emailAppOpened', 'false');
+          navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress: weighbridgeRepairEmail, images, sourcePage: 'WeighbridgeRepair' });
+        }
+      };
+
+      checkEmailAppOpened();
     }, [colors])
   );
 
@@ -92,13 +104,11 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
   };
 
   const handleSend = () => {
-    const missingImageIndex = buttonNames.findIndex((_, index) => images[index].length === 0 && buttonNames[index] !== 'Other');
-
-    if (missingImageIndex !== -1) {
-      Alert.alert(
-        'Incomplete Images',
-        `Please take a picture for the following button: ${buttonNames[missingImageIndex]}.`,
-      );
+    const incompleteButtonIndex = buttonNames.findIndex(
+      (name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red'
+    );
+    if (incompleteButtonIndex !== -1) {
+      Alert.alert('Incomplete', `Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
       return;
     }
 
@@ -107,12 +117,7 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
       return;
     }
 
-    const email = weighbridgeRepairEmail;
-    const subject = `${new Date().toISOString().split('T')[0]} S/C: ${vin} S/N: ${reg || ''}`;
-    const body = 'Attached are the repair images.';
-    const attachments = images.flat();
-
-    openMailApp(email, subject, body, attachments);
+    handleOpenMailApp(vin, reg, weighbridgeRepairEmail, buttonNames, images, getButtonBorderColor, navigation, 'WeighbridgeRepair');
   };
 
   const handleLayout = (event: any, index: number) => {

@@ -2,19 +2,21 @@ import React, { useEffect, useRef, useContext, useState, useLayoutEffect } from 
 import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, ImageBackground, Modal, ActivityIndicator, StatusBarStyle, Dimensions, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StatusBarContext } from '../App';
-import SystemNavigationBar from 'react-native-system-navigation-bar'; // Import SystemNavigationBar
+import SystemNavigationBar from 'react-native-system-navigation-bar';
 import { useTheme } from '../ThemeContext';
 import useStyles from '../styles';
 import { useEmail } from '../EmailContext';
 import { requestCameraPermission } from '../utils/permissionsUtils';
 import { openCamera } from '../utils/cameraUtils';
 import { deleteImage } from '../utils/imageUtils';
-import { getThumbnailStyle } from '../utils/thumbnailUtils'; // Import getThumbnailStyle
+import { getThumbnailStyle } from '../utils/thumbnailUtils';
+import { handleOpenMailApp } from '../utils/emailUtils';
+import { getItem, setItem } from '../storage';
 import SettingsButton from '../elements/SettingsButton';
 
 const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
-  const styles = useStyles(colors);
+  const styles = useStyles();
   const scrollViewRef = useRef<ScrollView>(null);
   const { weighbridgeInstallEmail } = useEmail();
   const route = useRoute();
@@ -44,7 +46,17 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
       StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
 
       // Set the navigation bar color and button color
-      SystemNavigationBar.setNavigationColor(colors.primary, true);
+      SystemNavigationBar.setNavigationColor(colors.primary, undefined);
+
+      const checkEmailAppOpened = async () => {
+        const emailAppOpened = await getItem('emailAppOpened');
+        if (emailAppOpened === 'true') {
+          await setItem('emailAppOpened', 'false');
+          navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress: weighbridgeInstallEmail, images, sourcePage: 'WeighbridgeInstall' });
+        }
+      };
+
+      checkEmailAppOpened();
     }, [colors])
   );
 
@@ -69,7 +81,7 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
   const [fullScreenImageLoading, setFullScreenImageLoading] = useState<boolean>(false);
   const [componentHeights, setComponentHeights] = useState<number[]>([]);
   const [thumbnailStyles, setThumbnailStyles] = useState<{ [key: string]: any }>({});
-  const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({}); // Define imageLoading state
+  const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     const checkCameraPermission = async () => {
@@ -110,12 +122,7 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
       return;
     }
 
-    const email = weighbridgeInstallEmail;
-    const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
-    const body = 'Attached are the installation images.';
-    const attachments = images.flat();
-
-    openMailApp(email, subject, body, attachments);
+    handleOpenMailApp(vin, reg, weighbridgeInstallEmail, buttonNames, images, getButtonBorderColor, navigation, 'WeighbridgeInstall');
   };
 
   const handleLayout = (event: any, index: number) => {

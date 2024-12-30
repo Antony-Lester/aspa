@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, Alert } from 'react-native';
-import { NavigationProp, RouteProp } from '@react-navigation/native';
-import useStyles from '../styles'; // Import useStyles
-import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
-import { deleteImage } from '../utils/imageUtils'; // Import deleteImage
+import { NavigationProp, RouteProp, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../ThemeContext';
+import useStyles from '../styles';
+import { handleOpenMailApp } from '../utils/emailUtils';
+import { deleteImage } from '../utils/imageUtils';
+import SettingsButton from '../elements/SettingsButton';
 
 type ConfirmEmailPageProps = {
   navigation: NavigationProp<any>;
@@ -12,7 +14,19 @@ type ConfirmEmailPageProps = {
 
 const ConfirmEmailPage = ({ navigation, route }: ConfirmEmailPageProps) => {
   const { vin, reg, emailAddress, images, sourcePage } = route.params;
-  const styles = useStyles();
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
+  const nav = useNavigation();
+
+  useLayoutEffect(() => {
+    nav.setOptions({
+      headerStyle: {
+        backgroundColor: colors.primary, // Set the top navigation bar color
+      },
+      headerTintColor: colors.onPrimary, // Set the text color on the navigation bar to a lighter color
+      headerRight: () => <SettingsButton />, // Use SettingsButton here
+    });
+  }, [nav, colors]);
 
   const handleDeleteAllImages = async () => {
     console.log('Deleting all images...');
@@ -20,7 +34,7 @@ const ConfirmEmailPage = ({ navigation, route }: ConfirmEmailPageProps) => {
       for (const imageUri of imageArray) {
         console.log(`Deleting image: ${imageUri}`);
         try {
-          await deleteImage({uri: imageUri, index: images.indexOf(imageArray)});
+          await deleteImage({ uri: imageUri, index: images.indexOf(imageArray) });
         } catch (error) {
           console.error(`Failed to delete image: ${imageUri}`, error);
         }
