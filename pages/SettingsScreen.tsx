@@ -1,96 +1,135 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Alert, ScrollView, BackHandler } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, View, Text, TextInput, ScrollView, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
-import { useTheme } from '../ThemeContext'; // Import useTheme
-import useStyles from '../styles'; // Use styles
-import { useEmail } from '../EmailContext'; // Import useEmail
+import { useFocusEffect } from '@react-navigation/native';
+import useStyles from '../styles';
+import { useTheme } from '../ThemeContext';
+import { useEmail } from '../EmailContext';
 
-const SettingsScreen = ({ navigation }: { navigation: any }) => {
-  const { colors, setTheme } = useTheme(); // Use theme colors and setTheme function
-  const styles = useStyles(); // Use styles
-  const {
-    obliInstallEmail,
-    setObliInstallEmail,
-    obliRepairEmail,
-    setObliRepairEmail,
-    weighbridgeRepairEmail,
-    setWeighbridgeRepairEmail,
-    weighbridgeInstallEmail,
-    setWeighbridgeInstallEmail,
-  } = useEmail(); // Use email context
-
-  const [selectedTheme, setSelectedTheme] = useState('light'); // Add state for selectedTheme
-  const [imageQuality, setImageQuality] = useState('0.5'); // Add state for imageQuality
+const SettingsScreen = () => {
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
+  const { obliInstallEmail, setObliInstallEmail, obliRepairEmail, setObliRepairEmail, weighbridgeRepairEmail, setWeighbridgeRepairEmail, weighbridgeInstallEmail, setWeighbridgeInstallEmail } = useEmail();
+  const [selectedTheme, setSelectedTheme] = useState('light');
+  const [imageQuality, setImageQuality] = useState('0.5');
 
   useEffect(() => {
-    console.log('SettingsScreen mounted');
-    console.log('Initial obliInstallEmail:', obliInstallEmail);
+    const loadSettings = async () => {
+      try {
+        const storedObliInstallEmail = await AsyncStorage.getItem('obliInstallEmail');
+        const storedObliRepairEmail = await AsyncStorage.getItem('obliRepairEmail');
+        const storedWeighbridgeRepairEmail = await AsyncStorage.getItem('weighbridgeRepairEmail');
+        const storedWeighbridgeInstallEmail = await AsyncStorage.getItem('weighbridgeInstallEmail');
+        const storedTheme = await AsyncStorage.getItem('selectedTheme');
+        const storedImageQuality = await AsyncStorage.getItem('imageQuality');
 
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (!validateEmail(obliInstallEmail)) {
-        Alert.alert('Invalid Email', 'Please enter a valid email address.');
-        return true; // Prevent default behavior (navigation)
+        if (storedObliInstallEmail) {
+          setObliInstallEmail(storedObliInstallEmail);
+          console.log('Loaded OBLI Install Email:', storedObliInstallEmail);
+        }
+        if (storedObliRepairEmail) {
+          setObliRepairEmail(storedObliRepairEmail);
+          console.log('Loaded OBLI Repair Email:', storedObliRepairEmail);
+        }
+        if (storedWeighbridgeRepairEmail) {
+          setWeighbridgeRepairEmail(storedWeighbridgeRepairEmail);
+          console.log('Loaded Weighbridge Repair Email:', storedWeighbridgeRepairEmail);
+        }
+        if (storedWeighbridgeInstallEmail) {
+          setWeighbridgeInstallEmail(storedWeighbridgeInstallEmail);
+          console.log('Loaded Weighbridge Install Email:', storedWeighbridgeInstallEmail);
+        }
+        if (storedTheme) setSelectedTheme(storedTheme);
+        if (storedImageQuality) setImageQuality(storedImageQuality);
+      } catch (error) {
+        console.error('Failed to load settings.', error);
       }
-      return false; // Allow default behavior (navigation)
-    });
-
-    return () => {
-      console.log('SettingsScreen unmounted');
-      backHandler.remove();
     };
-  }, [navigation, obliInstallEmail]);
 
-  const validateEmail = (email: string) => {
-    const re = /\S+@\S+\.\S+/;
-    return re.test(email);
-  };
+    loadSettings();
+  }, []);
 
-  const handleEmailBlur = (email: string, setEmail: (email: string) => void) => {
-    if (!validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address.');
-    } else {
-      setEmail(email);
-      console.log('Email validated and set:', email);
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        const saveSettings = async () => {
+          try {
+            await AsyncStorage.setItem('obliInstallEmail', obliInstallEmail);
+            console.log('Saved OBLI Install Email:', obliInstallEmail);
+            await AsyncStorage.setItem('obliRepairEmail', obliRepairEmail);
+            console.log('Saved OBLI Repair Email:', obliRepairEmail);
+            await AsyncStorage.setItem('weighbridgeRepairEmail', weighbridgeRepairEmail);
+            console.log('Saved Weighbridge Repair Email:', weighbridgeRepairEmail);
+            await AsyncStorage.setItem('weighbridgeInstallEmail', weighbridgeInstallEmail);
+            console.log('Saved Weighbridge Install Email:', weighbridgeInstallEmail);
+          } catch (error) {
+            console.error('Failed to save settings.', error);
+          }
+        };
+
+        saveSettings();
+      };
+    }, [obliInstallEmail, obliRepairEmail, weighbridgeRepairEmail, weighbridgeInstallEmail])
+  );
+
+  const handleEmailChange = (key, value) => {
+    switch (key) {
+      case 'obliInstallEmail':
+        setObliInstallEmail(value);
+        break;
+      case 'obliRepairEmail':
+        setObliRepairEmail(value);
+        break;
+      case 'weighbridgeRepairEmail':
+        setWeighbridgeRepairEmail(value);
+        break;
+      case 'weighbridgeInstallEmail':
+        setWeighbridgeInstallEmail(value);
+        break;
+      default:
+        break;
     }
   };
 
-  const handleThemeChange = (theme: string) => {
+  const handleThemeChange = (theme) => {
     setSelectedTheme(theme);
-    setTheme(theme); // Apply the selected theme colors to the app
-    console.log('Theme changed to:', theme);
+    AsyncStorage.setItem('selectedTheme', theme);
+  };
+
+  const handleImageQualityChange = (quality) => {
+    setImageQuality(quality);
+    AsyncStorage.setItem('imageQuality', quality);
   };
 
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.container}>
-        <Text style={styles.label}>Obli Install Email:</Text>
+        <Text style={styles.label}>OBLI Install Email:</Text>
         <TextInput
           style={styles.input}
           value={obliInstallEmail}
-          onChangeText={setObliInstallEmail}
-          onBlur={() => handleEmailBlur(obliInstallEmail, setObliInstallEmail)}
+          onChangeText={(text) => handleEmailChange('obliInstallEmail', text)}
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholder={obliInstallEmail || "Enter Obli Install Email"}
+          placeholder={obliInstallEmail || "Enter OBLI Install Email"}
           placeholderTextColor="gray"
         />
-        <Text style={styles.label}>Obli Repair Email:</Text>
+        <Text style={styles.label}>OBLI Repair Email:</Text>
         <TextInput
           style={styles.input}
           value={obliRepairEmail}
-          onChangeText={setObliRepairEmail}
-          onBlur={() => handleEmailBlur(obliRepairEmail, setObliRepairEmail)}
+          onChangeText={(text) => handleEmailChange('obliRepairEmail', text)}
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholder={obliRepairEmail || "Enter Obli Repair Email"}
+          placeholder={obliRepairEmail || "Enter OBLI Repair Email"}
           placeholderTextColor="gray"
         />
         <Text style={styles.label}>Weighbridge Repair Email:</Text>
         <TextInput
           style={styles.input}
           value={weighbridgeRepairEmail}
-          onChangeText={setWeighbridgeRepairEmail}
-          onBlur={() => handleEmailBlur(weighbridgeRepairEmail, setWeighbridgeRepairEmail)}
+          onChangeText={(text) => handleEmailChange('weighbridgeRepairEmail', text)}
           keyboardType="email-address"
           autoCapitalize="none"
           placeholder={weighbridgeRepairEmail || "Enter Weighbridge Repair Email"}
@@ -100,8 +139,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
         <TextInput
           style={styles.input}
           value={weighbridgeInstallEmail}
-          onChangeText={setWeighbridgeInstallEmail}
-          onBlur={() => handleEmailBlur(weighbridgeInstallEmail, setWeighbridgeInstallEmail)}
+          onChangeText={(text) => handleEmailChange('weighbridgeInstallEmail', text)}
           keyboardType="email-address"
           autoCapitalize="none"
           placeholder={weighbridgeInstallEmail || "Enter Weighbridge Install Email"}
@@ -121,7 +159,7 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
         <Picker
           selectedValue={imageQuality}
           style={styles.picker}
-          onValueChange={(itemValue) => setImageQuality(itemValue)}
+          onValueChange={(itemValue) => handleImageQualityChange(itemValue)}
         >
           <Picker.Item label="0.1" value="0.1" />
           <Picker.Item label="0.2" value="0.2" />
@@ -131,8 +169,6 @@ const SettingsScreen = ({ navigation }: { navigation: any }) => {
           <Picker.Item label="0.6" value="0.6" />
           <Picker.Item label="0.7" value="0.7" />
           <Picker.Item label="0.8" value="0.8" />
-          <Picker.Item label="0.9" value="0.9" />
-          <Picker.Item label="1.0" value="1.0" />
         </Picker>
       </View>
     </ScrollView>

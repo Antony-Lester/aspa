@@ -27,6 +27,7 @@ export const EmailProvider = ({ children }: { children: ReactNode }) => {
       const savedObliRepairEmail = await AsyncStorage.getItem('obliRepairEmail');
       const savedWeighbridgeRepairEmail = await AsyncStorage.getItem('weighbridgeRepairEmail');
       const savedWeighbridgeInstallEmail = await AsyncStorage.getItem('weighbridgeInstallEmail');
+
       if (savedObliInstallEmail) setObliInstallEmail(savedObliInstallEmail);
       if (savedObliRepairEmail) setObliRepairEmail(savedObliRepairEmail);
       if (savedWeighbridgeRepairEmail) setWeighbridgeRepairEmail(savedWeighbridgeRepairEmail);

@@ -108,7 +108,7 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
     }
 
     const email = weighbridgeRepairEmail;
-    const subject = `${new Date().toISOString().split('T')[0]} ${vin} ${reg || ''}`;
+    const subject = `${new Date().toISOString().split('T')[0]} S/C: ${vin} S/N: ${reg || ''}`;
     const body = 'Attached are the repair images.';
     const attachments = images.flat();
 
