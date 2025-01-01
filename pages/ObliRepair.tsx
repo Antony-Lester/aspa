@@ -91,6 +91,9 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
 
   const getButtonBorderColor = (index: number) => {
     const imageCount = images[index].length;
+    if (buttonNames[index] === 'Reg Plate') {
+      return imageCount > 0 ? 'green' : 'orange';
+    }
     return imageCount > 0 ? 'green' : 'red';
   };
 
