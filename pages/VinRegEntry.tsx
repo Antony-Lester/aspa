@@ -38,9 +38,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
   const [reg, setReg] = useState('');
   const [emailOpened, setEmailOpened] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
-  const [chassisPlateUri, setChassisPlateUri] = useState('');
   const [sendEmailButtonColor, setSendEmailButtonColor] = useState('red');
-  const [imageAspectRatio, setImageAspectRatio] = useState<number | null>(null);
   const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
 
   useLayoutEffect(() => {
@@ -217,24 +215,29 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
               maxLength={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 6 : 17}
             />
           </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Registration Number (Optional):</Text>
-            <TextInput
-              style={styles.input}
-              value={reg}
-              onChangeText={setReg}
-              placeholder="Enter Registration Number"
-              placeholderTextColor={colors.placeholder}
-            />
-          </View>
-          
+          {(sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair') && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Serial Number S/N (Optional):</Text>
+              <TextInput
+                style={styles.input}
+                value={reg}
+                onChangeText={setReg}
+                placeholder="Enter Serial Number S/N"
+                placeholderTextColor={colors.placeholder}
+                keyboardType="numeric"
+                maxLength={4}
+              />
+            </View>
+          )}
         </ScrollView>
         <View style={styles.bottomButtonContainer}>
-            <TouchableOpacity
-              style={[styles.bottomButton, { borderColor: sendEmailButtonColor }]} onPress={handleSave}>
-              <Text style={styles.buttonText}>Save</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={[styles.bottomButton, { borderColor: sendEmailButtonColor }]}
+            onPress={handleSave}
+          >
+            <Text style={styles.buttonText}>Save</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
