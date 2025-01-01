@@ -62,8 +62,15 @@ export const handleOpenMailApp = async (
     console.log(`Incomplete: Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
     return;
   }
-  const subject = `${new Date().toISOString().split('T')[0].replace(/-/g, '/') } ${vin} ${reg || ''}`;
+
+  let subject = `${new Date().toISOString().split('T')[0].replace(/-/g, '/') } `;
+  if (sourcePage === 'ObliInstall' || sourcePage === 'ObliRepair') {
+    subject += `VIN: ${vin} ${reg ? `REG: ${reg}` : ''}`;
+  } else if (sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair') {
+    subject += `SC: ${vin} ${reg ? `SN: ${reg}` : ''}`;
+  }
   console.log('Subject:', subject);
+
   let job = '';
   switch (sourcePage) {
     case 'ObliInstall':
@@ -79,22 +86,12 @@ export const handleOpenMailApp = async (
       job = 'Weighbridge Repair';
       break;
     default:
-      job = '';
+      job = 'Job';
   }
-  console.log('Job:', job);
-  const body = `Attached are the images for ${job},\n\n\nfor ${vin || ''} ${reg || ''}.`;
-  const attachments = images.flat();
 
-  console.log('IN handle email...Sending email to:', email);
-  console.log('Email subject:', subject);
-  console.log('Email body:', body);
-  console.log('Email attachments:', attachments);
+  const body = `Attached are the images for ${job}.`;
 
-  try {
-    await sendEmail(email, subject, body, attachments);
-    await setItem('emailAppOpened', 'true');
-    navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress: email, images, sourcePage });
-  } catch (error) {
-    console.error('Failed to send email:', error);
-  }
+  await sendEmail(email, subject, body, images.flat());
+  setItem('emailAppOpened', 'true');
+  navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress: email, images, sourcePage });
 };
