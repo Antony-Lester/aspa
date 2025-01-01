@@ -111,7 +111,9 @@ export const savePicture = async (assetUri: string, buttonName: string, index: n
     newImages[index] = [...newImages[index], privateFilePath];
     console.log(`Updated images state for index ${index}:`, newImages[index]);
     setImages(newImages);
+    return privateFilePath;
   } catch (error) {
     console.error('Failed to save image:', error);
+    throw error;
   }
 };

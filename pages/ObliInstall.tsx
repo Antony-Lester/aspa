@@ -6,13 +6,14 @@ import SystemNavigationBar from 'react-native-system-navigation-bar'; // Import 
 import { useTheme } from '../ThemeContext';
 import useStyles from '../styles';
 import { useEmail } from '../EmailContext';
-import { requestCameraPermission } from '../utils/permissionsUtils';
+import { requestCameraPermission, requestStoragePermissions } from '../utils/permissionsUtils';
 import { openCamera } from '../utils/cameraUtils';
 import { deleteImage } from '../utils/imageUtils';
 import { getThumbnailStyle } from '../utils/thumbnailUtils'; // Import getThumbnailStyle
 import SettingsButton from '../elements/SettingsButton';
 import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
 import { getItem, setItem } from '../storage';
+import changeNavigationBarColor from 'react-native-navigation-bar-color';
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
@@ -63,6 +64,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   useEffect(() => {
     setStatusBarColor(colors.primary);
     setNavigationBarColor(colors.primary);
+    changeNavigationBarColor(colors.primary, true);
   }, [colors, setStatusBarColor, setNavigationBarColor]);
 
   const buttonNames = [
@@ -81,6 +83,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [hasStoragePermissions, setHasStoragePermissions] = useState<boolean | null>(null);
   const [fullScreenImageSize, setFullScreenImageSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
   const [fullScreenImageLoading, setFullScreenImageLoading] = useState<boolean>(false);
   const [componentHeights, setComponentHeights] = useState<number[]>([]);
@@ -88,11 +91,13 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({}); // Define imageLoading state
 
   useEffect(() => {
-    const checkCameraPermission = async () => {
-      const granted = await requestCameraPermission();
-      setHasCameraPermission(granted);
+    const checkPermissions = async () => {
+      const cameraGranted = await requestCameraPermission();
+      const storageGranted = await requestStoragePermissions();
+      setHasCameraPermission(cameraGranted);
+      setHasStoragePermissions(storageGranted);
     };
-    checkCameraPermission();
+    checkPermissions();
   }, []);
 
   const getButtonBorderColor = (index: number) => {
@@ -118,17 +123,53 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   // Concatenate non-green buttons with green buttons at the end
   const sortedButtonNames = [...nonGreenButtons, ...greenButtons];
 
+  if (hasCameraPermission === null || hasStoragePermissions === null) {
+    return (
+      <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
+        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
+        <View style={styles.container}>
+          <Text style={styles.buttonText}>Checking permissions...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!hasCameraPermission || !hasStoragePermissions) {
+    return (
+      <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
+        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
+        <View style={styles.container}>
+          <Text style={styles.buttonText}>Camera and storage permissions are required to use this app.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const handleDeleteImage = () => {
     deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
+    const incompleteButtonIndex = buttonNames.findIndex((name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red');
+    if (incompleteButtonIndex !== -1) {
+      Alert.alert('Incomplete', `Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
+      return;
+    }
+
     if (!vin || vin.length < 6 || vin.length > 17) {
       navigation.navigate('VinRegEntry', { images, sourcePage: 'ObliInstall' });
       return;
     }
 
-    handleOpenMailApp(vin, reg, obliInstallEmail, buttonNames, images, getButtonBorderColor, navigation, 'ObliInstall');
+    const emailAddress = obliInstallEmail;
+    if (!emailAddress) {
+      Alert.alert('No Email Set', 'Please set an email address in the settings.', [
+        { text: 'OK', onPress: () => navigation.navigate('Settings') },
+      ]);
+      return;
+    }
+
+    await handleOpenMailApp(vin, reg, emailAddress, buttonNames, images, getButtonBorderColor, navigation, 'ObliInstall');
   };
 
   const handleLayout = (event: any, index: number) => {
