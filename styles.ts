@@ -379,6 +379,9 @@ padding: 16    },
     settingsPickerItem: {
       color: colors.onSurface,
     },
+    homeLogo: {
+      fontSize: 20,
+    },
   });
 };
 

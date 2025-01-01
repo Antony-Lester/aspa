@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'react-native';
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
-import HomeScreen from './pages/Home';
+import HomePage from './pages/Home';
 import ObliInstall from './pages/ObliInstall';
 import ObliRepair from './pages/ObliRepair';
 import WeighbridgeInstall from './pages/WeighbridgeInstall';
@@ -15,6 +15,7 @@ import { ThemeProvider, useTheme } from './ThemeContext';
 import { EmailProvider } from './EmailContext';
 import { ImagesProvider } from './ImagesContext';
 import useStyles from './styles';
+import { getItem, setItem } from './storage';
 
 const Stack = createStackNavigator();
 
@@ -26,9 +27,20 @@ const StatusBarContext = createContext({
 const App = () => {
   const { colors } = useTheme();
   const styles = useStyles();
-  const [statusBarColor, setStatusBarColor] = useState(colors.secondary);
-  const [navigationBarColor, setNavigationBarColor] = useState(colors.secondary);
+  const [statusBarColor, setStatusBarColor] = useState(colors.primary);
+  const [navigationBarColor, setNavigationBarColor] = useState(colors.primary);
   const [initialRouteName, setInitialRouteName] = useState('Home');
+  
+  type RootStackParamList = {
+    Home: undefined;
+    ObliInstall: undefined;
+    ObliRepair: undefined;
+    WeighbridgeInstall: undefined;
+    WeighbridgeRepair: undefined;
+    Settings: undefined;
+    VinRegEntry: undefined;
+    ConfirmEmail: undefined;
+  };
 
   useEffect(() => {
     // Apply status bar color
@@ -41,6 +53,23 @@ const App = () => {
     changeNavigationBarColor(navigationBarColor, true);
   }, [navigationBarColor]);
 
+  useEffect(() => {
+    const loadSettings = async () => {
+      const storedStatusBarColor = await getItem('statusBarColor');
+      const storedNavigationBarColor = await getItem('navigationBarColor');
+      if (storedStatusBarColor) setStatusBarColor(storedStatusBarColor);
+      if (storedNavigationBarColor) setNavigationBarColor(storedNavigationBarColor);
+    };
+
+    loadSettings();
+  }, []);
+
+  useEffect(() => {
+    // Set initial colors on app load
+    setStatusBarColor(colors.secondary);
+    setNavigationBarColor(colors.secondary);
+  }, []);
+
   return (
     <ThemeProvider>
       <EmailProvider>
@@ -48,7 +77,7 @@ const App = () => {
           <StatusBarContext.Provider value={{ setStatusBarColor, setNavigationBarColor }}>
             <NavigationContainer>
               <Stack.Navigator initialRouteName={initialRouteName}>
-                <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="Home" component={HomePage} options={{ headerShown: false }} />
                 <Stack.Screen
                   name="ObliInstall"
                   component={ObliInstall}
@@ -65,7 +94,7 @@ const App = () => {
                 <Stack.Screen name="WeighbridgeRepair" component={WeighbridgeRepair} options={{ title: 'Weighbridge Repair' }} />
                 <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
                 <Stack.Screen name="VinRegEntry" component={VinRegEntry} options={{ title: 'Enter VIN and REG' }} />
-                <Stack.Screen name="ConfirmEmailPage" component={ConfirmEmailPage} options={{ title: 'Confirm Email' }} />
+                <Stack.Screen name="ConfirmEmail" component={ConfirmEmailPage} options={{ title: 'Confirm Email' }} />
               </Stack.Navigator>
             </NavigationContainer>
           </StatusBarContext.Provider>

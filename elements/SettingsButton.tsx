@@ -14,7 +14,7 @@ const SettingsButton = () => {
         navigation.navigate('Settings');
       }}
     >
-      <Text style={[styles.buttonText, { color: colors.onTertiary }]}>⚙️</Text>
+      <Text style={styles.buttonText}>⚙️</Text>
     </TouchableOpacity>
   );
 };
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   buttonText: {
-    fontSize: 24,
+    fontSize: 33,
   },
 });
 

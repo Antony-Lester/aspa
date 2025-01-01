@@ -32,16 +32,16 @@ const HomeScreen: React.FC = () => {
   useFocusEffect(
     React.useCallback(() => {
       // Set the status bar color
-      StatusBar.setBackgroundColor(colors.background);
+      StatusBar.setBackgroundColor(colors.primary);
       StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
 
       // Set the navigation bar color
-      changeNavigationBarColor(colors.background, true);
+      changeNavigationBarColor(colors.primary, true);
     }, [colors])
   );
 
   return (
-    <View style={[styles.homeButtonContainer, { backgroundColor: colors.background }]}>
+    <View style={styles.homeButtonContainer}>
       <SettingsButton />
       <Image source={require('../assets/Logo.png')} style={styles.logo} resizeMode="contain" />
       <TouchableOpacity

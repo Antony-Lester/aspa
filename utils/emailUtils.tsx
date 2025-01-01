@@ -62,11 +62,13 @@ export const handleOpenMailApp = (
   navigation: any,
   sourcePage: string
 ) => {
+  console.log('IN handleOpenMailApp...');
   const incompleteButtonIndex = buttonNames.findIndex(
     (name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red'
   );
   if (incompleteButtonIndex !== -1) {
     Alert.alert('Incomplete', `Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
+    console.log(`Incomplete: Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
     return;
   }
 
@@ -94,6 +96,10 @@ export const handleOpenMailApp = (
   const attachments = images.flat();
 
   console.log('IN handle email...Sending email to:', email);
+  console.log('Email subject:', subject);
+  console.log('Email body:', body);
+  console.log('Email attachments:', attachments);
+
   Mailer.mail({
     subject: subject,
     recipients: [email],
@@ -108,6 +114,7 @@ export const handleOpenMailApp = (
     if (error) {
       console.error('Failed to send email:', error);
     } else {
+      console.log('Email sent successfully:', event);
       await setItem('emailAppOpened', 'true');
       navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress: email, images, sourcePage });
     }
