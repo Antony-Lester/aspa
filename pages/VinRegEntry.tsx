@@ -189,6 +189,14 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
     }
   }, [routeImages, setImages]);
 
+  const isValidVinOrServiceCall = sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall'
+    ? vin.replace(/\s/g, '').length === 6
+    : vin.replace(/\s/g, '').length >= 6 && vin.replace(/\s/g, '').length <= 17;
+
+  const isValidReg = sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair'
+    ? reg.replace(/\s/g, '').length === 4 || reg === ''
+    : true;
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
@@ -204,7 +212,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
                 : 'Vehicle Identification Number VIN'}
             </Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { borderColor: isValidVinOrServiceCall ? 'green' : 'red' }]}
               value={vin}
               onChangeText={setVin}
               placeholder={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair'
@@ -219,7 +227,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Serial Number S/N (Optional):</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderColor: isValidReg ? 'green' : 'red' }]}
                 value={reg}
                 onChangeText={setReg}
                 placeholder="Enter Serial Number S/N"
@@ -233,7 +241,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Registration Number (Optional):</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderColor: 'green' }]} // Assuming registration number is always valid
                 value={reg}
                 onChangeText={setReg}
                 placeholder="Enter Registration Number"
