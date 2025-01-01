@@ -199,43 +199,49 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
     loadSettings();
   }, []);
 
+  useEffect(() => {
+    if (routeImages) {
+      setImages(routeImages);
+    }
+  }, [routeImages, setImages]);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>VIN:</Text>
-          <TextInput
-            style={styles.input}
-            value={vin}
-            onChangeText={setVin}
-            placeholder="Enter VIN"
-            placeholderTextColor="gray"
-          />
-          <Text style={styles.label}>Registration (Optional):</Text>
-          <TextInput
-            style={styles.input}
-            value={reg}
-            onChangeText={setReg}
-            placeholder="Enter Registration"
-            placeholderTextColor="gray"
-          />
-        </View>
-        <View style={[styles.bottomButtonContainer, { backgroundColor: colors.primary }]}>
-          <TouchableOpacity
-            style={[
-              styles.bottomButton,
-              {
-                borderColor: sendEmailButtonColor,
-                backgroundColor: colors.primary,
-                borderWidth: sendEmailButtonColor === 'green' ? 10 : 3,
-              },
-            ]}
-            onPress={handleSave}
-          >
-            <Text style={[styles.bottomButtonText, { color: colors.onPrimary }]}>Send</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
+      <View style={styles.container}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={styles.scrollView}
+        >
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>VIN or Service Call:</Text>
+            <TextInput
+              style={styles.input}
+              value={vin}
+              onChangeText={setVin}
+              placeholder="Enter VIN or Service Call"
+              placeholderTextColor={colors.placeholder}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Registration Number (Optional):</Text>
+            <TextInput
+              style={styles.input}
+              value={reg}
+              onChangeText={setReg}
+              placeholder="Enter Registration Number"
+              placeholderTextColor={colors.placeholder}
+            />
+          </View>
+          
+        </ScrollView>
+        <View style={styles.bottomButtonContainer}>
+            <TouchableOpacity
+              style={[styles.bottomButton, { borderColor: sendEmailButtonColor }]} onPress={handleSave}>
+              <Text style={styles.buttonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+      </View>
     </SafeAreaView>
   );
 };

@@ -25,13 +25,13 @@ const SettingsScreen = () => {
   }, [navigation, colors]);
 
   useEffect(() => {
-    const loadSettings = () => {
-      const storedObliInstallEmail = getItem('obliInstallEmail');
-      const storedObliRepairEmail = getItem('obliRepairEmail');
-      const storedWeighbridgeRepairEmail = getItem('weighbridgeRepairEmail');
-      const storedWeighbridgeInstallEmail = getItem('weighbridgeInstallEmail');
-      const storedTheme = getItem('selectedTheme');
-      const storedImageQuality = getItem('imageQuality');
+    const loadSettings = async () => {
+      const storedObliInstallEmail = await getItem('obliInstallEmail');
+      const storedObliRepairEmail = await getItem('obliRepairEmail');
+      const storedWeighbridgeRepairEmail = await getItem('weighbridgeRepairEmail');
+      const storedWeighbridgeInstallEmail = await getItem('weighbridgeInstallEmail');
+      const storedTheme = await getItem('selectedTheme');
+      const storedImageQuality = await getItem('imageQuality');
 
       if (storedObliInstallEmail) {
         setObliInstallEmail(storedObliInstallEmail);
