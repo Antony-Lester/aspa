@@ -227,7 +227,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Serial Number S/N (Optional):</Text>
               <TextInput
-                style={[styles.input, { borderColor: isValidReg ? 'green' : 'red' }]}
+                style={[styles.input, { borderColor: reg ? (isValidReg ? 'green' : 'red') : 'orange' }]}
                 value={reg}
                 onChangeText={setReg}
                 placeholder="Enter Serial Number S/N"
@@ -241,7 +241,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Registration Number (Optional):</Text>
               <TextInput
-                style={[styles.input, { borderColor: 'green' }]} // Assuming registration number is always valid
+                style={[styles.input, { borderColor: reg ? 'green' : 'orange' }]}
                 value={reg}
                 onChangeText={setReg}
                 placeholder="Enter Registration Number"
