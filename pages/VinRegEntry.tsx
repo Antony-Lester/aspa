@@ -5,14 +5,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
   Alert,
   StatusBar,
   StatusBarStyle,
   ScrollView,
 } from 'react-native';
 import { useFocusEffect, useRoute, useNavigation, StackScreenProps } from '@react-navigation/native';
-import RNFS from 'react-native-fs';
 import useStyles from '../styles';
 import { handleOpenMailApp } from '../utils/emailUtils';
 import { deleteImage } from '../utils/imageUtils';
@@ -67,18 +65,6 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
     setStatusBarColor(colors.primary);
     setNavigationBarColor(colors.primary);
   }, [colors, setStatusBarColor, setNavigationBarColor]);
-
-  useEffect(() => {
-    const suggestVinAndReg = async () => {
-      for (const imageArray of images) {
-        for (const imageUri of imageArray) {
-          // Your existing logic here...
-        }
-      }
-    };
-
-    suggestVinAndReg();
-  }, [images]);
 
   useEffect(() => {
     const isValidVinOrServiceCall = sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall'
@@ -224,9 +210,11 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
               value={vin}
               onChangeText={setVin}
               placeholder={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair'
-                ? 'Enter S/C'
-                : 'Enter VIN'}
+                ? 'Enter Service Call S/C'
+                : 'Enter Vehicle Identification Number VIN'}
               placeholderTextColor={colors.placeholder}
+              keyboardType={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 'numeric' : 'default'}
+              maxLength={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 6 : 17}
             />
           </View>
           <View style={styles.inputContainer}>
