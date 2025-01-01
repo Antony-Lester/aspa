@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useContext, useState, useLayoutEffect } from 'react';
-import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, ImageBackground, Modal, ActivityIndicator, StatusBarStyle, Dimensions } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, ImageBackground, Modal, ActivityIndicator, StatusBarStyle, Dimensions, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StatusBarContext } from '../App';
 import SystemNavigationBar from 'react-native-system-navigation-bar'; // Import SystemNavigationBar
@@ -11,8 +11,8 @@ import { openCamera } from '../utils/cameraUtils';
 import { deleteImage } from '../utils/imageUtils';
 import { getThumbnailStyle } from '../utils/thumbnailUtils'; // Import getThumbnailStyle
 import SettingsButton from '../elements/SettingsButton';
-import { handleOpenMailApp } from '../utils/emailUtils';
-import { getItem, setItem } from '../storage'; // Import getItem and setItem
+import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
+import { getItem, setItem } from '../storage';
 
 const ObliRepair = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
@@ -68,6 +68,8 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
   const buttonNames = [
     'Before Repair',
     'After Repair',
+    'Chassis Plate',
+    'Reg Plate',
   ];
 
   const [images, setImages] = useState<string[][]>(Array(buttonNames.length).fill([]));
@@ -92,14 +94,35 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
     return imageCount > 0 ? 'green' : 'red';
   };
 
-  const allButtonsGreen = images.every((imageArray) => imageArray.length > 0);
-  const sendEmailButtonColor = allButtonsGreen ? 'green' : 'red';
+  const handleOpenCamera = async (index: number) => {
+    if (!hasCameraPermission) {
+      Alert.alert('Camera Permission', 'Camera permission is required to take pictures.');
+      return;
+    }
+    const imageUri = await openCamera();
+    if (imageUri) {
+      setImages(prevImages => {
+        const newImages = [...prevImages];
+        newImages[index] = [...newImages[index], imageUri];
+        return newImages;
+      });
+    }
+  };
 
-  const handleDeleteImage = () => {
-    deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
+  const handleDeleteImage = async (imageUri: string, index: number) => {
+    await deleteImage({ uri: imageUri, index }, images, setImages);
   };
 
   const handleSend = () => {
+    const incompleteButtonIndex = buttonNames.findIndex(
+      (name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red'
+    );
+
+    if (incompleteButtonIndex !== -1) {
+      Alert.alert('Incomplete', `Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
+      return;
+    }
+
     if (!vin || vin.length < 6 || vin.length > 17) {
       navigation.navigate('VinRegEntry', { images, sourcePage: 'ObliRepair' });
       return;
@@ -192,9 +215,9 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
             style={[
               styles.bottomButton,
               {
-                borderColor: sendEmailButtonColor,
+                borderColor: getButtonBorderColor(0),
                 backgroundColor: colors.primary,
-                borderWidth: sendEmailButtonColor === 'green' ? 10 : 3, // Set border width conditionally
+                borderWidth: getButtonBorderColor(0) === 'green' ? 10 : 3, // Set border width conditionally
               },
             ]}
             onPress={handleSend}
