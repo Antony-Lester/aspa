@@ -229,6 +229,18 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
               />
             </View>
           )}
+          {(sourcePage === 'ObliInstall' || sourcePage === 'ObliRepair') && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Registration Number (Optional):</Text>
+              <TextInput
+                style={styles.input}
+                value={reg}
+                onChangeText={setReg}
+                placeholder="Enter Registration Number"
+                placeholderTextColor={colors.placeholder}
+              />
+            </View>
+          )}
         </ScrollView>
         <View style={styles.bottomButtonContainer}>
           <TouchableOpacity
