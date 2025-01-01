@@ -1,4 +1,4 @@
-import React, { useEffect, createContext, useContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'react-native';
@@ -30,17 +30,6 @@ const App = () => {
   const [statusBarColor, setStatusBarColor] = useState(colors.primary);
   const [navigationBarColor, setNavigationBarColor] = useState(colors.primary);
   const [initialRouteName, setInitialRouteName] = useState('Home');
-  
-  type RootStackParamList = {
-    Home: undefined;
-    ObliInstall: undefined;
-    ObliRepair: undefined;
-    WeighbridgeInstall: undefined;
-    WeighbridgeRepair: undefined;
-    Settings: undefined;
-    VinRegEntry: undefined;
-    ConfirmEmail: undefined;
-  };
 
   useEffect(() => {
     // Apply status bar color
@@ -94,7 +83,7 @@ const App = () => {
                 <Stack.Screen name="WeighbridgeRepair" component={WeighbridgeRepair} options={{ title: 'Weighbridge Repair' }} />
                 <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
                 <Stack.Screen name="VinRegEntry" component={VinRegEntry} options={{ title: 'Enter VIN and REG' }} />
-                <Stack.Screen name="ConfirmEmail" component={ConfirmEmailPage} options={{ title: 'Confirm Email' }} />
+                <Stack.Screen name="ConfirmEmailPage" component={ConfirmEmailPage} options={{ title: 'Confirm Email' }} />
               </Stack.Navigator>
             </NavigationContainer>
           </StatusBarContext.Provider>

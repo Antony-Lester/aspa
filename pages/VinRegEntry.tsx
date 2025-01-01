@@ -167,6 +167,31 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
     navigation.navigate('ConfirmEmailPage', { vin: formattedVinOrServiceCall, reg, emailAddress, images, sourcePage });
   };
 
+  const handleSend = async () => {
+    const incompleteButtonIndex = buttonNames.findIndex((name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red');
+    if (incompleteButtonIndex !== -1) {
+      Alert.alert('Incomplete', `Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
+      return;
+    }
+
+    if (!vin || vin.length < 6 || vin.length > 17) {
+      navigation.navigate('VinRegEntry', { images, sourcePage: 'ObliInstall' });
+      return;
+    }
+
+    const emailAddress = obliInstallEmail;
+    if (!emailAddress) {
+      Alert.alert('No Email Set', 'Please set an email address in the settings.', [
+        { text: 'OK', onPress: () => navigation.navigate('Settings') },
+      ]);
+      return;
+    }
+
+    await handleOpenMailApp(vin, reg, emailAddress, buttonNames, images, getButtonBorderColor, navigation, 'ObliInstall');
+    console.log('Navigating to ConfirmEmailPage...');
+    navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress, images, sourcePage: 'ObliInstall' });
+  };
+
   const handleImageLayout = (event: { nativeEvent: { layout: { width: any; height: any; }; }; }) => {
     const { width, height } = event.nativeEvent.layout;
     setImageAspectRatio(width / height);
