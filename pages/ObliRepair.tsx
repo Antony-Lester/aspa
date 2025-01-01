@@ -150,6 +150,9 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
     return offsets;
   };
 
+  const isAnyButtonRed = buttonNames.some((name, index) => getButtonBorderColor(index) === 'red');
+  const sendEmailButtonColor = isAnyButtonRed ? 'red' : 'green';
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
@@ -215,9 +218,9 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
             style={[
               styles.bottomButton,
               {
-                borderColor: getButtonBorderColor(0),
+                borderColor: sendEmailButtonColor,
                 backgroundColor: colors.primary,
-                borderWidth: getButtonBorderColor(0) === 'green' ? 10 : 3, // Set border width conditionally
+                borderWidth: sendEmailButtonColor === 'green' ? 10 : 3, // Set border width conditionally
               },
             ]}
             onPress={handleSend}
