@@ -214,12 +214,18 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
           style={styles.scrollView}
         >
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>VIN or Service Call:</Text>
+            <Text style={styles.label}>
+              {sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair'
+                ? 'Service Call S/C'
+                : 'Vehicle Identification Number VIN'}
+            </Text>
             <TextInput
               style={styles.input}
               value={vin}
               onChangeText={setVin}
-              placeholder="Enter VIN or Service Call"
+              placeholder={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair'
+                ? 'Enter S/C'
+                : 'Enter VIN'}
               placeholderTextColor={colors.placeholder}
             />
           </View>
