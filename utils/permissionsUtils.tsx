@@ -87,10 +87,53 @@ export const requestStoragePermissions = async (): Promise<boolean> => {
   }
 };
 
+export const requestBluetoothPermissions = async (): Promise<boolean> => {
+  try {
+    if (Platform.OS === 'android') {
+      const scanGranted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+        {
+          title: 'Bluetooth Scan Permission',
+          message: 'This app needs access to scan for Bluetooth devices.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+
+      const connectGranted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+        {
+          title: 'Bluetooth Connect Permission',
+          message: 'This app needs access to connect to Bluetooth devices.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+
+      if (
+        scanGranted === PermissionsAndroid.RESULTS.GRANTED &&
+        connectGranted === PermissionsAndroid.RESULTS.GRANTED
+      ) {
+        return true;
+      } else {
+        console.warn('Bluetooth permissions denied');
+        showPermissionAlert();
+        return false;
+      }
+    }
+    return true;
+  } catch (err) {
+    console.warn(err);
+    return false;
+  }
+};
+
 const showPermissionAlert = () => {
   Alert.alert(
-    'Storage Permission Required',
-    'This app needs storage permissions to function properly. Please grant the permissions in the app settings.',
+    'Bluetooth Permission Required',
+    'This app needs Bluetooth permissions to function properly. Please grant the permissions in the app settings.',
     [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Open Settings', onPress: () => Linking.openSettings() },
