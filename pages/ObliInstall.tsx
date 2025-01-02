@@ -14,6 +14,7 @@ import SettingsButton from '../elements/SettingsButton';
 import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
 import { getItem, setItem } from '../storage';
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
+import FullScreenImageView from '../components/FullScreenImageView'; // Import FullScreenImageView
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
@@ -89,6 +90,8 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const [componentHeights, setComponentHeights] = useState<number[]>([]);
   const [thumbnailStyles, setThumbnailStyles] = useState<{ [key: string]: any }>({});
   const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({}); // Define imageLoading state
+  const [emailAddress, setEmailAddress] = useState('');
+  const [thumbnailSizes, setThumbnailSizes] = useState<{ [key: string]: { width: number, height: number } }>({});
 
   useEffect(() => {
     const checkPermissions = async () => {
@@ -99,6 +102,23 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     };
     checkPermissions();
   }, []);
+
+  useEffect(() => {
+    images.flat().forEach(uri => {
+      setImageLoading(prev => ({ ...prev, [uri]: true }));
+      Image.getSize(`file://${uri}`, (imgWidth, imgHeight) => {
+        const aspectRatio = imgWidth / imgHeight;
+        if (aspectRatio > 1) {
+          // Landscape
+          setThumbnailSizes(prev => ({ ...prev, [uri]: { width: 150, height: 150 / aspectRatio } }));
+        } else {
+          // Portrait
+          setThumbnailSizes(prev => ({ ...prev, [uri]: { width: 150 * aspectRatio, height: 150 } }));
+        }
+        setImageLoading(prev => ({ ...prev, [uri]: false }));
+      });
+    });
+  }, [images]);
 
   const getButtonBorderColor = (index: number) => {
     const imageCount = images[index].length;
@@ -123,29 +143,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   // Concatenate non-green buttons with green buttons at the end
   const sortedButtonNames = [...nonGreenButtons, ...greenButtons];
 
-  if (hasCameraPermission === null || hasStoragePermissions === null) {
-    return (
-      <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
-        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
-        <View style={styles.container}>
-          <Text style={styles.buttonText}>Checking permissions...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (!hasCameraPermission || !hasStoragePermissions) {
-    return (
-      <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
-        <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} />
-        <View style={styles.container}>
-          <Text style={styles.buttonText}>Camera and storage permissions are required to use this app.</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  const handleDeleteImage = () => {
+  const handleDeleteImage = (fullScreenImage: { uri: string; index: number; } | null, images: string[][] | undefined, setImages: ((images: string[][]) => void) | undefined, setFullScreenImage: ((image: { uri: string; index: number; } | null) => void) | undefined) => {
     deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
   };
 
@@ -267,25 +265,12 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
           </TouchableOpacity>
         </View>
         {fullScreenImage && (
-          <Modal
+          <FullScreenImageView
             visible={true}
-            transparent={false}
-            onRequestClose={() => setFullScreenImage(null)}>
-            <TouchableOpacity style={styles.fullScreenContainer} onPress={() => setFullScreenImage(null)}>
-              {fullScreenImageLoading ? (
-                <ActivityIndicator size="large" color={colors.primary} />
-              ) : (
-                <Image
-                  source={{ uri: `file://${fullScreenImage.uri}` }}
-                  style={[styles.fullScreenImage, { width: fullScreenImageSize.width, height: fullScreenImageSize.height, borderColor: colors.primary, borderWidth: 2 }]}
-                  resizeMode="contain"
-                />
-              )}
-              <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteImage}>
-                <Text style={styles.deleteButtonText}>Delete</Text>
-              </TouchableOpacity>
-            </TouchableOpacity>
-          </Modal>
+            imageUri={`file://${fullScreenImage.uri}`}
+            onClose={() => setFullScreenImage(null)}
+            onDelete={() => handleDeleteImage(fullScreenImage, images, setImages, setFullScreenImage)}
+          />
         )}
       </View>
     </SafeAreaView>

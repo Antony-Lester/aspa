@@ -134,11 +134,14 @@ const useStyles = () => {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'black',
+      backgroundColor: colors.background, // Use theme background color
     },
     fullScreenImage: {
+      height: '100%', // Set height to 100% of the screen height
+      width: '100%', // Set width to 100% of the screen width
       borderRadius: 20,
       alignSelf: 'center', // Center the image horizontally
+      resizeMode: 'contain', // Maintain aspect ratio and fit container
     },
     deleteButton: {
       position: 'absolute',
@@ -153,6 +156,8 @@ const useStyles = () => {
       fontSize: 16,
     },
     closeButton: {
+      position: 'absolute',
+      bottom: 20,
       backgroundColor: 'gray',
       padding: 10,
       borderRadius: 5,
@@ -170,7 +175,7 @@ const useStyles = () => {
     input: {
       height: 50, // Increase height
       fontSize: 18, // Increase font size
-      borderColor: colors.onSecondaryFixedVariant, // Use theme primary color for border
+      borderColor: 'gray',
       borderWidth: 2, // Increase border width
       borderRadius: 10, // Add border radius
       paddingHorizontal: 10, // Add horizontal padding
@@ -210,7 +215,9 @@ const useStyles = () => {
     picker: {
       height: 50,
       width: '100%',
-padding: 16    },
+      padding: 16,
+      color: colors.onBackground,
+    },
     saveButton: {
       backgroundColor: colors.secondary, // Use theme secondary color
       padding: 15,
@@ -381,6 +388,11 @@ padding: 16    },
     },
     homeLogo: {
       fontSize: 20,
+    },
+    saveButtonContainer: {
+      marginTop: 20,
+      padding: 10,
+      alignItems: 'center',
     },
   });
 };

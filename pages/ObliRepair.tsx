@@ -13,6 +13,7 @@ import { getThumbnailStyle } from '../utils/thumbnailUtils'; // Import getThumbn
 import SettingsButton from '../elements/SettingsButton';
 import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
 import { getItem, setItem } from '../storage';
+import FullScreenImageView from '../components/FullScreenImageView'; // Import FullScreenImageView
 
 const ObliRepair = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
@@ -102,8 +103,8 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
       Alert.alert('Camera Permission', 'Camera permission is required to take pictures.');
       return;
     }
-    const imageUri = await openCamera();
-    if (imageUri) {
+    const imageUri = await openCamera(index, buttonNames[index], images, setImages);
+    if (typeof imageUri === 'string' && imageUri) {
       setImages(prevImages => {
         const newImages = [...prevImages];
         newImages[index] = [...newImages[index], imageUri];
@@ -232,25 +233,12 @@ const ObliRepair = ({ navigation }: { navigation: any }) => {
           </TouchableOpacity>
         </View>
         {fullScreenImage && (
-          <Modal
+          <FullScreenImageView
             visible={true}
-            transparent={false}
-            onRequestClose={() => setFullScreenImage(null)}>
-            <TouchableOpacity style={styles.fullScreenContainer} onPress={() => setFullScreenImage(null)}>
-              {fullScreenImageLoading ? (
-                <ActivityIndicator size="large" color={colors.primary} />
-              ) : (
-                <Image
-                  source={{ uri: `file://${fullScreenImage.uri}` }}
-                  style={[styles.fullScreenImage, { width: fullScreenImageSize.width, height: fullScreenImageSize.height, borderColor: colors.primary, borderWidth: 2 }]}
-                  resizeMode="contain"
-                />
-              )}
-              <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteImage}>
-                <Text style={styles.deleteButtonText}>Delete</Text>
-              </TouchableOpacity>
-            </TouchableOpacity>
-          </Modal>
+            imageUri={`file://${fullScreenImage.uri}`}
+            onClose={() => setFullScreenImage(null)}
+            onDelete={() => handleDeleteImage(fullScreenImage.uri, fullScreenImage.index)}
+          />
         )}
       </View>
     </SafeAreaView>

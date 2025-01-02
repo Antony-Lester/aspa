@@ -40,3 +40,5 @@ export const requestStoragePermissions = async (): Promise<boolean> => {
     return false;
   }
 };
+
+export default requestStoragePermissions;

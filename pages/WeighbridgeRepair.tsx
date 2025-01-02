@@ -13,6 +13,7 @@ import { getThumbnailStyle } from '../utils/thumbnailUtils'; // Import getThumbn
 import { handleOpenMailApp } from '../utils/emailUtils';
 import { getItem, setItem } from '../storage';
 import SettingsButton from '../elements/SettingsButton';
+import FullScreenImageView from '../components/FullScreenImageView';
 
 const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
@@ -215,25 +216,12 @@ const WeighbridgeRepair = ({ navigation }: { navigation: any }) => {
           </TouchableOpacity>
         </View>
         {fullScreenImage && (
-          <Modal
+          <FullScreenImageView
             visible={true}
-            transparent={false}
-            onRequestClose={() => setFullScreenImage(null)}>
-            <TouchableOpacity style={styles.fullScreenContainer} onPress={() => setFullScreenImage(null)}>
-              {fullScreenImageLoading ? (
-                <ActivityIndicator size="large" color={colors.primary} />
-              ) : (
-                <Image
-                  source={{ uri: `file://${fullScreenImage.uri}` }}
-                  style={[styles.fullScreenImage, { width: fullScreenImageSize.width, height: fullScreenImageSize.height, borderColor: colors.primary, borderWidth: 2 }]}
-                  resizeMode="contain"
-                />
-              )}
-              <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteImage}>
-                <Text style={styles.deleteButtonText}>Delete</Text>
-              </TouchableOpacity>
-            </TouchableOpacity>
-          </Modal>
+            imageUri={`file://${fullScreenImage.uri}`}
+            onClose={() => setFullScreenImage(null)}
+            onDelete={() => handleDeleteImage()}
+          />
         )}
       </View>
     </SafeAreaView>

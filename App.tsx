@@ -17,7 +17,18 @@ import { ImagesProvider } from './ImagesContext';
 import useStyles from './styles';
 import { getItem, setItem } from './storage';
 
-const Stack = createStackNavigator();
+type RootStackParamList = {
+  Home: undefined;
+  ObliInstall: undefined;
+  ObliRepair: undefined;
+  WeighbridgeInstall: undefined;
+  WeighbridgeRepair: undefined;
+  Settings: undefined;
+  VinRegEntry: undefined;
+  ConfirmEmailPage: undefined;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 const StatusBarContext = createContext({
   setStatusBarColor: (color: string) => {},
@@ -29,7 +40,7 @@ const App = () => {
   const styles = useStyles();
   const [statusBarColor, setStatusBarColor] = useState(colors.primary);
   const [navigationBarColor, setNavigationBarColor] = useState(colors.primary);
-  const [initialRouteName, setInitialRouteName] = useState('Home');
+  const [initialRouteName, setInitialRouteName] = useState<keyof RootStackParamList>('Home');
 
   useEffect(() => {
     // Apply status bar color

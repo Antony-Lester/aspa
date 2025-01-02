@@ -11,8 +11,9 @@ export const openCamera = async (index: number, buttonName: string, images: stri
   const hasStoragePermissions = await requestStoragePermissions();
 
   if (!hasCameraPermission || !hasStoragePermissions) {
-    console.log('Permissions not granted');
-    return;
+    console.log('Camera Permissions not granted');
+    await requestCameraPermission();
+    await requestStoragePermissions();
   }
 
   const quality: PhotoQuality | undefined = parseFloat(await getItem('imageQuality') || '0.5') as PhotoQuality; // Default to 0.5 if not set
