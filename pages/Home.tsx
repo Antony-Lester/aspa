@@ -46,25 +46,25 @@ const HomeScreen: React.FC = () => {
       <Image source={require('../assets/Logo.png')} style={styles.logo} resizeMode="contain" />
       <TouchableOpacity
         style={styles.homeButton}
-        onPress={() => navigation.navigate('ObliInstall')}
+        onPress={() => navigation.navigate('Obli Install')}
       >
         <Text style={styles.homeButtonText}>Obli Install</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.homeButton}
-        onPress={() => navigation.navigate('ObliRepair')}
+        onPress={() => navigation.navigate('Obli Repair')}
       >
         <Text style={styles.homeButtonText}>Obli Repair</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.homeButton}
-        onPress={() => navigation.navigate('WeighbridgeInstall')}
+        onPress={() => navigation.navigate('Weighbridge Install')}
       >
         <Text style={styles.homeButtonText}>Weighbridge Install</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.homeButton}
-        onPress={() => navigation.navigate('WeighbridgeRepair')}
+        onPress={() => navigation.navigate('Weighbridge Repair')}
       >
         <Text style={styles.homeButtonText}>Weighbridge Repair</Text>
       </TouchableOpacity>

@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   buttonText: {
-    fontSize: 33,
+    fontSize: 28,
   },
 });
 
