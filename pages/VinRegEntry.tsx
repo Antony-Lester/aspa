@@ -248,7 +248,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
                 ? 'Enter Service Call S/C'
                 : 'Enter Vehicle Identification Number VIN'}
               placeholderTextColor={colors.placeholder}
-              keyboardType={sourcePage === 'WeighbridgeInstall' || sourcePage   {detectedVin ? (<Text style={styles.detectedVin}>{detectedVin}</Text>) : null}=== 'WeighbridgeRepair' ? 'numeric' : 'default'}
+              keyboardType={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 'numeric' : 'default'}
               maxLength={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 6 : 17}
             />
           </View>

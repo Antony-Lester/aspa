@@ -1,7 +1,7 @@
 import RNFS from 'react-native-fs';
 import { requestStoragePermissions } from './permissionsUtils';
 import TextRecognition from '@react-native-ml-kit/text-recognition';
-import { setItem } from './storage';
+import { setItem } from '../storage';
 
 export const deleteImage = async (
   fullScreenImage: { uri: string, index: number } | null,
@@ -180,31 +180,12 @@ export const savePicture = async (assetUri: string, buttonName: string, index: n
 
     // If the button name is "Chassis Plate", recognize VIN in the image
     if (buttonName === 'Chassis Plate') {
-      await recognizeVinInImage(privateFilePath, setDetectedVin);
+      recognizeVinInImage(privateFilePath, setDetectedVin);
     }
 
     return privateFilePath;
   } catch (error) {
     console.error('Failed to save image:', error);
     throw error;
-  }
-};
-
-export const recognizeTextInImage = async (imageUri: string) => {
-  try {
-    const result = await TextRecognition.recognize(imageUri);
-    console.log('Recognized text:', result.text);
-
-    for (let block of result.blocks) {
-      console.log('Block text:', block.text);
-      console.log('Block frame:', block.frame);
-
-      for (let line of block.lines) {
-        console.log('Line text:', line.text);
-        console.log('Line frame:', line.frame);
-      }
-    }
-  } catch (error) {
-    console.error('Failed to recognize text in image:', error);
   }
 };

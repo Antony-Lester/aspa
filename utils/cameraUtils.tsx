@@ -7,11 +7,11 @@ import { requestCameraPermission, requestStoragePermissions } from './permission
 import { PhotoQuality } from 'react-native-image-picker';
 
 export const openCamera = async (index: number, buttonName: string, images: string[][], setImages: (images: string[][]) => void) => {
-  const hasCameraPermission = await requestCameraPermission();
-  const hasStoragePermissions = await requestStoragePermissions();
+  const hasCameraPermission = requestCameraPermission();
+  //const hasStoragePermissions = requestStoragePermissions();
 
-  if (!hasCameraPermission || !hasStoragePermissions) {
-    console.log('Permissions not granted');
+  if (!hasCameraPermission) {
+    console.log('Permission not granted');
     return;
   }
 
@@ -20,7 +20,6 @@ export const openCamera = async (index: number, buttonName: string, images: stri
   const options = {
     mediaType: 'photo' as const,
     quality: quality as PhotoQuality | undefined,
-    saveToPhotos: false, // Do not save to camera roll
   };
 
   launchCamera(options, async (response) => {
