@@ -17,7 +17,7 @@ import { ImagesProvider } from './ImagesContext';
 import useStyles from './styles';
 import { getItem, setItem } from './storage';
 
-type RootStackParamList = {
+export type RootStackParamList = {
   Home: undefined;
   ObliInstall: undefined;
   ObliRepair: undefined;

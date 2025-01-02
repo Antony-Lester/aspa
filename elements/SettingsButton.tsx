@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../ThemeContext';
+import { RootStackParamList } from '../App';
 
 const SettingsButton = () => {
   const navigation = useNavigation();

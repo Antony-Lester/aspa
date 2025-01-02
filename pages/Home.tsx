@@ -6,13 +6,7 @@ import useStyles from '../styles'; // Import useStyles
 import changeNavigationBarColor from 'react-native-navigation-bar-color'; // Import navigation bar color changer
 import SettingsButton from '../elements/SettingsButton'; // Import SettingsButton
 
-type RootStackParamList = {
-  'Obli Repair': undefined;
-  'Obli Install': undefined;
-  'Weighbridge Install': undefined;
-  'Weighbridge Repair': undefined;
-  'Settings': undefined;
-};
+import { RootStackParamList } from '../App'; // Import RootStackParamList
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -46,25 +40,25 @@ const HomeScreen: React.FC = () => {
       <Image source={require('../assets/Logo.png')} style={styles.logo} resizeMode="contain" />
       <TouchableOpacity
         style={styles.homeButton}
-        onPress={() => navigation.navigate('Obli Install')}
+        onPress={() => navigation.navigate('ObliInstall')}
       >
         <Text style={styles.homeButtonText}>Obli Install</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.homeButton}
-        onPress={() => navigation.navigate('Obli Repair')}
+        onPress={() => navigation.navigate('ObliRepair')}
       >
         <Text style={styles.homeButtonText}>Obli Repair</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.homeButton}
-        onPress={() => navigation.navigate('Weighbridge Install')}
+        onPress={() => navigation.navigate('WeighbridgeInstall')}
       >
         <Text style={styles.homeButtonText}>Weighbridge Install</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.homeButton}
-        onPress={() => navigation.navigate('Weighbridge Repair')}
+        onPress={() => navigation.navigate('WeighbridgeRepair')}
       >
         <Text style={styles.homeButtonText}>Weighbridge Repair</Text>
       </TouchableOpacity>
