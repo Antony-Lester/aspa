@@ -266,10 +266,10 @@ const useStyles = () => {
       fontWeight: 'bold',
     },
     logo: {
-      width: '80%', // Set width to 50% of the screen width
+      width: '60%', // Set width to 50% of the screen width
       height: undefined, // Maintain aspect ratio
       aspectRatio: 1, // Ensure the logo is square
-      marginBottom: 20, // Add margin to the logo
+      marginBottom: 0, // Add margin to the logo
     },
     chassisPlateContainer: {
       width: '100%', // Full width of the screen
@@ -394,6 +394,13 @@ const useStyles = () => {
       padding: 10,
       alignItems: 'center',
     },
+    headerButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      width: '100%',
+      height: 150,
+      paddingHorizontal: 0,
+    }
   });
 };
 

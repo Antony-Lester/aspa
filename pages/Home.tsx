@@ -5,6 +5,7 @@ import { useTheme } from '../ThemeContext'; // Import useTheme
 import useStyles from '../styles'; // Import useStyles
 import changeNavigationBarColor from 'react-native-navigation-bar-color'; // Import navigation bar color changer
 import SettingsButton from '../elements/SettingsButton'; // Import SettingsButton
+import WeighPadsButton from '../elements/WeighPadsButton'; // Import WeighPadsButton
 
 import { RootStackParamList } from '../App'; // Import RootStackParamList
 
@@ -20,6 +21,7 @@ const HomeScreen: React.FC = () => {
       },
       headerTintColor: colors.onPrimary, // Set the text color on the navigation bar to a lighter color
       headerRight: () => <SettingsButton />, // Use SettingsButton here
+      
     });
   }, [navigation, colors]);
 
@@ -36,7 +38,10 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.homeButtonContainer}>
-      <SettingsButton />
+      <View style={styles.headerButtons}>
+        <SettingsButton />
+        <WeighPadsButton />
+      </View>
       <Image source={require('../assets/Logo.png')} style={styles.logo} resizeMode="contain" />
       <TouchableOpacity
         style={styles.homeButton}
