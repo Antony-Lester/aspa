@@ -1,7 +1,7 @@
 // utils/emailUtils.ts
 import { PermissionsAndroid, Platform, Alert } from 'react-native';
 import Mailer from 'react-native-mail';
-import RNFS from 'react-native-fs';
+
 import { setItem } from '../storage';
 import { requestStoragePermissions } from './permissionsUtils';
 

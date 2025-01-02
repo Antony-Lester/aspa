@@ -3,17 +3,18 @@ import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../ThemeContext';
 
-const SettingsButton = () => {
+const WeighPadsButton = () => {
   const navigation = useNavigation();
+  const { colors } = useTheme();
 
   return (
     <TouchableOpacity
-      style={styles.button}
+      style={[styles.button, { backgroundColor: colors.background }]}
       onPress={() => {
-        navigation.navigate('Settings');
+        navigation.navigate('WeighPads');
       }}
     >
-      <Text style={styles.buttonText}>⚙️</Text>
+      <Text style={[styles.buttonText, { color: colors.onPrimary }]}>⚖️</Text>
     </TouchableOpacity>
   );
 };
@@ -28,4 +29,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SettingsButton;
+export default WeighPadsButton;

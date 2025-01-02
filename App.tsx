@@ -16,6 +16,7 @@ import { EmailProvider } from './EmailContext';
 import { ImagesProvider } from './ImagesContext';
 import useStyles from './styles';
 import { getItem, setItem } from './storage';
+import WeighPads from './pages/WeighPads';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -26,6 +27,7 @@ export type RootStackParamList = {
   Settings: undefined;
   VinRegEntry: undefined;
   ConfirmEmailPage: undefined;
+  WeighPads: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -95,6 +97,7 @@ const App = () => {
                 <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: 'Settings' }} />
                 <Stack.Screen name="VinRegEntry" component={VinRegEntry} options={{ title: 'Enter VIN and REG' }} />
                 <Stack.Screen name="ConfirmEmailPage" component={ConfirmEmailPage} options={{ title: 'Confirm Email' }} />
+                <Stack.Screen name="WeighPads" component={WeighPads} options={{ title: 'Weigh Pads' }} />
               </Stack.Navigator>
             </NavigationContainer>
           </StatusBarContext.Provider>
