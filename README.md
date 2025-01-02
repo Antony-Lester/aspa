@@ -1,7 +1,7 @@
 
 # Aspa
 testing release
-https://github.com/Antony-Lester/aspa/releases/download/testing/app-release.apk
+https://github.com/Antony-Lester/aspa/releases/download/v00.70/app-release.apk
 
 -download
 -settings > Install unknown apps > Allow from this source
@@ -57,6 +57,7 @@ https://github.com/Antony-Lester/aspa/releases/download/testing/app-release.apk
 1. Open a terminal and navigate to the `android` directory of your project.
 2. Run the following command to build the release APK:
    ```sh
+   cd android
    ./gradlew assembleRelease
    ```
 3. The generated APK will be located at `android/app/build/outputs/apk/release/app-release.apk`.
