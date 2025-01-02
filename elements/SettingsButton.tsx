@@ -3,8 +3,13 @@ import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../ThemeContext';
 
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../App';
+
+type SettingsScreenProp = StackNavigationProp<RootStackParamList, 'Settings'>;
+
 const SettingsButton = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<SettingsScreenProp>();
 
   return (
     <TouchableOpacity

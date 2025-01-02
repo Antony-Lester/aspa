@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { View, Text, StatusBar, Alert, FlatList, StatusBarStyle } from 'react-native';
+import { View, Text, StatusBar, Alert, FlatList, StatusBarStyle, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import SystemNavigationBar from 'react-native-system-navigation-bar';
 import { useTheme } from '../ThemeContext';
@@ -13,6 +13,8 @@ const WeighPads = () => {
   const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
   const [devices, setDevices] = useState<Device[]>([]);
   const [scanning, setScanning] = useState(false);
+  const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
+  const [receivedData, setReceivedData] = useState<string[]>([]);
   const manager = new BleManager();
 
   useEffect(() => {
@@ -43,19 +45,48 @@ const WeighPads = () => {
       return true;
     };
 
-    
-
     const handleDiscoverPeripheral = (device: Device) => {
-      if (device.isConnectable) {
-        setDevices((prevDevices) => {
-          if (!prevDevices.some((d) => d.id === device.id)) {
-            if (prevDevices.length === 0) {
-              console.log('First discovered peripheral:', device);
+      if (!device.name) {
+        return; // Ignore devices without a name
+      }
+      console.log('Discovered peripheral:', device);
+      if (device.name === 'Prot3') {
+        connectToDevice(device);
+      }
+      setDevices((prevDevices) => {
+        if (!prevDevices.some((d) => d.id === device.id)) {
+          return [...prevDevices, device];
+        }
+        return prevDevices;
+      });
+    };
+
+    const connectToDevice = async (device: Device) => {
+      try {
+        await manager.stopDeviceScan();
+        const connectedDevice = await device.connect();
+        console.log('Connected to device:', connectedDevice);
+        setConnectedDevice(connectedDevice);
+        await connectedDevice.discoverAllServicesAndCharacteristics();
+        console.log('Discovered services and characteristics');
+        // Subscribe to notifications or read characteristics as needed
+        connectedDevice.monitorCharacteristicForService(
+          'service-uuid', // Replace with your service UUID
+          'characteristic-uuid', // Replace with your characteristic UUID
+          (error, characteristic) => {
+            if (error) {
+              console.error('Error monitoring characteristic:', error);
+              return;
             }
-            return [...prevDevices, device];
+            if (characteristic?.value) {
+              const data = Buffer.from(characteristic.value, 'base64').toString('utf-8');
+              console.log('Received data:', data);
+              setReceivedData((prevData) => [...prevData, data]);
+            }
           }
-          return prevDevices;
-        });
+        );
+      } catch (error) {
+        console.error('Failed to connect to device:', error);
       }
     };
 
@@ -108,11 +139,19 @@ const WeighPads = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View>
-            <Text>{item.name || 'Unnamed Device'}</Text>
+            <Text>{item.name}</Text>
             <Text>{item.id}</Text>
           </View>
         )}
       />
+      {connectedDevice && (
+        <ScrollView>
+          <Text>Connected to: {connectedDevice.name}</Text>
+          {receivedData.map((data, index) => (
+            <Text key={index}>{data}</Text>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };

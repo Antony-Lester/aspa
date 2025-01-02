@@ -13,7 +13,14 @@ export const requestCameraPermission = async (): Promise<boolean> => {
           buttonPositive: 'OK',
         },
       );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        return true;
+      } else {
+        console.warn('Camera permission denied');
+        showPermissionAlert('Camera Permission Required', 'This app needs camera permissions to function properly. Please grant the permissions in the app settings.');
+        return false;
+      }
     }
     return true;
   } catch (err) {
@@ -25,65 +32,24 @@ export const requestCameraPermission = async (): Promise<boolean> => {
 export const requestStoragePermissions = async (): Promise<boolean> => {
   try {
     if (Platform.OS === 'android') {
-      const readGranted = await PermissionsAndroid.request(
+      const granted = await PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-        {
-          title: 'Read Storage Permission',
-          message: 'This app needs access to your storage to read files.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-
-      const writeGranted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        {
-          title: 'Write Storage Permission',
-          message: 'This app needs access to your storage to write files.',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-
+      ]);
       if (
-        readGranted === PermissionsAndroid.RESULTS.GRANTED &&
-        writeGranted === PermissionsAndroid.RESULTS.GRANTED
+        granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
+        granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED
       ) {
-        // Check if MANAGE_EXTERNAL_STORAGE permission is needed
-        if (Platform.Version >= 30) {
-          const manageGranted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.MANAGE_EXTERNAL_STORAGE,
-            {
-              title: 'Manage Storage Permission',
-              message: 'This app needs access to manage all files.',
-              buttonNeutral: 'Ask Me Later',
-              buttonNegative: 'Cancel',
-              buttonPositive: 'OK',
-            },
-          );
-
-          if (manageGranted === PermissionsAndroid.RESULTS.GRANTED) {
-            return true;
-          } else {
-            console.warn('Manage storage permission denied');
-            showPermissionAlert();
-            return false;
-          }
-        }
-
         return true;
       } else {
-        console.warn('Read/Write storage permission denied');
-        showPermissionAlert();
-        return false;
+        console.warn('Storage permissions denied');
+        return true;
       }
     }
     return true;
   } catch (err) {
     console.warn(err);
-    return false;
+    return true;
   }
 };
 
@@ -119,7 +85,7 @@ export const requestBluetoothPermissions = async (): Promise<boolean> => {
         return true;
       } else {
         console.warn('Bluetooth permissions denied');
-        showPermissionAlert();
+        showPermissionAlert('Bluetooth Permission Required', 'This app needs Bluetooth permissions to function properly. Please grant the permissions in the app settings.');
         return false;
       }
     }
@@ -130,14 +96,26 @@ export const requestBluetoothPermissions = async (): Promise<boolean> => {
   }
 };
 
-const showPermissionAlert = () => {
+const showPermissionAlert = (title: string, message: string) => {
   Alert.alert(
-    'Bluetooth Permission Required',
-    'This app needs Bluetooth permissions to function properly. Please grant the permissions in the app settings.',
+    title,
+    message,
     [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Open Settings', onPress: () => Linking.openSettings() },
     ],
     { cancelable: false }
   );
+};
+
+export const requestAllPermissions = async (sourcePage: string): Promise<boolean> => {
+  const cameraPermission = await requestCameraPermission();
+  const storagePermission = await requestStoragePermissions();
+  let bluetoothPermission = true;
+
+  if (sourcePage === 'WeighPads') {
+    bluetoothPermission = await requestBluetoothPermissions();
+  }
+
+  return cameraPermission && storagePermission && bluetoothPermission;
 };

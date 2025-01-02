@@ -1,7 +1,7 @@
 import RNFS from 'react-native-fs';
 import { requestStoragePermissions } from './permissionsUtils';
 import TextRecognition from '@react-native-ml-kit/text-recognition';
-import { setItem } from './storage';
+import { setItem } from '../storage';
 
 export const deleteImage = async (
   fullScreenImage: { uri: string, index: number } | null,
@@ -43,7 +43,6 @@ export const deleteImage = async (
         console.log(`Deleted image from private directory: ${privateFilePath}`);
       } catch (error) {
         console.error('Failed to delete image from private directory:', error);
-        // Log each file name in the directory if deletion fails
         try {
           const files = await RNFS.readDir(RNFS.DocumentDirectoryPath);
           console.log(`Files AFTER in private directory: ${files.length}`);
@@ -95,7 +94,7 @@ export const deleteImage = async (
   }
 };
 
-const validateVIN = (vin) => {
+const validateVIN = (vin: string | any[]) => {
   if (typeof vin !== 'string') {
     return false;
   }
@@ -117,7 +116,7 @@ const validateVIN = (vin) => {
   const weights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2];
 
   // VIN character values
-  const transliterations = {
+  const transliterations: { [key: string]: number } = {
     A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, J: 1, K: 2, L: 3, M: 4, N: 5, P: 7, R: 9, S: 2, T: 3, U: 4, V: 5, W: 6, X: 7, Y: 8, Z: 9,
     1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 0: 0
   };
@@ -126,7 +125,7 @@ const validateVIN = (vin) => {
   let sum = 0;
   for (let i = 0; i < vin.length; i++) {
     const char = vin[i];
-    const value = transliterations[char];
+    const value = transliterations[char as keyof typeof transliterations];
     const weight = weights[i];
     sum += value * weight;
   }

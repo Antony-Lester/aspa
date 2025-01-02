@@ -11,7 +11,7 @@ const WeighPadsButton = () => {
     <TouchableOpacity
       style={[styles.button, { backgroundColor: colors.background }]}
       onPress={() => {
-        navigation.navigate('WeighPads');
+        navigation.navigate('WeighPads' as never);
       }}
     >
       <Text style={[styles.buttonText, { color: colors.onPrimary }]}>⚖️</Text>

@@ -10,28 +10,20 @@ import {
   StatusBarStyle,
   ScrollView,
 } from 'react-native';
-import { useFocusEffect, useRoute, useNavigation, StackScreenProps } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 import useStyles from '../styles';
 import { handleOpenMailApp } from '../utils/emailUtils';
-import { deleteImage, recognizeVinInImage, savePicture } from '../utils/imageUtils';
+import { deleteImage } from '../utils/imageUtils';
 import { useEmail } from '../EmailContext';
 import { StatusBarContext } from '../App';
 import SystemNavigationBar from 'react-native-system-navigation-bar';
 import SettingsButton from '../elements/SettingsButton';
 import { useTheme } from '../ThemeContext';
 import { useImages } from '../ImagesContext';
-import { setItem, getItem } from '../storage';
-import RNFS from 'react-native-fs';
-import { requestStoragePermissions } from '../utils/permissionsUtils';
-import TextRecognition from '@react-native-ml-kit/text-recognition';
+import { getItem } from '../storage';
 
-type RootStackParamList = {
-  VinRegEntry: { images: string[][]; sourcePage: string };
-};
-
-type VinRegEntryProps = StackScreenProps<RootStackParamList, 'VinRegEntry'>;
-
-const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
+const VinRegEntry: React.FC = ({ navigation, route }) => {
   const { images: routeImages, sourcePage } = route.params || {};
   const { colors } = useTheme();
   const styles = useStyles();
@@ -97,7 +89,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
       }
     }
     console.log('All images deleted.');
-    navigation.navigate('Home');
+    navigation.navigate({ name: 'HomeScreen' });
   };
 
   useFocusEffect(
@@ -147,7 +139,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
     const emailAddress = getEmailAddress();
     if (!emailAddress) {
       Alert.alert('No Email Set', 'Please set an email address in the settings.', [
-        { text: 'OK', onPress: () => navigation.navigate('Settings') },
+        { text: 'OK', onPress: () => navigation.navigate({ name: 'Settings' }) },
       ]);
       return;
     }
@@ -168,36 +160,6 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
     console.log('Email sent and navigating to confirmation page.');
     await new Promise(resolve => setTimeout(resolve, 1000));
     navigation.navigate('ConfirmEmailPage', { vin: formattedVinOrServiceCall, reg, emailAddress, images, sourcePage });
-  };
-
-  const handleSend = async () => {
-    const incompleteButtonIndex = buttonNames.findIndex((name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red');
-    if (incompleteButtonIndex !== -1) {
-      Alert.alert('Incomplete', `Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
-      return;
-    }
-
-    if (!vin || vin.length < 6 || vin.length > 17) {
-      navigation.navigate('VinRegEntry', { images, sourcePage: 'ObliInstall' });
-      return;
-    }
-
-    const emailAddress = obliInstallEmail;
-    if (!emailAddress) {
-      Alert.alert('No Email Set', 'Please set an email address in the settings.', [
-        { text: 'OK', onPress: () => navigation.navigate('Settings') },
-      ]);
-      return;
-    }
-
-    await handleOpenMailApp(vin, reg, emailAddress, buttonNames, images, getButtonBorderColor, navigation, 'ObliInstall');
-    console.log('Navigating to ConfirmEmailPage...');
-    navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress, images, sourcePage: 'ObliInstall' });
-  };
-
-  const handleImageLayout = (event: { nativeEvent: { layout: { width: any; height: any; }; }; }) => {
-    const { width, height } = event.nativeEvent.layout;
-    setImageAspectRatio(width / height);
   };
 
   useEffect(() => {
@@ -239,7 +201,6 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
                 ? 'Service Call S/C'
                 : 'Vehicle Identification Number VIN'}
             </Text>
-            {detectedVin ? (<Text style={styles.detectedVin}>{detectedVin}</Text>) : null}
             <TextInput
               style={[styles.input, { borderColor: isValidVinOrServiceCall ? 'green' : 'red' }]}
               value={vin}
@@ -247,8 +208,8 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
               placeholder={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair'
                 ? 'Enter Service Call S/C'
                 : 'Enter Vehicle Identification Number VIN'}
-              placeholderTextColor={colors.placeholder}
-              keyboardType={sourcePage === 'WeighbridgeInstall' || sourcePage   {detectedVin ? (<Text style={styles.detectedVin}>{detectedVin}</Text>) : null}=== 'WeighbridgeRepair' ? 'numeric' : 'default'}
+              placeholderTextColor={colors.onPrimary}
+              keyboardType={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 'numeric' : 'default'}
               maxLength={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 6 : 17}
             />
           </View>
@@ -260,7 +221,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
                 value={reg}
                 onChangeText={setReg}
                 placeholder="Enter Serial Number S/N"
-                placeholderTextColor={colors.placeholder}
+                placeholderTextColor={colors.primary}
                 keyboardType="numeric"
                 maxLength={4}
               />
@@ -274,7 +235,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
                 value={reg}
                 onChangeText={setReg}
                 placeholder="Enter Registration Number"
-                placeholderTextColor={colors.placeholder}
+                placeholderTextColor={colors.primary}
               />
             </View>
           )}
