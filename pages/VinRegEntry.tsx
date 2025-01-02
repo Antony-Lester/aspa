@@ -13,7 +13,7 @@ import {
 import { useFocusEffect, useRoute, useNavigation, StackScreenProps } from '@react-navigation/native';
 import useStyles from '../styles';
 import { handleOpenMailApp } from '../utils/emailUtils';
-import { deleteImage } from '../utils/imageUtils';
+import { deleteImage, recognizeVinInImage, savePicture } from '../utils/imageUtils';
 import { useEmail } from '../EmailContext';
 import { StatusBarContext } from '../App';
 import SystemNavigationBar from 'react-native-system-navigation-bar';
@@ -21,6 +21,9 @@ import SettingsButton from '../elements/SettingsButton';
 import { useTheme } from '../ThemeContext';
 import { useImages } from '../ImagesContext';
 import { setItem, getItem } from '../storage';
+import RNFS from 'react-native-fs';
+import { requestStoragePermissions } from '../utils/permissionsUtils';
+import TextRecognition from '@react-native-ml-kit/text-recognition';
 
 type RootStackParamList = {
   VinRegEntry: { images: string[][]; sourcePage: string };
@@ -236,6 +239,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
                 ? 'Service Call S/C'
                 : 'Vehicle Identification Number VIN'}
             </Text>
+            {detectedVin ? (<Text style={styles.detectedVin}>{detectedVin}</Text>) : null}
             <TextInput
               style={[styles.input, { borderColor: isValidVinOrServiceCall ? 'green' : 'red' }]}
               value={vin}
@@ -244,7 +248,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
                 ? 'Enter Service Call S/C'
                 : 'Enter Vehicle Identification Number VIN'}
               placeholderTextColor={colors.placeholder}
-              keyboardType={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 'numeric' : 'default'}
+              keyboardType={sourcePage === 'WeighbridgeInstall' || sourcePage   {detectedVin ? (<Text style={styles.detectedVin}>{detectedVin}</Text>) : null}=== 'WeighbridgeRepair' ? 'numeric' : 'default'}
               maxLength={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 6 : 17}
             />
           </View>
