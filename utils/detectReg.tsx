@@ -1,5 +1,6 @@
 import TextRecognition from '@react-native-ml-kit/text-recognition';
 import { setItem } from '../storage';
+import { Platform } from 'react-native';
 
 const validRegCurrentStyle = (reg: string) => {
   const currentStyle = /^[A-Z]{2}[0-9]{2}\s?[A-Z]{3}$/; // 2001 onwards
@@ -16,9 +17,17 @@ const validRegSuffixStyle = (reg: string) => {
   return suffixStyle.test(reg);
 };
 
-export const recognizeRegInImage = async (imageUri: string, setDetectedReg: (reg: string) => void) => {
+const getContentUri = (filePath: string) => {
+  if (Platform.OS === 'android') {
+    return `file://${filePath}`;
+  }
+  return filePath;
+};
+
+export const recognizeRegInImage = async (imageUri: string) => {
   try {
-    const result = await TextRecognition.recognize(imageUri);
+    const contentUri = getContentUri(imageUri);
+    const result = await TextRecognition.recognize(contentUri);
     console.log('Recognized text:', result.text);
 
     let detectedReg = '';
@@ -29,7 +38,6 @@ export const recognizeRegInImage = async (imageUri: string, setDetectedReg: (reg
 
         if (validRegCurrentStyle(cleanedText)) {
           console.log(`Detected Registration (Current Style): ${cleanedText}`);
-          setDetectedReg(cleanedText);
           setItem('detectedReg', cleanedText);
           return;
         } else if (validRegPrefixStyle(cleanedText)) {
@@ -44,7 +52,6 @@ export const recognizeRegInImage = async (imageUri: string, setDetectedReg: (reg
 
     if (detectedReg) {
       console.log(`Detected Registration: ${detectedReg}`);
-      setDetectedReg(detectedReg);
       setItem('detectedReg', detectedReg);
     } else {
       console.log('No valid registration found in the image.');

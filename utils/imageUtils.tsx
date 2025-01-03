@@ -1,10 +1,15 @@
 import RNFS from 'react-native-fs';
-import { requestStoragePermissions } from './permissionsUtils';
-import { recognizeVinInImage } from './detectVin';
+import { recognizeVinInImage, recognizeTextInImage } from './detectVin';
 import { recognizeRegInImage } from './detectReg';
+import { requestStoragePermissions } from './permissionsUtils';
 
-
-export const savePicture = async (assetUri: string, buttonName: string, index: number, images: string[][], setImages: (images: string[][]) => void, setDetectedVin: (vin: string) => void) => {
+export const savePicture = async (
+  assetUri: string,
+  buttonName: string,
+  index: number,
+  images: string[][],
+  setImages: (images: string[][]) => void,
+) => {
   const newImages = [...images];
   const pictureNumber = newImages[index].length + 1;
   const fileName = `${buttonName.replace(/\s+/g, '_')}_${pictureNumber}.jpg`;
@@ -13,28 +18,25 @@ export const savePicture = async (assetUri: string, buttonName: string, index: n
   console.log(`Saving picture to private directory: ${privateFilePath}`);
 
   try {
-    // Save to private directory
     await RNFS.copyFile(assetUri, privateFilePath);
-    const fileSizePrivate = await RNFS.stat(privateFilePath).then(stat => stat.size);
+    const fileSizePrivate = await RNFS.stat(privateFilePath).then((stat) => stat.size);
     console.log(`File saved to private directory: ${privateFilePath}, size: ${fileSizePrivate} bytes`);
 
-    // Update state with the private file path only
     newImages[index] = [...newImages[index], privateFilePath];
     console.log(`Updated images state for index ${index}:`, newImages[index]);
     setImages(newImages);
 
-    // If the button name is "Chassis Plate", recognize VIN in the image
     if (buttonName === 'Chassis Plate') {
       console.log('Recognizing VIN in image...');
-      recognizeVinInImage(privateFilePath, setDetectedVin);
+      recognizeVinInImage(privateFilePath);
     } else if (buttonName === 'Reg Plate') {
       console.log('Recognizing reg plate in image...');
-      recognizeRegInImage(privateFilePath, setDetectedVin);
+      recognizeRegInImage(privateFilePath);
     }
 
     return privateFilePath;
   } catch (error) {
-      console.error('Failed to save image:', error);
+    console.error('Failed to save image:', error);
     throw error;
   }
 };

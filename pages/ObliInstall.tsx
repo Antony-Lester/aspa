@@ -148,7 +148,7 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
                   onPress={() => openCamera(index, name, images, setImages)}>
                   <View style={styles.buttonContent}>
                     <Text style={styles.buttonText}>
-                      {name === 'Chassis Plate' && detectedVin ? detectedVin : name === 'Reg Plate' && detectedReg ? detectedReg : name}
+                      {name === 'Chassis Plate' && detectedVin ? 'Vin:' + detectedVin : name === 'Reg Plate' && detectedReg ? 'Reg: ' + detectedReg : name}
                     </Text></View>
                 </TouchableOpacity>
                 <View style={styles.thumbnailContainer}>

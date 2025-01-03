@@ -1,5 +1,6 @@
 import TextRecognition from '@react-native-ml-kit/text-recognition';
 import { setItem } from '../storage';
+import { Platform } from 'react-native';
 
 const validateVIN = (vin: string) => {
     if (typeof vin !== 'string') {
@@ -25,7 +26,7 @@ const validateVIN = (vin: string) => {
     // VIN character values
     const transliterations: { [key: string]: number } = {
         A: 1, B: 2, C: 3, D: 4, E: 5, F: 6, G: 7, H: 8, J: 1, K: 2, L: 3, M: 4, N: 5, P: 7, R: 9, S: 2, T: 3, U: 4, V: 5, W: 6, X: 7, Y: 8, Z: 9,
-        1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 0: 0
+        1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 0: 0,
     };
 
     // Calculate the check digit
@@ -64,22 +65,41 @@ const validatePartialVIN = (vin: string) => {
     return true;
 };
 
-export const recognizeVinInImage = async (imageUri: string, setDetectedVin: (vin: string) => void) => {
+const getContentUri = (filePath: string) => {
+    if (Platform.OS === 'android') {
+        return `file://${filePath}`;
+    }
+    return filePath;
+};
+
+export const recognizeVinInImage = async (imageUri: string) => {
     try {
-        const result = await TextRecognition.recognize(imageUri);
+        const contentUri = getContentUri(imageUri);
+        const result = await TextRecognition.recognize(contentUri);
         console.log('Recognized text:', result.text);
 
         let detectedVIN = '';
 
+        // First, filter for strings that are 17 characters long and validate them
+        const vinCandidates = result.blocks.flatMap(block =>
+            block.lines
+                .map(line => line.text.replace(/[^a-zA-Z0-9]/g, '')) // Remove non-alphanumeric characters
+                .filter(text => text.length === 17)
+        );
+
+        for (const candidate of vinCandidates) {
+            if (validateVIN(candidate)) {
+                console.log(`Detected VIN: ${candidate}`);
+                setItem('detectedVin', candidate);
+                return;
+            }
+        }
+
+        // If no valid 17-character VIN is found, look for partial VINs
         for (const block of result.blocks) {
             for (const line of block.lines) {
-                const cleanedText = line.text.replace(/[\s\n\t]/g, '');
-                if (cleanedText.length === 17 && validateVIN(cleanedText)) {
-                    console.log(`Detected VIN: ${cleanedText}`);
-                    setDetectedVin(cleanedText);
-                    setItem('detectedVin', cleanedText);
-                    return;
-                } else if (validatePartialVIN(cleanedText)) {
+                const cleanedText = line.text.replace(/[^a-zA-Z0-9]/g, ''); // Remove non-alphanumeric characters
+                if (validatePartialVIN(cleanedText)) {
                     detectedVIN = cleanedText;
                 }
             }
@@ -88,7 +108,6 @@ export const recognizeVinInImage = async (imageUri: string, setDetectedVin: (vin
         if (detectedVIN) {
             const partialVIN = detectedVIN.slice(-6);
             console.log(`Detected partial VIN: ${partialVIN}`);
-            setDetectedVin(partialVIN);
             setItem('detectedVin', partialVIN);
         } else {
             console.log('No valid VIN found in the image.');
@@ -100,7 +119,8 @@ export const recognizeVinInImage = async (imageUri: string, setDetectedVin: (vin
 
 export const recognizeTextInImage = async (imageUri: string) => {
     try {
-        const result = await TextRecognition.recognize(imageUri);
+        const contentUri = getContentUri(imageUri);
+        const result = await TextRecognition.recognize(contentUri);
         console.log('Recognized text:', result.text);
 
         for (const block of result.blocks) {

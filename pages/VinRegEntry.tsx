@@ -11,7 +11,6 @@ import {
   ScrollView,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { StackScreenProps } from '@react-navigation/stack';
 import useStyles from '../styles';
 import { handleOpenMailApp } from '../utils/emailUtils';
 import { deleteImage } from '../utils/imageUtils';
@@ -23,14 +22,10 @@ import { useTheme } from '../ThemeContext';
 import { useImages } from '../ImagesContext';
 import { getItem, setItem } from '../storage'; // Import storage functions
 
-type RootStackParamList = {
-  VinRegEntry: { images: string[][]; sourcePage: string };
-  ConfirmEmailPage: { vin: string; reg: string; emailAddress: string; images: string[][]; sourcePage: string };
-};
+import { ConfirmEmailPageProps } from '../App';
+import { RootStackParamList } from '../App';
 
-type VinRegEntryProps = StackScreenProps<RootStackParamList, 'VinRegEntry'>;
-
-const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
+const VinRegEntry: React.FC<ConfirmEmailPageProps> = ({ navigation, route }) => {
   const { images: routeImages, sourcePage } = route.params || {};
   const { colors } = useTheme();
   const styles = useStyles();
@@ -185,7 +180,7 @@ const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
     const emailAddress = getEmailAddress();
     if (!emailAddress) {
       Alert.alert('No Email Set', 'Please set an email address in the settings.', [
-        { text: 'OK', onPress: () => navigation.navigate('Settings', { screen: 'Settings' }) },
+        { text: 'OK', onPress: () => navigation.navigate('Settings') },
       ]);
       return;
     }

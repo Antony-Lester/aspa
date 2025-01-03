@@ -1,4 +1,3 @@
-// utils/cameraUtils.ts
 import { launchCamera } from 'react-native-image-picker';
 import { savePicture } from './imageUtils';
 import { getItem } from '../storage';
@@ -16,12 +15,12 @@ export const openCamera = async (index: number, buttonName: string, images: stri
     await requestStoragePermissions();
   }
 
-  const quality: PhotoQuality | undefined = parseFloat(await getItem('imageQuality') || '0.5') as PhotoQuality; // Default to 0.5 if not set
+  const quality: PhotoQuality | undefined = parseFloat(getItem('imageQuality') || '0.5') as PhotoQuality;
 
   const options = {
     mediaType: 'photo' as const,
     quality: quality as PhotoQuality | undefined,
-    saveToPhotos: false, // Do not save to camera roll
+    saveToPhotos: false,
   };
 
   launchCamera(options, async (response) => {
