@@ -1,20 +1,23 @@
 import React, { useEffect, useRef, useContext, useState, useLayoutEffect } from 'react';
-import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, Image, ImageBackground, Modal, ActivityIndicator, StatusBarStyle, Dimensions, Alert } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, View, Text, TouchableOpacity, ImageBackground, ActivityIndicator, StatusBarStyle, Dimensions, Alert } from 'react-native';
 import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
+import SystemNavigationBar from 'react-native-system-navigation-bar';
+import changeNavigationBarColor from 'react-native-navigation-bar-color';
+
 import { StatusBarContext } from '../App';
-import SystemNavigationBar from 'react-native-system-navigation-bar'; // Import SystemNavigationBar
+import { getItem, setItem } from '../storage';
 import { useTheme } from '../ThemeContext';
-import useStyles from '../styles';
 import { useEmail } from '../EmailContext';
+import useStyles from '../styles';
 import { requestCameraPermission, requestStoragePermissions } from '../utils/permissionsUtils';
 import { openCamera } from '../utils/cameraUtils';
 import { deleteImage } from '../utils/imageUtils';
-import { getThumbnailStyle } from '../utils/thumbnailUtils'; // Import getThumbnailStyle
+import { getThumbnailStyle } from '../utils/thumbnailUtils';
+import { handleOpenMailApp } from '../utils/emailUtils';
 import SettingsButton from '../elements/SettingsButton';
-import { handleOpenMailApp } from '../utils/emailUtils'; // Import handleOpenMailApp
-import { getItem, setItem } from '../storage';
-import changeNavigationBarColor from 'react-native-navigation-bar-color';
-import FullScreenImageView from '../components/FullScreenImageView'; // Import FullScreenImageView
+import FullScreenImageView from '../components/FullScreenImageView';
+
+type RouteParams = { vin?: string; reg?: string; };
 
 const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { colors } = useTheme();
@@ -23,42 +26,31 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const { obliInstallEmail } = useEmail();
   const route = useRoute();
   const nav = useNavigation();
-  type RouteParams = {
-    vin?: string;
-    reg?: string;
-  };
+  const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
 
   const { vin, reg } = (route.params as RouteParams) || {};
-  const { setStatusBarColor, setNavigationBarColor } = useContext(StatusBarContext);
+  const detectedVin = getItem('detectedVin');
+  const detectedReg = getItem('detectedReg');
 
   useLayoutEffect(() => {
     nav.setOptions({
-      headerStyle: {
-        backgroundColor: colors.primary, // Set the top navigation bar color
-      },
-      headerTintColor: colors.onPrimary, // Set the text color on the navigation bar to a lighter color
-      headerRight: () => <SettingsButton />, // Use SettingsButton here
+      headerStyle: { backgroundColor: colors.primary }, headerTintColor: colors.onPrimary,
+      headerRight: () => <SettingsButton />
     });
   }, [nav, colors]);
 
   useFocusEffect(
     React.useCallback(() => {
-      // Set the status bar color
       StatusBar.setBackgroundColor(colors.primary);
       StatusBar.setBarStyle(colors.statusBarStyle as StatusBarStyle);
-
-      // Set the navigation bar color and button color
       SystemNavigationBar.setNavigationColor(colors.primary, undefined);
-
       const checkEmailAppOpened = async () => {
-        const emailAppOpened = await getItem('emailAppOpened');
-        if (emailAppOpened === 'true') {
-          await setItem('emailAppOpened', 'false');
+        if (getItem('emailAppOpened') === 'true') {
+          setItem('emailAppOpened', 'false');
           navigation.navigate('ConfirmEmailPage', { vin, reg, emailAddress: obliInstallEmail, images, sourcePage: 'ObliInstall' });
         }
       };
-
-      checkEmailAppOpened();
+      checkEmailAppOpened()
     }, [colors])
   );
 
@@ -85,13 +77,9 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   const [fullScreenImage, setFullScreenImage] = useState<{ uri: string, index: number } | null>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [hasStoragePermissions, setHasStoragePermissions] = useState<boolean | null>(null);
-  const [fullScreenImageSize, setFullScreenImageSize] = useState<{ width: number, height: number }>({ width: 0, height: 0 });
-  const [fullScreenImageLoading, setFullScreenImageLoading] = useState<boolean>(false);
   const [componentHeights, setComponentHeights] = useState<number[]>([]);
   const [thumbnailStyles, setThumbnailStyles] = useState<{ [key: string]: any }>({});
-  const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({}); // Define imageLoading state
-  const [emailAddress, setEmailAddress] = useState('');
-  const [thumbnailSizes, setThumbnailSizes] = useState<{ [key: string]: { width: number, height: number } }>({});
+  const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     const checkPermissions = async () => {
@@ -103,70 +91,28 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
     checkPermissions();
   }, []);
 
-  useEffect(() => {
-    images.flat().forEach(uri => {
-      setImageLoading(prev => ({ ...prev, [uri]: true }));
-      Image.getSize(`file://${uri}`, (imgWidth, imgHeight) => {
-        const aspectRatio = imgWidth / imgHeight;
-        if (aspectRatio > 1) {
-          // Landscape
-          setThumbnailSizes(prev => ({ ...prev, [uri]: { width: 150, height: 150 / aspectRatio } }));
-        } else {
-          // Portrait
-          setThumbnailSizes(prev => ({ ...prev, [uri]: { width: 150 * aspectRatio, height: 150 } }));
-        }
-        setImageLoading(prev => ({ ...prev, [uri]: false }));
-      });
-    });
-  }, [images]);
-
   const getButtonBorderColor = (index: number) => {
     const imageCount = images[index].length;
-    if (buttonNames[index] === 'Front Sensor(s)' || buttonNames[index] === 'Rear Sensor(s)') {
-      return imageCount >= 2 ? 'green' : imageCount === 1 ? 'orange' : 'red';
-    }
-    return imageCount > 0 ? 'green' : (buttonNames[index] === 'T Piece Locations' || buttonNames[index] === 'Reg Plate' || buttonNames[index] === 'Other') ? 'orange' : 'red';
+    return (buttonNames[index] === 'Other') ? imageCount > 0 ? 'green' : 'orange' : imageCount > 0 ? 'green' : 'red';
   };
-
-  const allButtonsGreenOrOrange = images.every((imageArray, index) => imageArray.length > 0 || getButtonBorderColor(index) === 'orange');
+  const allButtonsGreenOrOrange = images.every((imageArray, index) => imageArray.length > 0 || buttonNames[index] === 'Other');
   const sendEmailButtonColor = allButtonsGreenOrOrange ? 'green' : 'red';
-
-  // Separate green buttons and non-green buttons
-  const nonGreenButtons = buttonNames
-    .map((name, index) => ({ name, index, borderColor: getButtonBorderColor(index) }))
-    .filter(button => button.borderColor !== 'green');
-
-  const greenButtons = buttonNames
-    .map((name, index) => ({ name, index, borderColor: getButtonBorderColor(index) }))
-    .filter(button => button.borderColor === 'green');
-
-  // Concatenate non-green buttons with green buttons at the end
-  const sortedButtonNames = [...nonGreenButtons, ...greenButtons];
-
-  const handleDeleteImage = (fullScreenImage: { uri: string; index: number; } | null, images: string[][] | undefined, setImages: ((images: string[][]) => void) | undefined, setFullScreenImage: ((image: { uri: string; index: number; } | null) => void) | undefined) => {
-    deleteImage(fullScreenImage, images, setImages, setFullScreenImage);
-  };
+  const handleDeleteImage = () => { deleteImage(fullScreenImage, images, setImages, setFullScreenImage); };
 
   const handleSend = async () => {
     const incompleteButtonIndex = buttonNames.findIndex((name, index) => images[index].length === 0 && getButtonBorderColor(index) === 'red');
     if (incompleteButtonIndex !== -1) {
       Alert.alert('Incomplete', `Please take a picture of ${buttonNames[incompleteButtonIndex]}.`);
-      return;
+      return
     }
-
     if (!vin || vin.length < 6 || vin.length > 17) {
-      navigation.navigate('VinRegEntry', { images, sourcePage: 'ObliInstall' });
-      return;
+      navigation.navigate('VinRegEntry', { images, sourcePage: 'ObliInstall' }); return;
     }
-
     const emailAddress = obliInstallEmail;
     if (!emailAddress) {
       Alert.alert('No Email Set', 'Please set an email address in the settings.', [
-        { text: 'OK', onPress: () => navigation.navigate('Settings') },
-      ]);
-      return;
+        { text: 'OK', onPress: () => navigation.navigate('Settings') }]); return
     }
-
     await handleOpenMailApp(vin, reg, emailAddress, buttonNames, images, getButtonBorderColor, navigation, 'ObliInstall');
   };
 
@@ -190,63 +136,44 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
   };
 
   return (
-    <SafeAreaView style={{  flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }}>
       <StatusBar barStyle={colors.statusBarStyle as StatusBarStyle} backgroundColor={colors.primary} />
       <View style={styles.container}>
-        <ScrollView
-          ref={scrollViewRef}
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}
-          snapToOffsets={getSnapToOffsets()} // Ensure components are fully visible when scrolling stops
-          snapToAlignment="start"
-          decelerationRate="fast"
-        >
+        <ScrollView ref={scrollViewRef} contentInsetAdjustmentBehavior="automatic"
+          style={styles.scrollView} snapToOffsets={getSnapToOffsets()} snapToAlignment="start" decelerationRate="fast">
           <View style={styles.buttonContainer}>
-            {sortedButtonNames.map(({ name, index, borderColor }) => (
+            {buttonNames.map((name, index) => (
               <View key={index} style={styles.buttonWrapper} onLayout={(event) => handleLayout(event, index)}>
-                <TouchableOpacity
-                  style={[styles.button, { borderColor }]}
+                <TouchableOpacity style={[styles.button, { borderColor: getButtonBorderColor(index) }]}
                   onPress={() => openCamera(index, name, images, setImages)}>
                   <View style={styles.buttonContent}>
-                    <Text style={styles.buttonText}>{name}</Text>
-                  </View>
+                    <Text style={styles.buttonText}>
+                      {name === 'Chassis Plate' && detectedVin ? detectedVin : name === 'Reg Plate' && detectedReg ? detectedReg : name}
+                    </Text></View>
                 </TouchableOpacity>
                 <View style={styles.thumbnailContainer}>
                   {images[index].map((uri, imgIndex) => {
                     if (!thumbnailStyles[uri]) {
-                      getThumbnailStyle(uri, (style) => {
-                        setThumbnailStyles((prevStyles) => ({
-                          ...prevStyles,
-                          [uri]: style,
-                        }));
-                      });
+                      getThumbnailStyle(uri, (style) => { setThumbnailStyles((prevStyles) => ({ ...prevStyles, [uri]: style, })); });
                     }
                     const thumbnailStyle = thumbnailStyles[uri] || {};
                     return (
                       <View key={imgIndex} style={styles.thumbnailWrapper}>
                         {imageLoading[uri] && <ActivityIndicator size="small" color={colors.primary} />}
                         <TouchableOpacity onPress={() => setFullScreenImage({ uri, index })}>
-                          <ImageBackground
-                            source={{ uri: `file://${uri}` }}
-                            style={[styles.thumbnail, thumbnailStyle]}
-                            imageStyle={{ borderRadius: 20 }} // Ensure the image fits within the rounded border
-                            onLoad={() => {
-                              setImageLoading(prev => ({ ...prev, [uri]: false }));
-                            }}
-                            onError={(error) => {
-                              setImageLoading(prev => ({ ...prev, [uri]: false }));
-                            }}
-                          >
+                          <ImageBackground source={{ uri: `file://${uri}` }} style={[styles.thumbnail, thumbnailStyle]}
+                            imageStyle={{ borderRadius: 20 }}
+                            onLoad={() => { setImageLoading(prev => ({ ...prev, [uri]: false })); }}
+                            onError={(error) => { setImageLoading(prev => ({ ...prev, [uri]: false })) }}>
                             {imageLoading[uri] && <ActivityIndicator size="small" color={colors.primary} />}
                           </ImageBackground>
                         </TouchableOpacity>
                       </View>
-                    );
+                    )
                   })}
                 </View>
               </View>
             ))}
-            <View style={{ height: 250 }} />
           </View>
         </ScrollView>
         <View style={[styles.bottomButtonContainer, { backgroundColor: colors.primary }]}>
@@ -254,24 +181,15 @@ const ObliInstall = ({ navigation }: { navigation: any }) => {
             style={[
               styles.bottomButton,
               {
-                borderColor: sendEmailButtonColor,
-                backgroundColor: colors.primary,
-                borderWidth: sendEmailButtonColor === 'green' ? 10 : 3, // Set border width conditionally
-              },
-            ]}
-            onPress={handleSend}
-          >
+                borderColor: sendEmailButtonColor, backgroundColor: colors.primary, borderWidth: sendEmailButtonColor === 'green' ? 10 : 3,
+              }]}
+            onPress={handleSend}>
             <Text style={[styles.bottomButtonText, { color: colors.onPrimary }]}>Send</Text>
           </TouchableOpacity>
         </View>
         {fullScreenImage && (
-          <FullScreenImageView
-            visible={true}
-            imageUri={`file://${fullScreenImage.uri}`}
-            onClose={() => setFullScreenImage(null)}
-            onDelete={() => handleDeleteImage(fullScreenImage, images, setImages, setFullScreenImage)}
-          />
-        )}
+          <FullScreenImageView visible={true} imageUri={`file://${fullScreenImage.uri}`}
+            onClose={() => setFullScreenImage(null)} onDelete={() => handleDeleteImage()} />)}
       </View>
     </SafeAreaView>
   );

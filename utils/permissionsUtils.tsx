@@ -119,3 +119,5 @@ export const requestAllPermissions = async (sourcePage: string): Promise<boolean
 
   return cameraPermission && storagePermission && bluetoothPermission;
 };
+
+

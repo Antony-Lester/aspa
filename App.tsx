@@ -15,9 +15,10 @@ import { ThemeProvider, useTheme } from './ThemeContext';
 import { EmailProvider } from './EmailContext';
 import { ImagesProvider } from './ImagesContext';
 import useStyles from './styles';
-import { getItem } from './storage';
+import { getItem, setItem } from './storage';
 import WeighPads from './pages/WeighPads';
 import { requestAllPermissions } from './utils/permissionsUtils';
+import { StackScreenProps } from '@react-navigation/stack';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -27,7 +28,7 @@ export type RootStackParamList = {
   WeighbridgeRepair: undefined;
   Settings: undefined;
   VinRegEntry: undefined;
-  ConfirmEmailPage: undefined;
+  ConfirmEmailPage: { vin: string; reg: string; emailAddress: string; images: string[][]; sourcePage: string };
   WeighPads: undefined;
 };
 
@@ -46,11 +47,13 @@ const App = () => {
   const [initialRouteName, setInitialRouteName] = useState<keyof RootStackParamList>('Home');
 
   useEffect(() => {
+    // Apply status bar color
     StatusBar.setBackgroundColor(statusBarColor);
     StatusBar.setBarStyle(statusBarColor === colors.primary ? 'light-content' : 'dark-content');
   }, [statusBarColor, colors]);
 
   useEffect(() => {
+    // Apply navigation bar color
     changeNavigationBarColor(navigationBarColor, true);
   }, [navigationBarColor]);
 
@@ -66,6 +69,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    // Set initial colors on app load
     setStatusBarColor(colors.secondary);
     setNavigationBarColor(colors.secondary);
     requestAllPermissions('Home');
@@ -108,3 +112,5 @@ const App = () => {
 
 export default App;
 export { StatusBarContext };
+
+export type ConfirmEmailPageProps = StackScreenProps<RootStackParamList, 'ConfirmEmailPage'>;

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { SafeAreaView, View, Text, TextInput, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+
 import useStyles from '../styles';
 import { useTheme } from '../ThemeContext';
 import { useEmail } from '../EmailContext';
@@ -17,22 +18,19 @@ const SettingsScreen = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerStyle: {
-        backgroundColor: colors.primary,
-      },
+      headerStyle: { backgroundColor: colors.primary },
       headerTintColor: colors.onPrimary,
     });
   }, [navigation, colors]);
 
   useEffect(() => {
     const loadSettings = async () => {
-      const storedObliInstallEmail = await getItem('obliInstallEmail');
-      const storedObliRepairEmail = await getItem('obliRepairEmail');
-      const storedWeighbridgeRepairEmail = await getItem('weighbridgeRepairEmail');
-      const storedWeighbridgeInstallEmail = await getItem('weighbridgeInstallEmail');
-      const storedTheme = await getItem('selectedTheme');
-      const storedImageQuality = await getItem('imageQuality');
-
+      const storedObliInstallEmail = getItem('obliInstallEmail');
+      const storedObliRepairEmail = getItem('obliRepairEmail');
+      const storedWeighbridgeRepairEmail = getItem('weighbridgeRepairEmail');
+      const storedWeighbridgeInstallEmail = getItem('weighbridgeInstallEmail');
+      const storedTheme = getItem('selectedTheme');
+      const storedImageQuality = getItem('imageQuality');
       if (storedObliInstallEmail) {
         setObliInstallEmail(storedObliInstallEmail);
         console.log('Loaded OBLI Install Email:', storedObliInstallEmail);
@@ -55,7 +53,6 @@ const SettingsScreen = () => {
       }
       if (storedImageQuality) setImageQuality(storedImageQuality);
     };
-
     loadSettings();
   }, []);
 
@@ -78,7 +75,6 @@ const SettingsScreen = () => {
             console.error('Failed to save settings.', error);
           }
         };
-
         saveSettings();
       };
     }, [obliInstallEmail, obliRepairEmail, weighbridgeRepairEmail, weighbridgeInstallEmail, selectedTheme, imageQuality])

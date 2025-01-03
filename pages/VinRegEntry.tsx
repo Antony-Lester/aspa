@@ -21,9 +21,16 @@ import SystemNavigationBar from 'react-native-system-navigation-bar';
 import SettingsButton from '../elements/SettingsButton';
 import { useTheme } from '../ThemeContext';
 import { useImages } from '../ImagesContext';
-import { getItem } from '../storage';
+import { getItem, setItem } from '../storage'; // Import storage functions
 
-const VinRegEntry: React.FC = ({ navigation, route }) => {
+type RootStackParamList = {
+  VinRegEntry: { images: string[][]; sourcePage: string };
+  ConfirmEmailPage: { vin: string; reg: string; emailAddress: string; images: string[][]; sourcePage: string };
+};
+
+type VinRegEntryProps = StackScreenProps<RootStackParamList, 'VinRegEntry'>;
+
+const VinRegEntry: React.FC<VinRegEntryProps> = ({ navigation, route }) => {
   const { images: routeImages, sourcePage } = route.params || {};
   const { colors } = useTheme();
   const styles = useStyles();
@@ -31,6 +38,8 @@ const VinRegEntry: React.FC = ({ navigation, route }) => {
   const { images, setImages } = useImages();
   const [vin, setVin] = useState('');
   const [reg, setReg] = useState('');
+  const [detectedVin, setDetectedVin] = useState('');
+  const [detectedReg, setDetectedReg] = useState('');
   const [emailOpened, setEmailOpened] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [sendEmailButtonColor, setSendEmailButtonColor] = useState('red');
@@ -60,11 +69,48 @@ const VinRegEntry: React.FC = ({ navigation, route }) => {
   }, [colors, setStatusBarColor, setNavigationBarColor]);
 
   useEffect(() => {
+    const loadSettings = async () => {
+      const storedVin = getItem('vin');
+      const storedReg = getItem('reg');
+      if (storedVin) setVin(storedVin);
+      if (storedReg) setReg(storedReg);
+    };
+
+    loadSettings();
+  }, []);
+
+  useEffect(() => {
+    setItem('vin', vin);
+  }, [vin]);
+
+  useEffect(() => {
+    setItem('reg', reg);
+  }, [reg]);
+
+  useEffect(() => {
+    if (routeImages) {
+      setImages(routeImages);
+    }
+  }, [routeImages, setImages]);
+
+  useEffect(() => {
     const isValidVinOrServiceCall = sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall'
       ? vin.replace(/\s/g, '').length === 6
       : vin.replace(/\s/g, '').length >= 6 && vin.replace(/\s/g, '').length <= 17;
     setSendEmailButtonColor(isValidVinOrServiceCall ? 'green' : 'red');
   }, [vin, sourcePage]);
+
+  useEffect(() => {
+    if (detectedVin) {
+      setVin(detectedVin);
+    }
+  }, [detectedVin]);
+
+  useEffect(() => {
+    if (detectedReg) {
+      setReg(detectedReg);
+    }
+  }, [detectedReg]);
 
   const getEmailAddress = () => {
     switch (sourcePage) {
@@ -89,7 +135,7 @@ const VinRegEntry: React.FC = ({ navigation, route }) => {
       }
     }
     console.log('All images deleted.');
-    navigation.navigate({ name: 'HomeScreen' });
+    navigation.navigate('Home');
   };
 
   useFocusEffect(
@@ -139,7 +185,7 @@ const VinRegEntry: React.FC = ({ navigation, route }) => {
     const emailAddress = getEmailAddress();
     if (!emailAddress) {
       Alert.alert('No Email Set', 'Please set an email address in the settings.', [
-        { text: 'OK', onPress: () => navigation.navigate({ name: 'Settings' }) },
+        { text: 'OK', onPress: () => navigation.navigate('Settings', { screen: 'Settings' }) },
       ]);
       return;
     }
@@ -161,23 +207,6 @@ const VinRegEntry: React.FC = ({ navigation, route }) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     navigation.navigate('ConfirmEmailPage', { vin: formattedVinOrServiceCall, reg, emailAddress, images, sourcePage });
   };
-
-  useEffect(() => {
-    const loadSettings = () => {
-      const storedVin = getItem('vin');
-      const storedReg = getItem('reg');
-      if (storedVin) setVin(storedVin);
-      if (storedReg) setReg(storedReg);
-    };
-
-    loadSettings();
-  }, []);
-
-  useEffect(() => {
-    if (routeImages) {
-      setImages(routeImages);
-    }
-  }, [routeImages, setImages]);
 
   const isValidVinOrServiceCall = sourcePage === 'WeighbridgeRepair' || sourcePage === 'WeighbridgeInstall'
     ? vin.replace(/\s/g, '').length === 6
@@ -205,9 +234,9 @@ const VinRegEntry: React.FC = ({ navigation, route }) => {
               style={[styles.input, { borderColor: isValidVinOrServiceCall ? 'green' : 'red' }]}
               value={vin}
               onChangeText={setVin}
-              placeholder={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair'
+              placeholder={detectedVin || (sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair'
                 ? 'Enter Service Call S/C'
-                : 'Enter Vehicle Identification Number VIN'}
+                : 'Enter Vehicle Identification Number VIN')}
               placeholderTextColor={colors.onPrimary}
               keyboardType={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 'numeric' : 'default'}
               maxLength={sourcePage === 'WeighbridgeInstall' || sourcePage === 'WeighbridgeRepair' ? 6 : 17}
@@ -220,7 +249,7 @@ const VinRegEntry: React.FC = ({ navigation, route }) => {
                 style={[styles.input, { borderColor: reg ? (isValidReg ? 'green' : 'red') : 'orange' }]}
                 value={reg}
                 onChangeText={setReg}
-                placeholder="Enter Serial Number S/N"
+                placeholder={detectedReg || 'Enter Serial Number S/N'}
                 placeholderTextColor={colors.primary}
                 keyboardType="numeric"
                 maxLength={4}
@@ -234,7 +263,7 @@ const VinRegEntry: React.FC = ({ navigation, route }) => {
                 style={[styles.input, { borderColor: reg ? 'green' : 'orange' }]}
                 value={reg}
                 onChangeText={setReg}
-                placeholder="Enter Registration Number"
+                placeholder={detectedReg || 'Enter Registration Number'}
                 placeholderTextColor={colors.primary}
               />
             </View>

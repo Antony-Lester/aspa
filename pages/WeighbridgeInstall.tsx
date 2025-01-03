@@ -136,9 +136,9 @@ const WeighbridgeInstall = ({ navigation }: { navigation: any }) => {
   };
 
   const getSnapToOffsets = () => {
-    let offsets = [];
+    const offsets = [];
     let currentOffset = 0;
-    for (let height of componentHeights) {
+    for (const height of componentHeights) {
       offsets.push(currentOffset);
       currentOffset += height;
     }
